@@ -1,0 +1,18 @@
+<?php
+declare(strict_types=1);
+namespace BusinessMapLocator\Export;
+final class LocationCsvExporter {
+    public const FIELDS=['external_id','title','address','city','category','region','country','postcode','lat','lng','phone','email','website','hours','status'];
+    public function __construct(private ?CsvFormulaEscaper $escaper=null){$this->escaper??=new CsvFormulaEscaper();}
+    public function stream(array $request=[]): void {
+        $fields=$this->fields($request['fields']??self::FIELDS);$bom=!isset($request['bom'])||!in_array((string)$request['bom'],['0','false','no'],true);$delimiter=(string)($request['delimiter']??',');if(!in_array($delimiter,[',',';',"\t"],true)){$delimiter=',';}
+        nocache_headers();header('Content-Type: text/csv; charset=utf-8');header('Content-Disposition: attachment; filename=business-map-locations-'.gmdate('Y-m-d').'.csv');$out=fopen('php://output','wb');if(!$out){wp_die(esc_html__('Unable to open export stream.','business-map-locator'));}if($bom){fwrite($out,"\xEF\xBB\xBF");}fputcsv($out,$fields,$delimiter,'"','\\');
+        $page=1;$chunk=max(50,min(1000,(int)apply_filters('bml_export_chunk_size',500)));
+        do {$q=new \WP_Query(['post_type'=>'bml_location','post_status'=>$this->statuses($request),'posts_per_page'=>$chunk,'paged'=>$page,'fields'=>'ids','orderby'=>'ID','order'=>'ASC','no_found_rows'=>false,'s'=>$this->text($request['s']??''),'tax_query'=>$this->taxQuery($request)]);foreach($q->posts as $id){$row=$this->row((int)$id);$values=[];foreach($fields as $field){$values[]=$this->escaper->escape($row[$field]??'');}fputcsv($out,$values,$delimiter,'"','\\');}if(function_exists('wp_cache_flush_runtime')){wp_cache_flush_runtime();}$page++;}while($page<=(int)$q->max_num_pages);fclose($out);exit;
+    }
+    private function fields(mixed $fields): array {$list=is_array($fields)?$fields:explode(',',sanitize_text_field((string)$fields));$list=array_values(array_intersect(self::FIELDS,array_map('sanitize_key',$list)));return $list!==[]?$list:self::FIELDS;}
+    private function statuses(array $r): array {$s=sanitize_key((string)($r['status']??''));return in_array($s,['publish','draft','private'],true)?[$s]:['publish','draft','private'];}
+    private function text(mixed $v): string {return sanitize_text_field((string)$v);}
+    private function taxQuery(array $r): array {$tax=[];foreach(['city'=>'bml_city','category'=>'bml_category'] as $key=>$taxonomy){$slug=sanitize_title((string)($r[$key]??''));if($slug!==''){$tax[]=['taxonomy'=>$taxonomy,'field'=>'slug','terms'=>[$slug]];}}return $tax;}
+    private function row(int $id): array {$post=get_post($id);$terms=static function(int $id,string $tax):string{$names=wp_get_post_terms($id,$tax,['fields'=>'names']);return is_wp_error($names)?'':implode('|',array_map('strval',$names));};return ['external_id'=>(string)get_post_meta($id,'bml_external_id',true),'title'=>(string)($post?->post_title??''),'address'=>(string)get_post_meta($id,'bml_address',true),'city'=>$terms($id,'bml_city'),'category'=>$terms($id,'bml_category'),'region'=>(string)get_post_meta($id,'bml_region',true),'country'=>(string)get_post_meta($id,'bml_country',true),'postcode'=>(string)get_post_meta($id,'bml_postcode',true),'lat'=>(string)get_post_meta($id,'bml_lat',true),'lng'=>(string)get_post_meta($id,'bml_lng',true),'phone'=>(string)get_post_meta($id,'bml_phone',true),'email'=>(string)get_post_meta($id,'bml_email',true),'website'=>(string)get_post_meta($id,'bml_website',true),'hours'=>(string)get_post_meta($id,'bml_hours',true),'status'=>(string)($post?->post_status??'')];}
+}

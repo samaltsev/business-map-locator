@@ -1,0 +1,3 @@
+﻿external_id,title,address,city,category,region,country,postcode,lat,lng,phone,email,website,hours,status,visible
+STORE-001,Central Pharmacy,Main Street 1,Minsk,Pharmacy|24 Hours,Minsk Region,Belarus,220000,53.900601,27.558972,+375 17 000-00-01,central@example.com,https://example.com/central,Mon-Sun 00:00-24:00,publish,yes
+STORE-002,North Pet Store,North Avenue 10,Minsk,Pet Store,Minsk Region,Belarus,220100,53.931200,27.591400,+375 17 000-00-02,north@example.com,https://example.com/north,Mon-Fri 09:00-20:00,draft,no

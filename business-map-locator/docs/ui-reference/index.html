@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Map Locator — UI Prototype</title>
+    <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+    <div class="bm-app">
+        <aside class="bm-sidebar">
+            <div class="bm-brand">
+                <div class="bm-brand__mark">BM</div>
+                <div>
+                    <strong>Business Map Locator</strong>
+                    <span>WordPress Plugin</span>
+                </div>
+            </div>
+
+            <nav class="bm-nav" aria-label="Навигация плагина">
+                <button class="bm-nav__item is-active" data-page="dashboard">
+                    <span class="bm-nav__icon">⌂</span>
+                    <span>Обзор</span>
+                </button>
+                <button class="bm-nav__item" data-page="locations">
+                    <span class="bm-nav__icon">●</span>
+                    <span>Точки</span>
+                    <span class="bm-nav__count">24</span>
+                </button>
+                <button class="bm-nav__item" data-page="add-location">
+                    <span class="bm-nav__icon">＋</span>
+                    <span>Добавить точку</span>
+                </button>
+                <button class="bm-nav__item" data-page="providers">
+                    <span class="bm-nav__icon">◈</span>
+                    <span>Провайдеры карт</span>
+                </button>
+                <button class="bm-nav__item" data-page="import">
+                    <span class="bm-nav__icon">⇅</span>
+                    <span>Импорт / экспорт</span>
+                </button>
+                <button class="bm-nav__item" data-page="display">
+                    <span class="bm-nav__icon">▣</span>
+                    <span>Отображение</span>
+                </button>
+                <button class="bm-nav__item" data-page="block">
+                    <span class="bm-nav__icon">G</span>
+                    <span>Gutenberg-блок</span>
+                </button>
+                <button class="bm-nav__item" data-page="settings">
+                    <span class="bm-nav__icon">⚙</span>
+                    <span>Настройки</span>
+                </button>
+            </nav>
+
+            <div class="bm-sidebar__footer">
+                <div class="bm-status-dot"></div>
+                <div>
+                    <strong>Версия 1.0.0</strong>
+                    <span>Система работает</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="bm-main">
+            <header class="bm-topbar">
+                <div>
+                    <span class="bm-topbar__eyebrow">Business Map Locator</span>
+                    <h1 id="page-title">Обзор</h1>
+                </div>
+                <div class="bm-topbar__actions">
+                    <button class="bm-button bm-button--secondary">Документация</button>
+                    <button class="bm-button bm-button--primary" data-page-link="add-location">Добавить точку</button>
+                </div>
+            </header>
+
+            <section class="bm-page is-active" id="dashboard" data-title="Обзор">
+                <div class="bm-hero">
+                    <div>
+                        <span class="bm-kicker">Карта филиалов, офисов и сервисных точек</span>
+                        <h2>Все точки бизнеса — в одном понятном интерфейсе</h2>
+                        <p>OpenStreetMap и Google Maps, быстрый поиск, фильтры, CSV-импорт и Gutenberg-блок.</p>
+                        <div class="bm-hero__actions">
+                            <button class="bm-button bm-button--primary" data-page-link="add-location">Создать первую точку</button>
+                            <button class="bm-button bm-button--ghost" data-page-link="providers">Настроить карту</button>
+                        </div>
+                    </div>
+                    <div class="bm-mini-map">
+                        <div class="bm-mini-map__grid"></div>
+                        <span class="bm-map-marker" style="left:22%;top:28%">1</span>
+                        <span class="bm-map-marker" style="left:48%;top:50%">2</span>
+                        <span class="bm-map-marker" style="left:74%;top:24%">3</span>
+                        <span class="bm-map-marker" style="left:66%;top:70%">4</span>
+                    </div>
+                </div>
+
+                <div class="bm-stats">
+                    <article class="bm-stat">
+                        <span>Всего точек</span>
+                        <strong>24</strong>
+                        <small>+3 за месяц</small>
+                    </article>
+                    <article class="bm-stat">
+                        <span>Опубликовано</span>
+                        <strong>21</strong>
+                        <small>87,5% от общего числа</small>
+                    </article>
+                    <article class="bm-stat">
+                        <span>Городов</span>
+                        <strong>8</strong>
+                        <small>4 региона</small>
+                    </article>
+                    <article class="bm-stat">
+                        <span>Провайдер</span>
+                        <strong>OSM</strong>
+                        <small>OpenStreetMap + Leaflet</small>
+                    </article>
+                </div>
+
+                <div class="bm-grid bm-grid--2">
+                    <article class="bm-card">
+                        <div class="bm-card__head">
+                            <div>
+                                <span class="bm-card__eyebrow">Быстрый старт</span>
+                                <h3>Настройка плагина</h3>
+                            </div>
+                            <span class="bm-progress-label">75%</span>
+                        </div>
+                        <div class="bm-progress"><span style="width:75%"></span></div>
+                        <div class="bm-checklist">
+                            <div class="is-done"><span>✓</span> Выбран провайдер карты</div>
+                            <div class="is-done"><span>✓</span> Добавлены первые точки</div>
+                            <div class="is-done"><span>✓</span> Настроены фильтры</div>
+                            <div><span>4</span> Добавить Gutenberg-блок на страницу</div>
+                        </div>
+                    </article>
+
+                    <article class="bm-card">
+                        <div class="bm-card__head">
+                            <div>
+                                <span class="bm-card__eyebrow">Система</span>
+                                <h3>Состояние модулей</h3>
+                            </div>
+                        </div>
+                        <div class="bm-health-list">
+                            <div><span>OpenStreetMap</span><b class="bm-badge bm-badge--success">Подключён</b></div>
+                            <div><span>Google Maps API</span><b class="bm-badge bm-badge--warning">Не настроен</b></div>
+                            <div><span>REST API</span><b class="bm-badge bm-badge--success">Работает</b></div>
+                            <div><span>Индекс поиска</span><b class="bm-badge bm-badge--success">Актуален</b></div>
+                        </div>
+                    </article>
+                </div>
+
+                <article class="bm-card bm-card--flush">
+                    <div class="bm-card__head bm-card__head--pad">
+                        <div>
+                            <span class="bm-card__eyebrow">Последние изменения</span>
+                            <h3>Недавние точки</h3>
+                        </div>
+                        <button class="bm-link-button" data-page-link="locations">Все точки →</button>
+                    </div>
+                    <div class="bm-table-wrap">
+                        <table class="bm-table">
+                            <thead>
+                                <tr>
+                                    <th>Название</th><th>Тип</th><th>Город</th><th>Статус</th><th>Обновлено</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Главный офис</strong><span>ул. Центральная, 12</span></td><td>Офис</td><td>Минск</td><td><span class="bm-badge bm-badge--success">Опубликовано</span></td><td>Сегодня, 14:20</td></tr>
+                                <tr><td><strong>Сервисный центр Север</strong><span>пр. Победителей, 84</span></td><td>Сервис</td><td>Минск</td><td><span class="bm-badge bm-badge--success">Опубликовано</span></td><td>Вчера, 18:04</td></tr>
+                                <tr><td><strong>Филиал Гродно</strong><span>ул. Советская, 7</span></td><td>Филиал</td><td>Гродно</td><td><span class="bm-badge">Черновик</span></td><td>09.07.2026</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <section class="bm-page" id="locations" data-title="Точки">
+                <div class="bm-section-head">
+                    <div>
+                        <p>Управляйте филиалами, офисами, сервисными центрами и пунктами выдачи.</p>
+                    </div>
+                    <button class="bm-button bm-button--primary" data-page-link="add-location">Добавить точку</button>
+                </div>
+
+                <div class="bm-toolbar">
+                    <label class="bm-search">
+                        <span>⌕</span>
+                        <input type="search" placeholder="Поиск по названию, адресу или городу">
+                    </label>
+                    <select><option>Все типы</option><option>Филиал</option><option>Офис</option><option>Сервис</option></select>
+                    <select><option>Все города</option><option>Минск</option><option>Гродно</option><option>Брест</option></select>
+                    <select><option>Все статусы</option><option>Опубликовано</option><option>Черновик</option></select>
+                </div>
+
+                <article class="bm-card bm-card--flush">
+                    <div class="bm-table-wrap">
+                        <table class="bm-table bm-table--checkbox">
+                            <thead><tr><th><input type="checkbox"></th><th>Точка</th><th>Тип</th><th>Город</th><th>Координаты</th><th>Статус</th><th></th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><strong>Главный офис</strong><span>ул. Центральная, 12</span></td>
+                                    <td><span class="bm-type-dot"></span> Офис</td>
+                                    <td>Минск</td><td>53.9006, 27.5590</td>
+                                    <td><span class="bm-badge bm-badge--success">Опубликовано</span></td>
+                                    <td><button class="bm-row-menu">•••</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><strong>Сервисный центр Север</strong><span>пр. Победителей, 84</span></td>
+                                    <td><span class="bm-type-dot bm-type-dot--orange"></span> Сервис</td>
+                                    <td>Минск</td><td>53.9294, 27.5098</td>
+                                    <td><span class="bm-badge bm-badge--success">Опубликовано</span></td>
+                                    <td><button class="bm-row-menu">•••</button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><strong>Филиал Гродно</strong><span>ул. Советская, 7</span></td>
+                                    <td><span class="bm-type-dot bm-type-dot--purple"></span> Филиал</td>
+                                    <td>Гродно</td><td>53.6693, 23.8131</td>
+                                    <td><span class="bm-badge">Черновик</span></td>
+                                    <td><button class="bm-row-menu">•••</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bm-pagination">
+                        <span>Показано 1–3 из 24</span>
+                        <div><button>←</button><button class="is-active">1</button><button>2</button><button>3</button><button>→</button></div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="bm-page" id="add-location" data-title="Добавить точку">
+                <div class="bm-grid bm-grid--editor">
+                    <div class="bm-stack">
+                        <article class="bm-card">
+                            <div class="bm-card__head"><div><span class="bm-card__eyebrow">Основная информация</span><h3>Данные точки</h3></div></div>
+                            <div class="bm-form-grid">
+                                <label class="bm-field bm-field--wide"><span>Название точки *</span><input value="Новый филиал" placeholder="Например, Главный офис"></label>
+                                <label class="bm-field"><span>Тип точки *</span><select><option>Филиал</option><option>Офис</option><option>Сервисный центр</option><option>Пункт выдачи</option></select></label>
+                                <label class="bm-field"><span>Статус</span><select><option>Опубликовано</option><option>Черновик</option><option>Временно закрыто</option></select></label>
+                                <label class="bm-field bm-field--wide"><span>Адрес *</span><input placeholder="Страна, город, улица, дом"></label>
+                                <label class="bm-field"><span>Город *</span><input placeholder="Минск"></label>
+                                <label class="bm-field"><span>Регион</span><input placeholder="Минская область"></label>
+                                <label class="bm-field"><span>Телефон</span><input placeholder="+375 29 000-00-00"></label>
+                                <label class="bm-field"><span>Email</span><input type="email" placeholder="office@example.com"></label>
+                                <label class="bm-field bm-field--wide"><span>Описание</span><textarea rows="4" placeholder="Краткая информация о точке"></textarea></label>
+                            </div>
+                        </article>
+
+                        <article class="bm-card">
+                            <div class="bm-card__head">
+                                <div><span class="bm-card__eyebrow">Расположение</span><h3>Координаты и карта</h3></div>
+                                <button class="bm-button bm-button--secondary bm-button--small">Найти по адресу</button>
+                            </div>
+                            <div class="bm-coordinate-row">
+                                <label class="bm-field"><span>Широта</span><input placeholder="53.9006000"></label>
+                                <label class="bm-field"><span>Долгота</span><input placeholder="27.5590000"></label>
+                            </div>
+                            <div class="bm-map-editor">
+                                <div class="bm-mini-map__grid"></div>
+                                <span class="bm-map-marker bm-map-marker--large" style="left:50%;top:50%">●</span>
+                                <div class="bm-map-editor__hint">Перетащите маркер, чтобы уточнить позицию</div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <aside class="bm-stack">
+                        <article class="bm-card bm-card--sticky">
+                            <div class="bm-card__head"><div><span class="bm-card__eyebrow">Публикация</span><h3>Сохранение</h3></div></div>
+                            <div class="bm-summary">
+                                <div><span>Статус</span><strong>Опубликовано</strong></div>
+                                <div><span>Провайдер</span><strong>OpenStreetMap</strong></div>
+                                <div><span>Видимость</span><strong>Публичная</strong></div>
+                            </div>
+                            <div class="bm-action-stack">
+                                <button class="bm-button bm-button--primary bm-button--full">Сохранить точку</button>
+                                <button class="bm-button bm-button--secondary bm-button--full">Сохранить как черновик</button>
+                            </div>
+                        </article>
+
+                        <article class="bm-card">
+                            <div class="bm-card__head"><div><span class="bm-card__eyebrow">Дополнительно</span><h3>Часы работы</h3></div></div>
+                            <div class="bm-hours">
+                                <div><span>Пн–Пт</span><input value="09:00–18:00"></div>
+                                <div><span>Суббота</span><input value="10:00–15:00"></div>
+                                <div><span>Воскресенье</span><input value="Выходной"></div>
+                            </div>
+                        </article>
+                    </aside>
+                </div>
+            </section>
+
+            <section class="bm-page" id="providers" data-title="Провайдеры карт">
+                <p class="bm-lead">Выберите основной картографический сервис. Интерфейс фронтенда остаётся одинаковым для обоих провайдеров.</p>
+                <div class="bm-provider-grid">
+                    <article class="bm-provider-card is-selected">
+                        <div class="bm-provider-card__top">
+                            <div class="bm-provider-logo bm-provider-logo--osm">OSM</div>
+                            <span class="bm-badge bm-badge--success">Активен</span>
+                        </div>
+                        <h3>OpenStreetMap</h3>
+                        <p>Бесплатная карта на базе Leaflet. Подходит для большинства каталогов филиалов и сервисных точек.</p>
+                        <ul>
+                            <li>Не нужен API-ключ</li>
+                            <li>Гибкие тайлы и стили</li>
+                            <li>Обязательная атрибуция OSM</li>
+                        </ul>
+                        <button class="bm-button bm-button--secondary bm-button--full">Настроить OpenStreetMap</button>
+                    </article>
+                    <article class="bm-provider-card">
+                        <div class="bm-provider-card__top">
+                            <div class="bm-provider-logo bm-provider-logo--google">G</div>
+                            <span class="bm-badge bm-badge--warning">Требует ключ</span>
+                        </div>
+                        <h3>Google Maps</h3>
+                        <p>Привычная карта Google с геокодированием, Places API и высоким качеством адресного поиска.</p>
+                        <ul>
+                            <li>Нужен Google Maps API Key</li>
+                            <li>Требуется биллинг Google Cloud</li>
+                            <li>Можно ограничить ключ по домену</li>
+                        </ul>
+                        <button class="bm-button bm-button--primary bm-button--full">Подключить Google Maps</button>
+                    </article>
+                </div>
+
+                <article class="bm-card">
+                    <div class="bm-card__head"><div><span class="bm-card__eyebrow">OpenStreetMap</span><h3>Настройки активного провайдера</h3></div><span class="bm-badge bm-badge--success">Подключение исправно</span></div>
+                    <div class="bm-form-grid">
+                        <label class="bm-field bm-field--wide"><span>URL тайлов</span><input value="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"></label>
+                        <label class="bm-field"><span>Начальный масштаб</span><input type="number" value="12"></label>
+                        <label class="bm-field"><span>Максимальный масштаб</span><input type="number" value="19"></label>
+                        <label class="bm-field"><span>Центр карты — широта</span><input value="53.9006"></label>
+                        <label class="bm-field"><span>Центр карты — долгота</span><input value="27.5590"></label>
+                    </div>
+                    <div class="bm-card__footer"><button class="bm-button bm-button--primary">Сохранить настройки</button></div>
+                </article>
+            </section>
+
+            <section class="bm-page" id="import" data-title="Импорт / экспорт">
+                <div class="bm-tabs">
+                    <button class="is-active">Импорт CSV</button>
+                    <button>Экспорт CSV</button>
+                    <button>История операций</button>
+                </div>
+                <article class="bm-card">
+                    <div class="bm-stepper">
+                        <div class="is-active"><span>1</span><b>Загрузка файла</b></div>
+                        <div><span>2</span><b>Сопоставление полей</b></div>
+                        <div><span>3</span><b>Проверка</b></div>
+                        <div><span>4</span><b>Импорт</b></div>
+                    </div>
+                    <div class="bm-upload">
+                        <div class="bm-upload__icon">⇧</div>
+                        <h3>Перетащите CSV-файл сюда</h3>
+                        <p>Кодировка UTF-8, размер до 20 МБ. Рекомендуется сначала скачать шаблон.</p>
+                        <div>
+                            <button class="bm-button bm-button--primary">Выбрать файл</button>
+                            <button class="bm-button bm-button--secondary">Скачать шаблон CSV</button>
+                        </div>
+                    </div>
+                </article>
+
+                <div class="bm-grid bm-grid--2">
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Поля CSV</span><h3>Поддерживаемые колонки</h3></div></div>
+                        <div class="bm-code-list">
+                            <code>external_id</code><code>name</code><code>type</code><code>address</code><code>city</code><code>region</code><code>latitude</code><code>longitude</code><code>phone</code><code>email</code><code>hours</code><code>status</code>
+                        </div>
+                    </article>
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Поведение</span><h3>Настройки импорта</h3></div></div>
+                        <label class="bm-switch-row"><span><strong>Обновлять существующие точки</strong><small>По external_id</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Пропускать строки с ошибками</strong><small>Остальные строки будут импортированы</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Геокодировать адреса</strong><small>Только если нет координат</small></span><input type="checkbox"></label>
+                    </article>
+                </div>
+            </section>
+
+            <section class="bm-page" id="display" data-title="Отображение">
+                <div class="bm-grid bm-grid--settings">
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Макет</span><h3>Интерфейс карты</h3></div></div>
+                        <div class="bm-layout-options">
+                            <label class="is-selected"><input type="radio" name="layout" checked><span class="bm-layout-preview bm-layout-preview--split"></span><strong>Список + карта</strong></label>
+                            <label><input type="radio" name="layout"><span class="bm-layout-preview bm-layout-preview--map"></span><strong>Только карта</strong></label>
+                            <label><input type="radio" name="layout"><span class="bm-layout-preview bm-layout-preview--cards"></span><strong>Карточки + карта</strong></label>
+                        </div>
+                        <div class="bm-form-grid">
+                            <label class="bm-field"><span>Высота карты, px</span><input type="number" value="680"></label>
+                            <label class="bm-field"><span>Ширина списка, %</span><input type="number" value="38"></label>
+                            <label class="bm-field"><span>Точек на странице</span><input type="number" value="20"></label>
+                            <label class="bm-field"><span>Радиус поиска по умолчанию</span><select><option>25 км</option><option>10 км</option><option>50 км</option></select></label>
+                        </div>
+                    </article>
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Функции</span><h3>Элементы интерфейса</h3></div></div>
+                        <label class="bm-switch-row"><span><strong>Строка поиска</strong><small>По названию, адресу и городу</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Фильтр по типу</strong><small>Филиал, офис, сервис, пункт выдачи</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Геолокация пользователя</strong><small>Кнопка «Найти рядом»</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Кластеризация маркеров</strong><small>Для карт с большим количеством точек</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Автоматически вписывать маркеры</strong><small>fitBounds после загрузки</small></span><input type="checkbox" checked></label>
+                    </article>
+                </div>
+
+                <article class="bm-card">
+                    <div class="bm-card__head"><div><span class="bm-card__eyebrow">Предпросмотр</span><h3>Фронтенд-карта</h3></div><button class="bm-button bm-button--secondary bm-button--small">Открыть на сайте</button></div>
+                    <div class="bm-frontend-preview">
+                        <aside>
+                            <label class="bm-search"><span>⌕</span><input placeholder="Введите город или адрес"></label>
+                            <div class="bm-filter-pills"><button class="is-active">Все</button><button>Офисы</button><button>Сервис</button></div>
+                            <div class="bm-location-card is-active"><b>Главный офис</b><span>Минск, ул. Центральная, 12</span><small>Открыто до 18:00</small></div>
+                            <div class="bm-location-card"><b>Сервисный центр Север</b><span>Минск, пр. Победителей, 84</span><small>Открыто до 19:00</small></div>
+                            <div class="bm-location-card"><b>Филиал Гродно</b><span>Гродно, ул. Советская, 7</span><small>Открыто до 17:30</small></div>
+                        </aside>
+                        <div class="bm-preview-map">
+                            <div class="bm-mini-map__grid"></div>
+                            <span class="bm-map-marker" style="left:35%;top:35%">1</span>
+                            <span class="bm-map-marker" style="left:65%;top:52%">2</span>
+                            <span class="bm-map-marker" style="left:52%;top:72%">3</span>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <section class="bm-page" id="block" data-title="Gutenberg-блок">
+                <div class="bm-grid bm-grid--2">
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Блок редактора</span><h3>Business Map Locator</h3></div><span class="bm-badge bm-badge--success">Зарегистрирован</span></div>
+                        <div class="bm-block-preview">
+                            <div class="bm-block-preview__toolbar"><span>⋮⋮</span><strong>Business Map Locator</strong><span>⚙</span></div>
+                            <div class="bm-block-preview__canvas">
+                                <div class="bm-mini-map__grid"></div>
+                                <span class="bm-map-marker" style="left:32%;top:40%">1</span>
+                                <span class="bm-map-marker" style="left:66%;top:55%">2</span>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Параметры блока</span><h3>Inspector Controls</h3></div></div>
+                        <div class="bm-form-grid bm-form-grid--single">
+                            <label class="bm-field"><span>Макет</span><select><option>Список + карта</option><option>Только карта</option></select></label>
+                            <label class="bm-field"><span>Провайдер</span><select><option>Глобальный</option><option>OpenStreetMap</option><option>Google Maps</option></select></label>
+                            <label class="bm-field"><span>Высота</span><input value="680px"></label>
+                            <label class="bm-field"><span>Фильтр по типу</span><select><option>Все типы</option><option>Офисы</option><option>Сервисы</option></select></label>
+                        </div>
+                        <label class="bm-switch-row"><span><strong>Показывать поиск</strong></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Показывать фильтры</strong></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Использовать текущую геопозицию</strong></span><input type="checkbox"></label>
+                    </article>
+                </div>
+                <article class="bm-card">
+                    <div class="bm-card__head"><div><span class="bm-card__eyebrow">Альтернативный вывод</span><h3>Шорткод</h3></div></div>
+                    <div class="bm-shortcode"><code>[business_map_locator layout="split" provider="default" height="680"]</code><button>Копировать</button></div>
+                </article>
+            </section>
+
+            <section class="bm-page" id="settings" data-title="Настройки">
+                <div class="bm-tabs">
+                    <button class="is-active">Основные</button><button>Поиск</button><button>Производительность</button><button>Дополнительно</button>
+                </div>
+                <div class="bm-grid bm-grid--settings">
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Основные</span><h3>Общие параметры</h3></div></div>
+                        <div class="bm-form-grid bm-form-grid--single">
+                            <label class="bm-field"><span>Провайдер карты по умолчанию</span><select><option>OpenStreetMap</option><option>Google Maps</option></select></label>
+                            <label class="bm-field"><span>Единицы расстояния</span><select><option>Километры</option><option>Мили</option></select></label>
+                            <label class="bm-field"><span>Язык интерфейса карты</span><select><option>Автоматически</option><option>Русский</option><option>English</option></select></label>
+                            <label class="bm-field"><span>Часовой пояс</span><select><option>Использовать WordPress</option></select></label>
+                        </div>
+                    </article>
+                    <article class="bm-card">
+                        <div class="bm-card__head"><div><span class="bm-card__eyebrow">Данные</span><h3>Очистка и обслуживание</h3></div></div>
+                        <label class="bm-switch-row"><span><strong>Удалять данные при деинсталляции</strong><small>Точки, настройки и индекс</small></span><input type="checkbox"></label>
+                        <label class="bm-switch-row"><span><strong>Кэшировать REST-запросы</strong><small>Уменьшает нагрузку на базу данных</small></span><input type="checkbox" checked></label>
+                        <label class="bm-switch-row"><span><strong>Логировать импорт</strong><small>Хранить отчёты об ошибках CSV</small></span><input type="checkbox" checked></label>
+                        <div class="bm-danger-zone">
+                            <strong>Сервисные операции</strong>
+                            <div><button class="bm-button bm-button--secondary">Перестроить индекс</button><button class="bm-button bm-button--danger">Очистить кэш</button></div>
+                        </div>
+                    </article>
+                </div>
+                <div class="bm-savebar"><span>Изменения сохраняются в настройках WordPress.</span><button class="bm-button bm-button--primary">Сохранить изменения</button></div>
+            </section>
+        </main>
+    </div>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

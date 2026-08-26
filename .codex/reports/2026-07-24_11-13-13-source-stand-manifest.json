@@ -1,0 +1,1708 @@
+﻿{
+    "source":  [
+                   {
+                       "Path":  "assets/css/admin.css",
+                       "SHA256":  "1BBAB0CE9F717C619144392750C805DD855F80F41016634264119B44CF0709AA",
+                       "Length":  92943
+                   },
+                   {
+                       "Path":  "assets/css/admin/pages/category-experience.css",
+                       "SHA256":  "7F401BBE8A711A912F76393D4F52A25924AD7BC003A147BAD46CEE8AA333B06B",
+                       "Length":  8204
+                   },
+                   {
+                       "Path":  "assets/css/admin/pages/city-experience.css",
+                       "SHA256":  "FD76B412C2CA36B24DF3866BC8246C5049567CA39B4E99361F2E89A04FB090C9",
+                       "Length":  6004
+                   },
+                   {
+                       "Path":  "assets/css/admin/pages/location-editor.css",
+                       "SHA256":  "3EF8A90FC8B63D56B979E88E9F791F87D6D9D915619C99DAEB98FA3FC83E0696",
+                       "Length":  24567
+                   },
+                   {
+                       "Path":  "assets/css/admin/pages/locations-experience.css",
+                       "SHA256":  "1D01BC37C6043D324662246B3C363504697CCF05B8371CB0F8A2F932E890F813",
+                       "Length":  7145
+                   },
+                   {
+                       "Path":  "assets/css/admin/settings-ux.css",
+                       "SHA256":  "4C873A002958C9E683947AB5C3972C526545C3E12A8A5C647B3EF2C5F7CE6D10",
+                       "Length":  12134
+                   },
+                   {
+                       "Path":  "assets/css/frontend.css",
+                       "SHA256":  "F2CADAEE1C43DD2DECF6AFB9BE2C84E0A0DC17DEF197BE31A0D024B9ED3BBA43",
+                       "Length":  19250
+                   },
+                   {
+                       "Path":  "assets/js/admin.js",
+                       "SHA256":  "43CEE9582B2B43BF31C7C1095629938DA2F3528BC49F8491A58F0FF679A8232C",
+                       "Length":  29800
+                   },
+                   {
+                       "Path":  "assets/js/admin/category-experience.js",
+                       "SHA256":  "7BC54679493ECC9DA1F2FB4CD5A49136625939F7BC899246355F7B12B0095A96",
+                       "Length":  4155
+                   },
+                   {
+                       "Path":  "assets/js/admin/city-experience.js",
+                       "SHA256":  "7B81B9847F0071C16FCDA6A348D15D726C1BDEC4D9164A9ED0BB7C7D981ED0B5",
+                       "Length":  2271
+                   },
+                   {
+                       "Path":  "assets/js/admin/import.js",
+                       "SHA256":  "802A86C1043161C2CC71D81F717E5AA6B3814D235682BEA15F99ED8580DA4EEB",
+                       "Length":  21243
+                   },
+                   {
+                       "Path":  "assets/js/admin/location-editor.js",
+                       "SHA256":  "0D1EAB315B57979F88EB44A19B6D6708AE3F72B0DA09F46F1E9C5ABA9C24EAC7",
+                       "Length":  23702
+                   },
+                   {
+                       "Path":  "assets/js/admin/location-map.js",
+                       "SHA256":  "DD97576889CE5045C10F8CABAD1468D4DBD4AC6E0CAD6A6E11A1898B116031E5",
+                       "Length":  10440
+                   },
+                   {
+                       "Path":  "assets/js/admin/locations-experience.js",
+                       "SHA256":  "64F64924CB89B1DEFA74B9A4928797DD2E734829FAF61F890D042FCBEA2798F2",
+                       "Length":  2226
+                   },
+                   {
+                       "Path":  "assets/js/admin/settings-ux.js",
+                       "SHA256":  "398349661BF41179CC064FDB50FF65DD212B191A13B372745627D16B4ABE2DBC",
+                       "Length":  20866
+                   },
+                   {
+                       "Path":  "assets/js/frontend.js",
+                       "SHA256":  "8FB5CE3B43E51D667FB64A7FE525475C5EE2ED4A7B34D8CE1BD1B5189CBF7B50",
+                       "Length":  883
+                   },
+                   {
+                       "Path":  "assets/js/map-controller.js",
+                       "SHA256":  "82CE06041176A628F71A503785CD5A60B8D1C5D3DB3113D34A7275ACE9BA3F9E",
+                       "Length":  30497
+                   },
+                   {
+                       "Path":  "assets/js/providers/base-provider.js",
+                       "SHA256":  "E67B293F66296E5B968D2CF8081D9EF9844CCCA464EA00F2D4AAAD6681E9873A",
+                       "Length":  1754
+                   },
+                   {
+                       "Path":  "assets/js/providers/google-maps-provider.js",
+                       "SHA256":  "CA09491E8B53BADFACF0C20725EE6F660A3E870D1CEA01CE9B3D7335079ACD7E",
+                       "Length":  10838
+                   },
+                   {
+                       "Path":  "assets/js/providers/openstreetmap-provider.js",
+                       "SHA256":  "0A6AEB479EDB40EB923040016A7958C9FC4182668DE494FE5F38331603C10156",
+                       "Length":  6400
+                   },
+                   {
+                       "Path":  "assets/samples/locations-basic.csv",
+                       "SHA256":  "EB5CE589F771173585F228C8055FED9FAF75C0A6BD9149E940712F587867EB99",
+                       "Length":  185
+                   },
+                   {
+                       "Path":  "assets/samples/locations-full.csv",
+                       "SHA256":  "EB49D11C862A535714F37790A35FAB47F0B2A190656D8D7662C8401FF3C84B97",
+                       "Length":  524
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/images/layers.png",
+                       "SHA256":  "1DBBE9D028E292F36FCBA8F8B3A28D5E8932754FC2215B9AC69E4CDECF5107C6",
+                       "Length":  696
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/images/layers-2x.png",
+                       "SHA256":  "066DACA850D8FFBEF007AF00B06EAC0015728DEE279C51F3CB6C716DF7C42EDF",
+                       "Length":  1259
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/images/marker-icon.png",
+                       "SHA256":  "574C3A5CCA85F4114085B6841596D62F00D7C892C7B03F28CBFA301DEB1DC437",
+                       "Length":  1466
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/images/marker-icon-2x.png",
+                       "SHA256":  "00179C4C1EE830D3A108412AE0D294F55776CFEB085C60129A39AA6FC4AE2528",
+                       "Length":  2464
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/images/marker-shadow.png",
+                       "SHA256":  "264F5C640339F042DD729062CFC04C17F8EA0F29882B538E3848ED8F10EDB4DA",
+                       "Length":  618
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/leaflet.css",
+                       "SHA256":  "337BFCA5CABD03B39815B2700FEBE2B3B7EDF55921C59CD49F88ECB328212303",
+                       "Length":  14145
+                   },
+                   {
+                       "Path":  "assets/vendor/leaflet/leaflet.js",
+                       "SHA256":  "85D455B4522415F6BADC42A0E7D17C919D100347D6B8958BD0DC738FDECD6D50",
+                       "Length":  147563
+                   },
+                   {
+                       "Path":  "assets/vendor/markercluster/leaflet.markercluster.js",
+                       "SHA256":  "58BE871DF61F6C512464E15DB0941E63B9491BF1396A2AE3BEA6F39E0854CD1C",
+                       "Length":  33724
+                   },
+                   {
+                       "Path":  "assets/vendor/markercluster/MarkerCluster.css",
+                       "SHA256":  "614DEA0A98FF3F4EAD74F04918F6B1D1B9BA435C25B5FC23B21A394D1E3E4D87",
+                       "Length":  872
+                   },
+                   {
+                       "Path":  "assets/vendor/markercluster/MarkerCluster.Default.css",
+                       "SHA256":  "61258232D98D64DC2A7B1E02130D67421BC5B9BDA5994EEF70228FF97570C170",
+                       "Length":  1287
+                   },
+                   {
+                       "Path":  "assets/vendor/README.md",
+                       "SHA256":  "25228477C6C71ED7C2D74685BFB5CA307D818D4A070C75E16EFF215B7F67CCD7",
+                       "Length":  457
+                   },
+                   {
+                       "Path":  "business-map-locator.php",
+                       "SHA256":  "6E94DFBCE87E92761241743A7E8C43F78F70F8525FEAF28B81F879350769A03F",
+                       "Length":  1875
+                   },
+                   {
+                       "Path":  "CHANGELOG.md",
+                       "SHA256":  "10E2B810DC1002A3F55FC4577A301AE153B8B74BB699A2C72EB51C980AE051EC",
+                       "Length":  28077
+                   },
+                   {
+                       "Path":  "composer.json",
+                       "SHA256":  "1A2E3840F7BA2E0BB288BAEBA19913C38AECC82D3923D594D7DFBB6F25705449",
+                       "Length":  844
+                   },
+                   {
+                       "Path":  "docs/csv-import-reference.html",
+                       "SHA256":  "FDB464AB549D37041C3CE6FAE799E1A300F8A2B0FCD7A41F2CD09F34E7A5CC1A",
+                       "Length":  4892
+                   },
+                   {
+                       "Path":  "docs/location-workspace.md",
+                       "SHA256":  "537039D5468A25C78A51BB8F47CCAA57D7DF6EF42233BD1807D0CACEE5B4E20F",
+                       "Length":  758
+                   },
+                   {
+                       "Path":  "docs/provider-architecture.md",
+                       "SHA256":  "4E1B17B16025817DDEAECEA7E49CF3A469BE4E614BBE7AE262D3C8303D8225B0",
+                       "Length":  883
+                   },
+                   {
+                       "Path":  "docs/settings-provider-panels.md",
+                       "SHA256":  "818641CEEFF370528EEC4538B763C602730DBF00506BB8CF31AC3D7CB7074BA6",
+                       "Length":  820
+                   },
+                   {
+                       "Path":  "docs/settings-ux-redesign.md",
+                       "SHA256":  "DCCF66FB9DBFD6491E035C74F43CCA6A9D10CFF142F528573AE0381DC9FDE54D",
+                       "Length":  1537
+                   },
+                   {
+                       "Path":  "docs/sprint-1-core-stabilization.md",
+                       "SHA256":  "EB3AD96C08B0152DCE31962F709A307F0A7D76B8C6267A2DAC8593E1FD8D1B1E",
+                       "Length":  1391
+                   },
+                   {
+                       "Path":  "docs/ui-reference/assets/css/admin.css",
+                       "SHA256":  "35DE86555596AD3ABE68AE39F4A82C88E325BAEEC1B70484F5E49B46D7D739F7",
+                       "Length":  18135
+                   },
+                   {
+                       "Path":  "docs/ui-reference/assets/js/admin.js",
+                       "SHA256":  "816CC6C2819119810B626E2AAEF87CE1F7B5B13DCB682B74053BBF70F826CB48",
+                       "Length":  2064
+                   },
+                   {
+                       "Path":  "docs/ui-reference/index.html",
+                       "SHA256":  "BF1A2BAFB6C122E11CC2663A31DD636DE8931CBA6DA208A4C4279B0D7A1C4833",
+                       "Length":  37192
+                   },
+                   {
+                       "Path":  "docs/ui-reference/README.txt",
+                       "SHA256":  "2D1DFB81BAE8103B9991464E08DCD3CD64B83F318C89405C312504C6F5814E21",
+                       "Length":  487
+                   },
+                   {
+                       "Path":  "examples/demo-locations.csv",
+                       "SHA256":  "5142E947B7E9107B65767310D7DC980C18D41101DDCF3E99FEAB5EEB63833BE0",
+                       "Length":  477
+                   },
+                   {
+                       "Path":  "includes/Blocks/business-locator/block.json",
+                       "SHA256":  "896F8932E157046DD1AAB8FBE0E96B470F3CAF1C1D253F3D4235539A93BE1123",
+                       "Length":  802
+                   },
+                   {
+                       "Path":  "includes/Blocks/business-locator/editor.css",
+                       "SHA256":  "EA6E8A6E3A2D66F27AEC2088C2C7DB9643240ECD80046FD56116A409F43114B2",
+                       "Length":  290
+                   },
+                   {
+                       "Path":  "includes/Blocks/business-locator/index.js",
+                       "SHA256":  "094E94891AC5ECD9C8F647CFCF93CDF763FD25EE8A067E7644A1EFE3883222A0",
+                       "Length":  2661
+                   },
+                   {
+                       "Path":  "includes/Core/class-bml-assets.php",
+                       "SHA256":  "9D3108F82D197996621EFC593C9B97443DAA3688AFC77762489AC14728C2BFC4",
+                       "Length":  1498
+                   },
+                   {
+                       "Path":  "includes/Core/class-bml-capabilities.php",
+                       "SHA256":  "52A53E5BE89CF8AB58273A8254711B3C2CE34F65C4FC6522FE026DA16AAA7601",
+                       "Length":  1250
+                   },
+                   {
+                       "Path":  "includes/Core/class-bml-diagnostics.php",
+                       "SHA256":  "E6F44C808EA6495F8F52DF13EA1CA20364E5F1C83BAC5F12C72EC77D1A530262",
+                       "Length":  1059
+                   },
+                   {
+                       "Path":  "includes/Core/class-bml-plugin.php",
+                       "SHA256":  "2C63E9EF76F49721F8233B8022BF78AA525A1679A0285266CA1CB57308471EEA",
+                       "Length":  2296
+                   },
+                   {
+                       "Path":  "includes/Database/class-bml-database.php",
+                       "SHA256":  "80C7971BCD489CD9DBC4802459BBB85686912C68828D214BE75660A7221CCACF",
+                       "Length":  3302
+                   },
+                   {
+                       "Path":  "includes/Database/class-bml-location-index.php",
+                       "SHA256":  "6DC6ADBD31B6D21D14FADFB6B4C4C9330B49F70651991BAD6D09A78FA58F9DD0",
+                       "Length":  8415
+                   },
+                   {
+                       "Path":  "includes/Database/class-bml-location-indexer.php",
+                       "SHA256":  "4EAA6FF156FEE0EBEFBF9F98EDBBD00055F844491D061CF88FC93487E14BC99D",
+                       "Length":  3184
+                   },
+                   {
+                       "Path":  "includes/Database/class-bml-migrator.php",
+                       "SHA256":  "145B7F315C10DE2605D1C41096B06EC0417580B2166FD3460EDE175BF6465024",
+                       "Length":  1368
+                   },
+                   {
+                       "Path":  "includes/Database/class-bml-schema.php",
+                       "SHA256":  "A7D9A24CCB99A7619EBCD71A705DB368769698486882C6646004F10936BB82F7",
+                       "Length":  5492
+                   },
+                   {
+                       "Path":  "includes/Frontend/class-bml-frontend.php",
+                       "SHA256":  "B4A8AA19DEAABE332A8DD6CE1844113CAF8E0C4ED1EE916B19DD1EEF63376E5B",
+                       "Length":  4456
+                   },
+                   {
+                       "Path":  "includes/Frontend/class-bml-locator-renderer.php",
+                       "SHA256":  "6F12E3838EA59C015026FA8C57AFB3B66143EAE25B67A0D208C365EFC333CE82",
+                       "Length":  3060
+                   },
+                   {
+                       "Path":  "includes/Providers/class-bml-google-maps-provider.php",
+                       "SHA256":  "C648F8287E84FD74629F6916FB7677C99EBF01A061754A5E189E6D8557E20E9F",
+                       "Length":  3623
+                   },
+                   {
+                       "Path":  "includes/Providers/class-bml-openstreetmap-provider.php",
+                       "SHA256":  "B6C7C6896FE1F9DB54862EFDCB876C04E95B16D8EEFC376BE373CF2D3C66295D",
+                       "Length":  2543
+                   },
+                   {
+                       "Path":  "includes/Providers/class-bml-provider-registry.php",
+                       "SHA256":  "803E26C1980885093606B2836A44E5B400048884DF3DFAD6EA86273C771D34B0",
+                       "Length":  5203
+                   },
+                   {
+                       "Path":  "includes/Providers/interface-bml-map-provider.php",
+                       "SHA256":  "2E93C82B56BC2BE216AF6AC0DD5ABE87BED13C84591C44ABA10B105899F36889",
+                       "Length":  365
+                   },
+                   {
+                       "Path":  "includes/REST/class-bml-rest.php",
+                       "SHA256":  "C119B011E93B419AA76E7426DE1461F9BFFCA176FF13E5E3C3717F08733FB35B",
+                       "Length":  12552
+                   },
+                   {
+                       "Path":  "includes/Shortcodes/class-bml-shortcode.php",
+                       "SHA256":  "F1B681B3E733A801710D93FC290899F02122F72D79B5F02EA6A9B66DC11F0254",
+                       "Length":  1181
+                   },
+                   {
+                       "Path":  "INSTALL.md",
+                       "SHA256":  "B7CAB93249961DE6BC748D975484EF421298CD8D52DC3E9610A2B820FB65A6DF",
+                       "Length":  2525
+                   },
+                   {
+                       "Path":  "phpcs.xml.dist",
+                       "SHA256":  "60F1F37B48A6D351DF319C1F1EF57E501D4B38C6ABD778B235C23DCDBA7D95FA",
+                       "Length":  611
+                   },
+                   {
+                       "Path":  "phpstan.neon",
+                       "SHA256":  "0E8E84ACDCBAC5DCEB354AF30D2DC11A420FD2798512D8112ACA71A76FEAA96A",
+                       "Length":  195
+                   },
+                   {
+                       "Path":  "phpunit.xml.dist",
+                       "SHA256":  "51721E0D53A1E0B4C68CAEB27476585E66D5D4B5DD1F8772CF0EFC3BD8561CE8",
+                       "Length":  550
+                   },
+                   {
+                       "Path":  "readme.txt",
+                       "SHA256":  "F8B8898CABF33819941E79CA78C628395985879FC36504F4B3060182BD859AC5",
+                       "Length":  2407
+                   },
+                   {
+                       "Path":  "src/Admin/AdminModule.php",
+                       "SHA256":  "78F9061E423AC7DB26A01F90EB630E242792279E7ECC782EB7438712E609A875",
+                       "Length":  3713
+                   },
+                   {
+                       "Path":  "src/Admin/Ajax/ImportAjaxController.php",
+                       "SHA256":  "9E3BF4E7B0BD60186262629A03D1A14E7B0A942A4AEA8DC97315B5EB524E0526",
+                       "Length":  3146
+                   },
+                   {
+                       "Path":  "src/Admin/Ajax/LocationEditorAjaxController.php",
+                       "SHA256":  "9D285A07D70D488D268BF4DF6A12962EC46B137DC475395F1FD54BE8ADA3B1B5",
+                       "Length":  6139
+                   },
+                   {
+                       "Path":  "src/Admin/Assets/AdminAssets.php",
+                       "SHA256":  "E0F54566E3CC8ED04284D60726708ECAAC0CABEB75E38377594498E85F593828",
+                       "Length":  5690
+                   },
+                   {
+                       "Path":  "src/Admin/Dashboard/DashboardPage.php",
+                       "SHA256":  "958422FDDEA6E220B67844DA01A7F9EF592315989A1034550B97AB01E2581D5B",
+                       "Length":  17258
+                   },
+                   {
+                       "Path":  "src/Admin/Demo/InstallDemoAction.php",
+                       "SHA256":  "E3DA4D97C6BFC45276C0ED83056E8683D1ECE7A33CAE4DDE8982322239A499DC",
+                       "Length":  3008
+                   },
+                   {
+                       "Path":  "src/Admin/Demo/TermAssigner.php",
+                       "SHA256":  "A08FD30FB47061D22259FC9775A0C95766AC616B0F22E3EEFF4622354CE5EBCF",
+                       "Length":  798
+                   },
+                   {
+                       "Path":  "src/Admin/Export/ExportCsvAction.php",
+                       "SHA256":  "6B93B3B952D0394C0A79E5201BF069045BDE64A849CED6F18D1862C452CFDC0A",
+                       "Length":  718
+                   },
+                   {
+                       "Path":  "src/Admin/Import/ImportPage.php",
+                       "SHA256":  "3682BC4BBF205D9CC02324BE91C1309E6441582F00468042AC45A021B597E38E",
+                       "Length":  25143
+                   },
+                   {
+                       "Path":  "src/Admin/Location/Action/BulkLocationsAction.php",
+                       "SHA256":  "9B41BA462FD6CECD5E39E53D41C44A93C7EF06EB1E121A10BFA36E2D46C53B10",
+                       "Length":  2187
+                   },
+                   {
+                       "Path":  "src/Admin/Location/Action/DeleteLocationAction.php",
+                       "SHA256":  "E2B8C506AAC8E12C90E29A74C5E44E2DA81185B470769578DD41CAB7DD0728D8",
+                       "Length":  1299
+                   },
+                   {
+                       "Path":  "src/Admin/Location/Action/DuplicateLocationAction.php",
+                       "SHA256":  "0E730BBBCB9C8E9C200B5F7CFF5C34DD544B39684E45A6FAAA9C8BAE0803E825",
+                       "Length":  2394
+                   },
+                   {
+                       "Path":  "src/Admin/Location/Action/SaveLocationAction.php",
+                       "SHA256":  "D5D6B08BDC0606DCC2B90CEF87C230FFDB6772B8B0A7FE7FE787F134CF990105",
+                       "Length":  6966
+                   },
+                   {
+                       "Path":  "src/Admin/Location/LocationCompleteness.php",
+                       "SHA256":  "9F7E45C9357043B1B102340FB4FA772129512A034CAC4E5BCCEE6B2DA1A83102",
+                       "Length":  1290
+                   },
+                   {
+                       "Path":  "src/Admin/Location/LocationEditorPage.php",
+                       "SHA256":  "11E9D5FE01A652707203B199BB55BF762D0B96139DFA4A248A52347D6D95D2A0",
+                       "Length":  2810
+                   },
+                   {
+                       "Path":  "src/Admin/Location/LocationsPage.php",
+                       "SHA256":  "3B30D7FE4CCE6CE3A75B4FE6A709D44743FE9F5B147AA659406B6875813E1DB3",
+                       "Length":  12332
+                   },
+                   {
+                       "Path":  "src/Admin/Location/LocationTableDataProvider.php",
+                       "SHA256":  "621AF5D0AC6EACF48DEA4F558543E1E538EA9CEF239CFAFB2B3CCAF14F482B99",
+                       "Length":  3509
+                   },
+                   {
+                       "Path":  "src/Admin/Location/View/ContactIcon.php",
+                       "SHA256":  "12900BE5C9A8346EF45BF2821191DF473D7CBA28AB078FF109CE824BEA0D365E",
+                       "Length":  4057
+                   },
+                   {
+                       "Path":  "src/Admin/Location/View/location-editor.php",
+                       "SHA256":  "34B671EF44ED2DD432B6B001778EFF87153AE0C27CDCCC343D0D901B534A87A3",
+                       "Length":  22299
+                   },
+                   {
+                       "Path":  "src/Admin/Location/View/LocationTableRenderer.php",
+                       "SHA256":  "AE734C947D402AC58CE8710C77D96828881CFC1C6D6553026A60C72C3B332397",
+                       "Length":  5420
+                   },
+                   {
+                       "Path":  "src/Admin/Menu/AdminMenu.php",
+                       "SHA256":  "15A3BDA1CF4E02A57E8295628119C065A0836D15E02FD3C7A941AD6FBB57D7F9",
+                       "Length":  2974
+                   },
+                   {
+                       "Path":  "src/Admin/Menu/AdminTitleRegistry.php",
+                       "SHA256":  "A7B138500903C3EA13EB68D3AEA3BBA2448FEB8E9A986ADB97002B178703AD41",
+                       "Length":  647
+                   },
+                   {
+                       "Path":  "src/Admin/Notice/AdminNotices.php",
+                       "SHA256":  "DC88EAE9CB315201EDA118DBBA984CE3C502E9204003906137F9CFFDE020FBBD",
+                       "Length":  2610
+                   },
+                   {
+                       "Path":  "src/Admin/Request/AdminRequest.php",
+                       "SHA256":  "BF4C924B0EE9774889B47839328397A18F2153D478C4725FA42DEF897219B0FF",
+                       "Length":  3010
+                   },
+                   {
+                       "Path":  "src/Admin/Settings/Action/SaveSettingsAction.php",
+                       "SHA256":  "69D60F7D968CA57C9B89BC76A2BD1EC183064D939D1D1A76E5D1292CE1E80F18",
+                       "Length":  4710
+                   },
+                   {
+                       "Path":  "src/Admin/Settings/SettingsPage.php",
+                       "SHA256":  "BBEF49596700DC09EE036ACD4B8A563F03A45968FC21B5E1FDA18EBB2BB448D4",
+                       "Length":  1686
+                   },
+                   {
+                       "Path":  "src/Admin/Settings/View/SettingsRenderer.php",
+                       "SHA256":  "3CA15E5302401800E4EAEAE431A998D9208819E839939F044B69054B237D55BE",
+                       "Length":  17306
+                   },
+                   {
+                       "Path":  "src/Admin/Shared/AdminActionResponder.php",
+                       "SHA256":  "FF10BDCC4E0AC9472D80B4D16C6563E57020732315A39A6E9DDC68C7EFE359CC",
+                       "Length":  710
+                   },
+                   {
+                       "Path":  "src/Admin/Shared/AdminShell.php",
+                       "SHA256":  "F845B562EF5099DB558C1FC061B1019B20E069DC59A8636506E0361CD7887481",
+                       "Length":  6446
+                   },
+                   {
+                       "Path":  "src/Admin/Taxonomy/Action/DeleteTermAction.php",
+                       "SHA256":  "1E703C47BF3FFA1CF8937376F4F58A0279B6FC4EED6E18946FB8E8FF18EF0E6B",
+                       "Length":  1956
+                   },
+                   {
+                       "Path":  "src/Admin/Taxonomy/Action/DuplicateTermAction.php",
+                       "SHA256":  "EB04F0E2CC17C2F4892237746F7E5BE66D74322590FB0EA42A7DB8AD445C0AC2",
+                       "Length":  1932
+                   },
+                   {
+                       "Path":  "src/Admin/Taxonomy/Action/SaveTermAction.php",
+                       "SHA256":  "B7134783036F42E188E2A3CD5DB610262DA47519EC578280CFC16331EE60E976",
+                       "Length":  2661
+                   },
+                   {
+                       "Path":  "src/Admin/Taxonomy/TaxonomyOptionsProvider.php",
+                       "SHA256":  "8A6086CDF02BA7583BCF69BA9BF1C4CC68FE15DEA807574B3483E8F078A7C2A2",
+                       "Length":  585
+                   },
+                   {
+                       "Path":  "src/Admin/Taxonomy/TaxonomyPage.php",
+                       "SHA256":  "F21EFD4121673866C0B9A473AF65AC61D02A460B0F704605840573EEA138BD64",
+                       "Length":  45810
+                   },
+                   {
+                       "Path":  "src/Admin/Taxonomy/View/TermSelectRenderer.php",
+                       "SHA256":  "33DFFF3520C310EEE16BF5FB37FD20CB9DC246209ADA2B3AE103B50591579FB8",
+                       "Length":  621
+                   },
+                   {
+                       "Path":  "src/Application/Location/SearchLocationsHandler.php",
+                       "SHA256":  "228CBB3E126052168834B99FBB94B89B170684F4C31864FA8DFD35DE0178812F",
+                       "Length":  3083
+                   },
+                   {
+                       "Path":  "src/Application/Location/SearchLocationsQuery.php",
+                       "SHA256":  "9D44CAAE08C715AE5766E099624496909F0AF1BFCC7FA04F74C6D9EADFC88EE1",
+                       "Length":  4706
+                   },
+                   {
+                       "Path":  "src/Container.php",
+                       "SHA256":  "06B3D6B00E5908D411BC6CFFD9225839CD320DD41002C5FC0F32078F5A718C5B",
+                       "Length":  797
+                   },
+                   {
+                       "Path":  "src/Domain/Geo/BoundingBox.php",
+                       "SHA256":  "2B0911E672C0EEBA551F7CFFF8BB88094671FFD96F1E85EA9F12FBEA6CDA7AA5",
+                       "Length":  598
+                   },
+                   {
+                       "Path":  "src/Domain/Geo/Coordinates.php",
+                       "SHA256":  "E095D4BB5A22D7F21993866E4A8D926D3EE2D39DF3A8DAB021AFAEF68179D5E4",
+                       "Length":  515
+                   },
+                   {
+                       "Path":  "src/Domain/Geo/Distance.php",
+                       "SHA256":  "5C10095856FD79F34E0D28ED22C2518D1F2584CBABBACBE2E18401759C3FFF21",
+                       "Length":  368
+                   },
+                   {
+                       "Path":  "src/Domain/Geo/DistanceUnit.php",
+                       "SHA256":  "772AD5EE0284A802508F93C86ACBA18D3D219FBC771F6654EB2141BD6117372F",
+                       "Length":  271
+                   },
+                   {
+                       "Path":  "src/Domain/Location/LocationServiceCatalog.php",
+                       "SHA256":  "62C93D8FB813E02C684F771789A98881D5EC9799E7056FBC210625DDA2CAC8DB",
+                       "Length":  763
+                   },
+                   {
+                       "Path":  "src/Export/CsvFormulaEscaper.php",
+                       "SHA256":  "B09680D701BFEA9C8B156CBECBFEC7C16510EC1E17EA217BCABDEA29CFA87720",
+                       "Length":  323
+                   },
+                   {
+                       "Path":  "src/Export/LocationCsvExporter.php",
+                       "SHA256":  "DBAC9A6F78279EE9B28BD50B848598C566AFEFEF03A93FBB86D61B3A1A5BA925",
+                       "Length":  3587
+                   },
+                   {
+                       "Path":  "src/Import/Config/ImportLimits.php",
+                       "SHA256":  "5A949714EF1555B7192910919AF7B721341980688F680AEEAC7B8BB63DA07DEB",
+                       "Length":  1602
+                   },
+                   {
+                       "Path":  "src/Import/Csv/CsvException.php",
+                       "SHA256":  "3E9F7C518FB17CA53083510AB21AACD167676E4CD0EA39F967CDFC7EFA428818",
+                       "Length":  337
+                   },
+                   {
+                       "Path":  "src/Import/Csv/CsvReader.php",
+                       "SHA256":  "C9E1E1D43AC38255BAA43A4B06672198CFB269FCC22DE20413432459B3BC4CBD",
+                       "Length":  5020
+                   },
+                   {
+                       "Path":  "src/Import/Dto/ImportJob.php",
+                       "SHA256":  "3682D24CA4A4A326C2BF00D7903D7FB6C88836520C863835FA0539F75336586D",
+                       "Length":  1404
+                   },
+                   {
+                       "Path":  "src/Import/Dto/ImportJobCounters.php",
+                       "SHA256":  "1755E071A560C656572BA1A327E83AB48D7D95516480F5B9A024D93149A86725",
+                       "Length":  767
+                   },
+                   {
+                       "Path":  "src/Import/Dto/ImportJobError.php",
+                       "SHA256":  "01D925C26647D388778EC1EF0963A91C1B77F18E77C7E92FDDB6EF8FC1AA650F",
+                       "Length":  610
+                   },
+                   {
+                       "Path":  "src/Import/Dto/ImportJobSummary.php",
+                       "SHA256":  "77F0864CADC1E4E187EDC7814D7F9646248CCFC49B250C9F0365AA82311A2FB8",
+                       "Length":  222
+                   },
+                   {
+                       "Path":  "src/Import/Duplicate/DuplicateDetector.php",
+                       "SHA256":  "2E9F2B720926043F0D052FA0DCF3F0491355A47956B557B93D1DB4AEA96F36D7",
+                       "Length":  2697
+                   },
+                   {
+                       "Path":  "src/Import/Duplicate/ExistingLocationLookup.php",
+                       "SHA256":  "22E7B6EC8E5ABDB33947752150CB65749C2B4856D4330C39C3329CB9EFE5F7FC",
+                       "Length":  2022
+                   },
+                   {
+                       "Path":  "src/Import/Event/ImportJobEventRepository.php",
+                       "SHA256":  "7111C5D11D0C18CD02F5780627F7BDC8DBEFA88B2A5F4158AB14575BE4D49065",
+                       "Length":  987
+                   },
+                   {
+                       "Path":  "src/Import/Exception/ImportJobException.php",
+                       "SHA256":  "6A519A8BFC159AFF7F597DA40302B76863CE19530F9893872793710A5FA97D4C",
+                       "Length":  1804
+                   },
+                   {
+                       "Path":  "src/Import/ImportCleanupScheduler.php",
+                       "SHA256":  "A1A55FE2633F5F95D9E34DE907EBD3FAF3848911A403361F71484B302CC0B82A",
+                       "Length":  614
+                   },
+                   {
+                       "Path":  "src/Import/ImportManager.php",
+                       "SHA256":  "8CE14772BBFEEE76533B5668A85844AE3DB00596FEC108868BFB391C20572826",
+                       "Length":  26069
+                   },
+                   {
+                       "Path":  "src/Import/Job/ImportJobRepository.php",
+                       "SHA256":  "591DBEAADB15B3D2C8754C011CEE7F91E3C7AD5FF8C97AE85D51456970FA1809",
+                       "Length":  8318
+                   },
+                   {
+                       "Path":  "src/Import/Job/ImportJobRepositoryInterface.php",
+                       "SHA256":  "40F7B14225E395768493C9E1048FB1CD406D01756FBCEF97678170301329B062",
+                       "Length":  1283
+                   },
+                   {
+                       "Path":  "src/Import/Job/ImportJobRowRepository.php",
+                       "SHA256":  "EDF04B62DF1E643DA9C9E00AF1DEAF2CA28002167AE4DA550CD317C355759A95",
+                       "Length":  3841
+                   },
+                   {
+                       "Path":  "src/Import/Job/ImportJobStateMachine.php",
+                       "SHA256":  "D503B8A4BF6BAB606DE5C272C3CC2C8435969190F0C7794A173581BECAAF4143",
+                       "Length":  1422
+                   },
+                   {
+                       "Path":  "src/Import/Job/ImportJobStatus.php",
+                       "SHA256":  "5C122E17BB2212BB075AFF07363D3A20CED1796CD472C962D5DDADE6B35ECE88",
+                       "Length":  894
+                   },
+                   {
+                       "Path":  "src/Import/Job/SourceRowHasher.php",
+                       "SHA256":  "382F0837CCAA67DC8C908EAE696C0690BC9ABAF05513C1EBB20B658DB85AB99C",
+                       "Length":  608
+                   },
+                   {
+                       "Path":  "src/Import/Logging/ImportLogger.php",
+                       "SHA256":  "2E5F5689C7F7A0ACFD58314FB2B303DED2AC39F359206DB741E34A39CAF0D165",
+                       "Length":  1069
+                   },
+                   {
+                       "Path":  "src/Import/Mapping/ImportMapper.php",
+                       "SHA256":  "EC23B4FF7D6177175717EBD1EE1D2AF2E3CD826C63018AB7490B679B026D4169",
+                       "Length":  4020
+                   },
+                   {
+                       "Path":  "src/Import/Processing/LocationImporter.php",
+                       "SHA256":  "8AB5D88FE330ACB5788EE30C5458A710EA5E45593C2D302F90D4CF9185468FE6",
+                       "Length":  6415
+                   },
+                   {
+                       "Path":  "src/Import/Security/ImportDirectory.php",
+                       "SHA256":  "EB6CD709AEF5C6338CA27AE7AA941EBAD15DAF1C641E9E5B758DE60271121DA1",
+                       "Length":  1702
+                   },
+                   {
+                       "Path":  "src/Import/Security/UploadValidator.php",
+                       "SHA256":  "62BA3C912B0F618A14FE8C74DA19F08EF8D77C4A422EF18E339C2D4CC17511BD",
+                       "Length":  1760
+                   },
+                   {
+                       "Path":  "src/Import/Serialization/ImportJobPayloadSerializer.php",
+                       "SHA256":  "F6AD2F6E6C277769AB726AA4983B878A8BBFF80EF7207B0F4160B8871F21E45B",
+                       "Length":  2415
+                   },
+                   {
+                       "Path":  "src/Infrastructure/Database/LocationRepository.php",
+                       "SHA256":  "7DB025EA6BBD9D218EEFF4DBFFDFA1EF2D432D03E9D0B504970C31C31B16D564",
+                       "Length":  7875
+                   },
+                   {
+                       "Path":  "src/Infrastructure/Database/Migration/SchemaMigrator.php",
+                       "SHA256":  "37FF7BACE84B2D7937319FC8E6172D3EADD378911A66CCD3508D0EA846790589",
+                       "Length":  806
+                   },
+                   {
+                       "Path":  "src/Legacy/LegacyClassLoader.php",
+                       "SHA256":  "F3D32584C529CAE53E3D77D86A40969DFDED7A5F7290513241B27BA6E31D26F5",
+                       "Length":  2436
+                   },
+                   {
+                       "Path":  "src/Lifecycle/Activator.php",
+                       "SHA256":  "7B291438F05CEEBA8E6B8A21DA55C7511106F5049E6F6A3685DD594A6B2E0F46",
+                       "Length":  657
+                   },
+                   {
+                       "Path":  "src/Lifecycle/Deactivator.php",
+                       "SHA256":  "0EC6DB7F5CD3F081EAC495D6CA5D6ED8A2ADF9379A868F211B4066642914D22B",
+                       "Length":  277
+                   },
+                   {
+                       "Path":  "src/Migration/AreaMigrationService.php",
+                       "SHA256":  "0C525AE06F52361A75BD63FE6124F82E4E0D112FE6BCB538BC4E361AECA01CD3",
+                       "Length":  4212
+                   },
+                   {
+                       "Path":  "src/Migration/AreaRollbackService.php",
+                       "SHA256":  "417F5FBD32BC7AE6521DB28F8497733F14E03A467E75A7A96666585E27BD190D",
+                       "Length":  1146
+                   },
+                   {
+                       "Path":  "src/Migration/MigrationSnapshotStore.php",
+                       "SHA256":  "8CC9719C43AF37DCFD3FAC706D3DD965AF12D4342625444CB9B6378AA21F1CDC",
+                       "Length":  4067
+                   },
+                   {
+                       "Path":  "src/Migration/RollbackInterface.php",
+                       "SHA256":  "30E4B5C2BFD30FD290B6374FB961ED8DC408671482D77F4A1F33F6AB90914F10",
+                       "Length":  472
+                   },
+                   {
+                       "Path":  "src/Plugin.php",
+                       "SHA256":  "B494350E819572EAE1AB88DC8A6D770C9843765E018697A27E1A6910E715E1D7",
+                       "Length":  20700
+                   },
+                   {
+                       "Path":  "src/Rest/LocationDetailResponseFactory.php",
+                       "SHA256":  "FBD18E1ED28C3FA0F745C6A33C57C9188D683571DA9384E9423C644454C12984",
+                       "Length":  2057
+                   },
+                   {
+                       "Path":  "src/Rest/LocationResponseFactory.php",
+                       "SHA256":  "6584A5DBE676D14962DD38429F6073D04E8E5998B6C140C95CEFD927E48C51A5",
+                       "Length":  6384
+                   },
+                   {
+                       "Path":  "src/Rest/LocationsController.php",
+                       "SHA256":  "C28ACFAB8131C748180FB8D533BC35607004A9321BF21CB0C08C331CA67562BB",
+                       "Length":  7952
+                   },
+                   {
+                       "Path":  "src/Settings/Settings.php",
+                       "SHA256":  "E1089664A2172695E7AB2F121CC4641A53178A9085059BB71ED61A5317DC040F",
+                       "Length":  2559
+                   },
+                   {
+                       "Path":  "src/Support/SlugGenerator.php",
+                       "SHA256":  "A7692942AB44E46C8D2890C1B8762FB6E984837F6D3995DB5BF96C4BECA4DD8F",
+                       "Length":  1378
+                   },
+                   {
+                       "Path":  "src/WordPress/BlockRegistrar.php",
+                       "SHA256":  "A52F6E3D5B64F600A05287419B3659C2A0005A66FAB40F906518FE760A7CDA95",
+                       "Length":  525
+                   },
+                   {
+                       "Path":  "src/WordPress/Capabilities.php",
+                       "SHA256":  "A77E340C4714933063892A2FD30AF25E5A0337F197DF7AE16A0E9E794B4B29FA",
+                       "Length":  2489
+                   },
+                   {
+                       "Path":  "src/WordPress/ContentTypes.php",
+                       "SHA256":  "577DD274B597C93559EDC72BE34F83AC5ED2761CE4789CA0DD533638EBE68B2D",
+                       "Length":  3315
+                   },
+                   {
+                       "Path":  "src/WordPress/MetaRegistrar.php",
+                       "SHA256":  "2B53EE80EEE93039481700F28DC6C0A3140CD16AF18F418E057DD840BA8E0D49",
+                       "Length":  1443
+                   },
+                   {
+                       "Path":  "src/WordPress/PrivacyPolicy.php",
+                       "SHA256":  "0B2A8508CFA8FB8D066745109375C7AF12D855EE7F46626D23C144D8EA18B50C",
+                       "Length":  772
+                   },
+                   {
+                       "Path":  "src/WordPress/TextDomain.php",
+                       "SHA256":  "EC4721405B2BB254A7ED8DA6993DBCC5A63847D927CBCB368A0378CFC280FF7F",
+                       "Length":  305
+                   },
+                   {
+                       "Path":  "templates/frontend/list.php",
+                       "SHA256":  "859E3F4E06BD48494F234687C130E78FAA6D8A9E24CB1B141858F15C7FF9A176",
+                       "Length":  200
+                   },
+                   {
+                       "Path":  "templates/frontend/locator.php",
+                       "SHA256":  "956B0BF2AB7FBBD74998061F1121AB2886373207DBF87217BE46B033758F1924",
+                       "Length":  959
+                   },
+                   {
+                       "Path":  "templates/frontend/map.php",
+                       "SHA256":  "9085F4A8F09D6D9C9F6F34A102AC37B5C39F657BF64EE025C1FB9A8D295DDC03",
+                       "Length":  175
+                   },
+                   {
+                       "Path":  "templates/frontend/popup.php",
+                       "SHA256":  "9B33F3F3C018A7F800E26254150619BA08637B22D87A78BA70D588CAE9D58535",
+                       "Length":  1094
+                   },
+                   {
+                       "Path":  "templates/frontend/toolbar.php",
+                       "SHA256":  "228AFA13AFA9A556B127FFB01F824B83046607BFB53317AB06F642B8C651924C",
+                       "Length":  1038
+                   },
+                   {
+                       "Path":  "tools/fetch-vendor.sh",
+                       "SHA256":  "71C1CD789D637D7175031E742B61848F6B5AB9FAFC2152D55507D11C34CE9790",
+                       "Length":  1559
+                   },
+                   {
+                       "Path":  "uninstall.php",
+                       "SHA256":  "B1939A3023E0E430AC979DA1CE36B7CDB9B50803F57A11154C8D198ADD69DB8B",
+                       "Length":  1443
+                   }
+               ],
+    "stand":  [
+                  {
+                      "Path":  "assets/css/admin.css",
+                      "SHA256":  "1BBAB0CE9F717C619144392750C805DD855F80F41016634264119B44CF0709AA",
+                      "Length":  92943
+                  },
+                  {
+                      "Path":  "assets/css/admin/pages/category-experience.css",
+                      "SHA256":  "7F401BBE8A711A912F76393D4F52A25924AD7BC003A147BAD46CEE8AA333B06B",
+                      "Length":  8204
+                  },
+                  {
+                      "Path":  "assets/css/admin/pages/city-experience.css",
+                      "SHA256":  "FD76B412C2CA36B24DF3866BC8246C5049567CA39B4E99361F2E89A04FB090C9",
+                      "Length":  6004
+                  },
+                  {
+                      "Path":  "assets/css/admin/pages/location-editor.css",
+                      "SHA256":  "3EF8A90FC8B63D56B979E88E9F791F87D6D9D915619C99DAEB98FA3FC83E0696",
+                      "Length":  24567
+                  },
+                  {
+                      "Path":  "assets/css/admin/pages/locations-experience.css",
+                      "SHA256":  "1D01BC37C6043D324662246B3C363504697CCF05B8371CB0F8A2F932E890F813",
+                      "Length":  7145
+                  },
+                  {
+                      "Path":  "assets/css/admin/settings-ux.css",
+                      "SHA256":  "4C873A002958C9E683947AB5C3972C526545C3E12A8A5C647B3EF2C5F7CE6D10",
+                      "Length":  12134
+                  },
+                  {
+                      "Path":  "assets/css/frontend.css",
+                      "SHA256":  "F2CADAEE1C43DD2DECF6AFB9BE2C84E0A0DC17DEF197BE31A0D024B9ED3BBA43",
+                      "Length":  19250
+                  },
+                  {
+                      "Path":  "assets/js/admin.js",
+                      "SHA256":  "43CEE9582B2B43BF31C7C1095629938DA2F3528BC49F8491A58F0FF679A8232C",
+                      "Length":  29800
+                  },
+                  {
+                      "Path":  "assets/js/admin/category-experience.js",
+                      "SHA256":  "7BC54679493ECC9DA1F2FB4CD5A49136625939F7BC899246355F7B12B0095A96",
+                      "Length":  4155
+                  },
+                  {
+                      "Path":  "assets/js/admin/city-experience.js",
+                      "SHA256":  "7B81B9847F0071C16FCDA6A348D15D726C1BDEC4D9164A9ED0BB7C7D981ED0B5",
+                      "Length":  2271
+                  },
+                  {
+                      "Path":  "assets/js/admin/import.js",
+                      "SHA256":  "802A86C1043161C2CC71D81F717E5AA6B3814D235682BEA15F99ED8580DA4EEB",
+                      "Length":  21243
+                  },
+                  {
+                      "Path":  "assets/js/admin/location-editor.js",
+                      "SHA256":  "0D1EAB315B57979F88EB44A19B6D6708AE3F72B0DA09F46F1E9C5ABA9C24EAC7",
+                      "Length":  23702
+                  },
+                  {
+                      "Path":  "assets/js/admin/location-map.js",
+                      "SHA256":  "DD97576889CE5045C10F8CABAD1468D4DBD4AC6E0CAD6A6E11A1898B116031E5",
+                      "Length":  10440
+                  },
+                  {
+                      "Path":  "assets/js/admin/locations-experience.js",
+                      "SHA256":  "64F64924CB89B1DEFA74B9A4928797DD2E734829FAF61F890D042FCBEA2798F2",
+                      "Length":  2226
+                  },
+                  {
+                      "Path":  "assets/js/admin/settings-ux.js",
+                      "SHA256":  "398349661BF41179CC064FDB50FF65DD212B191A13B372745627D16B4ABE2DBC",
+                      "Length":  20866
+                  },
+                  {
+                      "Path":  "assets/js/frontend.js",
+                      "SHA256":  "8FB5CE3B43E51D667FB64A7FE525475C5EE2ED4A7B34D8CE1BD1B5189CBF7B50",
+                      "Length":  883
+                  },
+                  {
+                      "Path":  "assets/js/map-controller.js",
+                      "SHA256":  "82CE06041176A628F71A503785CD5A60B8D1C5D3DB3113D34A7275ACE9BA3F9E",
+                      "Length":  30497
+                  },
+                  {
+                      "Path":  "assets/js/providers/base-provider.js",
+                      "SHA256":  "E67B293F66296E5B968D2CF8081D9EF9844CCCA464EA00F2D4AAAD6681E9873A",
+                      "Length":  1754
+                  },
+                  {
+                      "Path":  "assets/js/providers/google-maps-provider.js",
+                      "SHA256":  "CA09491E8B53BADFACF0C20725EE6F660A3E870D1CEA01CE9B3D7335079ACD7E",
+                      "Length":  10838
+                  },
+                  {
+                      "Path":  "assets/js/providers/openstreetmap-provider.js",
+                      "SHA256":  "0A6AEB479EDB40EB923040016A7958C9FC4182668DE494FE5F38331603C10156",
+                      "Length":  6400
+                  },
+                  {
+                      "Path":  "assets/samples/locations-basic.csv",
+                      "SHA256":  "EB5CE589F771173585F228C8055FED9FAF75C0A6BD9149E940712F587867EB99",
+                      "Length":  185
+                  },
+                  {
+                      "Path":  "assets/samples/locations-full.csv",
+                      "SHA256":  "EB49D11C862A535714F37790A35FAB47F0B2A190656D8D7662C8401FF3C84B97",
+                      "Length":  524
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/images/layers.png",
+                      "SHA256":  "1DBBE9D028E292F36FCBA8F8B3A28D5E8932754FC2215B9AC69E4CDECF5107C6",
+                      "Length":  696
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/images/layers-2x.png",
+                      "SHA256":  "066DACA850D8FFBEF007AF00B06EAC0015728DEE279C51F3CB6C716DF7C42EDF",
+                      "Length":  1259
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/images/marker-icon.png",
+                      "SHA256":  "574C3A5CCA85F4114085B6841596D62F00D7C892C7B03F28CBFA301DEB1DC437",
+                      "Length":  1466
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/images/marker-icon-2x.png",
+                      "SHA256":  "00179C4C1EE830D3A108412AE0D294F55776CFEB085C60129A39AA6FC4AE2528",
+                      "Length":  2464
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/images/marker-shadow.png",
+                      "SHA256":  "264F5C640339F042DD729062CFC04C17F8EA0F29882B538E3848ED8F10EDB4DA",
+                      "Length":  618
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/leaflet.css",
+                      "SHA256":  "337BFCA5CABD03B39815B2700FEBE2B3B7EDF55921C59CD49F88ECB328212303",
+                      "Length":  14145
+                  },
+                  {
+                      "Path":  "assets/vendor/leaflet/leaflet.js",
+                      "SHA256":  "85D455B4522415F6BADC42A0E7D17C919D100347D6B8958BD0DC738FDECD6D50",
+                      "Length":  147563
+                  },
+                  {
+                      "Path":  "assets/vendor/markercluster/leaflet.markercluster.js",
+                      "SHA256":  "58BE871DF61F6C512464E15DB0941E63B9491BF1396A2AE3BEA6F39E0854CD1C",
+                      "Length":  33724
+                  },
+                  {
+                      "Path":  "assets/vendor/markercluster/MarkerCluster.css",
+                      "SHA256":  "614DEA0A98FF3F4EAD74F04918F6B1D1B9BA435C25B5FC23B21A394D1E3E4D87",
+                      "Length":  872
+                  },
+                  {
+                      "Path":  "assets/vendor/markercluster/MarkerCluster.Default.css",
+                      "SHA256":  "61258232D98D64DC2A7B1E02130D67421BC5B9BDA5994EEF70228FF97570C170",
+                      "Length":  1287
+                  },
+                  {
+                      "Path":  "assets/vendor/README.md",
+                      "SHA256":  "25228477C6C71ED7C2D74685BFB5CA307D818D4A070C75E16EFF215B7F67CCD7",
+                      "Length":  457
+                  },
+                  {
+                      "Path":  "business-map-locator.php",
+                      "SHA256":  "6E94DFBCE87E92761241743A7E8C43F78F70F8525FEAF28B81F879350769A03F",
+                      "Length":  1875
+                  },
+                  {
+                      "Path":  "CHANGELOG.md",
+                      "SHA256":  "10E2B810DC1002A3F55FC4577A301AE153B8B74BB699A2C72EB51C980AE051EC",
+                      "Length":  28077
+                  },
+                  {
+                      "Path":  "composer.json",
+                      "SHA256":  "1A2E3840F7BA2E0BB288BAEBA19913C38AECC82D3923D594D7DFBB6F25705449",
+                      "Length":  844
+                  },
+                  {
+                      "Path":  "docs/csv-import-reference.html",
+                      "SHA256":  "FDB464AB549D37041C3CE6FAE799E1A300F8A2B0FCD7A41F2CD09F34E7A5CC1A",
+                      "Length":  4892
+                  },
+                  {
+                      "Path":  "docs/location-workspace.md",
+                      "SHA256":  "537039D5468A25C78A51BB8F47CCAA57D7DF6EF42233BD1807D0CACEE5B4E20F",
+                      "Length":  758
+                  },
+                  {
+                      "Path":  "docs/provider-architecture.md",
+                      "SHA256":  "4E1B17B16025817DDEAECEA7E49CF3A469BE4E614BBE7AE262D3C8303D8225B0",
+                      "Length":  883
+                  },
+                  {
+                      "Path":  "docs/settings-provider-panels.md",
+                      "SHA256":  "818641CEEFF370528EEC4538B763C602730DBF00506BB8CF31AC3D7CB7074BA6",
+                      "Length":  820
+                  },
+                  {
+                      "Path":  "docs/settings-ux-redesign.md",
+                      "SHA256":  "DCCF66FB9DBFD6491E035C74F43CCA6A9D10CFF142F528573AE0381DC9FDE54D",
+                      "Length":  1537
+                  },
+                  {
+                      "Path":  "docs/sprint-1-core-stabilization.md",
+                      "SHA256":  "EB3AD96C08B0152DCE31962F709A307F0A7D76B8C6267A2DAC8593E1FD8D1B1E",
+                      "Length":  1391
+                  },
+                  {
+                      "Path":  "docs/ui-reference/assets/css/admin.css",
+                      "SHA256":  "35DE86555596AD3ABE68AE39F4A82C88E325BAEEC1B70484F5E49B46D7D739F7",
+                      "Length":  18135
+                  },
+                  {
+                      "Path":  "docs/ui-reference/assets/js/admin.js",
+                      "SHA256":  "816CC6C2819119810B626E2AAEF87CE1F7B5B13DCB682B74053BBF70F826CB48",
+                      "Length":  2064
+                  },
+                  {
+                      "Path":  "docs/ui-reference/index.html",
+                      "SHA256":  "BF1A2BAFB6C122E11CC2663A31DD636DE8931CBA6DA208A4C4279B0D7A1C4833",
+                      "Length":  37192
+                  },
+                  {
+                      "Path":  "docs/ui-reference/README.txt",
+                      "SHA256":  "2D1DFB81BAE8103B9991464E08DCD3CD64B83F318C89405C312504C6F5814E21",
+                      "Length":  487
+                  },
+                  {
+                      "Path":  "examples/demo-locations.csv",
+                      "SHA256":  "5142E947B7E9107B65767310D7DC980C18D41101DDCF3E99FEAB5EEB63833BE0",
+                      "Length":  477
+                  },
+                  {
+                      "Path":  "includes/Blocks/business-locator/block.json",
+                      "SHA256":  "896F8932E157046DD1AAB8FBE0E96B470F3CAF1C1D253F3D4235539A93BE1123",
+                      "Length":  802
+                  },
+                  {
+                      "Path":  "includes/Blocks/business-locator/editor.css",
+                      "SHA256":  "EA6E8A6E3A2D66F27AEC2088C2C7DB9643240ECD80046FD56116A409F43114B2",
+                      "Length":  290
+                  },
+                  {
+                      "Path":  "includes/Blocks/business-locator/index.js",
+                      "SHA256":  "094E94891AC5ECD9C8F647CFCF93CDF763FD25EE8A067E7644A1EFE3883222A0",
+                      "Length":  2661
+                  },
+                  {
+                      "Path":  "includes/Core/class-bml-assets.php",
+                      "SHA256":  "9D3108F82D197996621EFC593C9B97443DAA3688AFC77762489AC14728C2BFC4",
+                      "Length":  1498
+                  },
+                  {
+                      "Path":  "includes/Core/class-bml-capabilities.php",
+                      "SHA256":  "52A53E5BE89CF8AB58273A8254711B3C2CE34F65C4FC6522FE026DA16AAA7601",
+                      "Length":  1250
+                  },
+                  {
+                      "Path":  "includes/Core/class-bml-diagnostics.php",
+                      "SHA256":  "E6F44C808EA6495F8F52DF13EA1CA20364E5F1C83BAC5F12C72EC77D1A530262",
+                      "Length":  1059
+                  },
+                  {
+                      "Path":  "includes/Core/class-bml-plugin.php",
+                      "SHA256":  "2C63E9EF76F49721F8233B8022BF78AA525A1679A0285266CA1CB57308471EEA",
+                      "Length":  2296
+                  },
+                  {
+                      "Path":  "includes/Database/class-bml-database.php",
+                      "SHA256":  "80C7971BCD489CD9DBC4802459BBB85686912C68828D214BE75660A7221CCACF",
+                      "Length":  3302
+                  },
+                  {
+                      "Path":  "includes/Database/class-bml-location-index.php",
+                      "SHA256":  "6DC6ADBD31B6D21D14FADFB6B4C4C9330B49F70651991BAD6D09A78FA58F9DD0",
+                      "Length":  8415
+                  },
+                  {
+                      "Path":  "includes/Database/class-bml-location-indexer.php",
+                      "SHA256":  "4EAA6FF156FEE0EBEFBF9F98EDBBD00055F844491D061CF88FC93487E14BC99D",
+                      "Length":  3184
+                  },
+                  {
+                      "Path":  "includes/Database/class-bml-migrator.php",
+                      "SHA256":  "145B7F315C10DE2605D1C41096B06EC0417580B2166FD3460EDE175BF6465024",
+                      "Length":  1368
+                  },
+                  {
+                      "Path":  "includes/Database/class-bml-schema.php",
+                      "SHA256":  "A7D9A24CCB99A7619EBCD71A705DB368769698486882C6646004F10936BB82F7",
+                      "Length":  5492
+                  },
+                  {
+                      "Path":  "includes/Frontend/class-bml-frontend.php",
+                      "SHA256":  "B4A8AA19DEAABE332A8DD6CE1844113CAF8E0C4ED1EE916B19DD1EEF63376E5B",
+                      "Length":  4456
+                  },
+                  {
+                      "Path":  "includes/Frontend/class-bml-locator-renderer.php",
+                      "SHA256":  "6F12E3838EA59C015026FA8C57AFB3B66143EAE25B67A0D208C365EFC333CE82",
+                      "Length":  3060
+                  },
+                  {
+                      "Path":  "includes/Providers/class-bml-google-maps-provider.php",
+                      "SHA256":  "C648F8287E84FD74629F6916FB7677C99EBF01A061754A5E189E6D8557E20E9F",
+                      "Length":  3623
+                  },
+                  {
+                      "Path":  "includes/Providers/class-bml-openstreetmap-provider.php",
+                      "SHA256":  "B6C7C6896FE1F9DB54862EFDCB876C04E95B16D8EEFC376BE373CF2D3C66295D",
+                      "Length":  2543
+                  },
+                  {
+                      "Path":  "includes/Providers/class-bml-provider-registry.php",
+                      "SHA256":  "803E26C1980885093606B2836A44E5B400048884DF3DFAD6EA86273C771D34B0",
+                      "Length":  5203
+                  },
+                  {
+                      "Path":  "includes/Providers/interface-bml-map-provider.php",
+                      "SHA256":  "2E93C82B56BC2BE216AF6AC0DD5ABE87BED13C84591C44ABA10B105899F36889",
+                      "Length":  365
+                  },
+                  {
+                      "Path":  "includes/REST/class-bml-rest.php",
+                      "SHA256":  "C119B011E93B419AA76E7426DE1461F9BFFCA176FF13E5E3C3717F08733FB35B",
+                      "Length":  12552
+                  },
+                  {
+                      "Path":  "includes/Shortcodes/class-bml-shortcode.php",
+                      "SHA256":  "F1B681B3E733A801710D93FC290899F02122F72D79B5F02EA6A9B66DC11F0254",
+                      "Length":  1181
+                  },
+                  {
+                      "Path":  "INSTALL.md",
+                      "SHA256":  "B7CAB93249961DE6BC748D975484EF421298CD8D52DC3E9610A2B820FB65A6DF",
+                      "Length":  2525
+                  },
+                  {
+                      "Path":  "phpcs.xml.dist",
+                      "SHA256":  "60F1F37B48A6D351DF319C1F1EF57E501D4B38C6ABD778B235C23DCDBA7D95FA",
+                      "Length":  611
+                  },
+                  {
+                      "Path":  "phpstan.neon",
+                      "SHA256":  "0E8E84ACDCBAC5DCEB354AF30D2DC11A420FD2798512D8112ACA71A76FEAA96A",
+                      "Length":  195
+                  },
+                  {
+                      "Path":  "phpunit.xml.dist",
+                      "SHA256":  "51721E0D53A1E0B4C68CAEB27476585E66D5D4B5DD1F8772CF0EFC3BD8561CE8",
+                      "Length":  550
+                  },
+                  {
+                      "Path":  "readme.txt",
+                      "SHA256":  "F8B8898CABF33819941E79CA78C628395985879FC36504F4B3060182BD859AC5",
+                      "Length":  2407
+                  },
+                  {
+                      "Path":  "src/Admin/AdminModule.php",
+                      "SHA256":  "78F9061E423AC7DB26A01F90EB630E242792279E7ECC782EB7438712E609A875",
+                      "Length":  3713
+                  },
+                  {
+                      "Path":  "src/Admin/Ajax/ImportAjaxController.php",
+                      "SHA256":  "9E3BF4E7B0BD60186262629A03D1A14E7B0A942A4AEA8DC97315B5EB524E0526",
+                      "Length":  3146
+                  },
+                  {
+                      "Path":  "src/Admin/Ajax/LocationEditorAjaxController.php",
+                      "SHA256":  "9D285A07D70D488D268BF4DF6A12962EC46B137DC475395F1FD54BE8ADA3B1B5",
+                      "Length":  6139
+                  },
+                  {
+                      "Path":  "src/Admin/Assets/AdminAssets.php",
+                      "SHA256":  "E0F54566E3CC8ED04284D60726708ECAAC0CABEB75E38377594498E85F593828",
+                      "Length":  5690
+                  },
+                  {
+                      "Path":  "src/Admin/Dashboard/DashboardPage.php",
+                      "SHA256":  "958422FDDEA6E220B67844DA01A7F9EF592315989A1034550B97AB01E2581D5B",
+                      "Length":  17258
+                  },
+                  {
+                      "Path":  "src/Admin/Demo/InstallDemoAction.php",
+                      "SHA256":  "E3DA4D97C6BFC45276C0ED83056E8683D1ECE7A33CAE4DDE8982322239A499DC",
+                      "Length":  3008
+                  },
+                  {
+                      "Path":  "src/Admin/Demo/TermAssigner.php",
+                      "SHA256":  "A08FD30FB47061D22259FC9775A0C95766AC616B0F22E3EEFF4622354CE5EBCF",
+                      "Length":  798
+                  },
+                  {
+                      "Path":  "src/Admin/Export/ExportCsvAction.php",
+                      "SHA256":  "6B93B3B952D0394C0A79E5201BF069045BDE64A849CED6F18D1862C452CFDC0A",
+                      "Length":  718
+                  },
+                  {
+                      "Path":  "src/Admin/Import/ImportPage.php",
+                      "SHA256":  "3682BC4BBF205D9CC02324BE91C1309E6441582F00468042AC45A021B597E38E",
+                      "Length":  25143
+                  },
+                  {
+                      "Path":  "src/Admin/Location/Action/BulkLocationsAction.php",
+                      "SHA256":  "9B41BA462FD6CECD5E39E53D41C44A93C7EF06EB1E121A10BFA36E2D46C53B10",
+                      "Length":  2187
+                  },
+                  {
+                      "Path":  "src/Admin/Location/Action/DeleteLocationAction.php",
+                      "SHA256":  "E2B8C506AAC8E12C90E29A74C5E44E2DA81185B470769578DD41CAB7DD0728D8",
+                      "Length":  1299
+                  },
+                  {
+                      "Path":  "src/Admin/Location/Action/DuplicateLocationAction.php",
+                      "SHA256":  "0E730BBBCB9C8E9C200B5F7CFF5C34DD544B39684E45A6FAAA9C8BAE0803E825",
+                      "Length":  2394
+                  },
+                  {
+                      "Path":  "src/Admin/Location/Action/SaveLocationAction.php",
+                      "SHA256":  "D5D6B08BDC0606DCC2B90CEF87C230FFDB6772B8B0A7FE7FE787F134CF990105",
+                      "Length":  6966
+                  },
+                  {
+                      "Path":  "src/Admin/Location/LocationCompleteness.php",
+                      "SHA256":  "9F7E45C9357043B1B102340FB4FA772129512A034CAC4E5BCCEE6B2DA1A83102",
+                      "Length":  1290
+                  },
+                  {
+                      "Path":  "src/Admin/Location/LocationEditorPage.php",
+                      "SHA256":  "11E9D5FE01A652707203B199BB55BF762D0B96139DFA4A248A52347D6D95D2A0",
+                      "Length":  2810
+                  },
+                  {
+                      "Path":  "src/Admin/Location/LocationsPage.php",
+                      "SHA256":  "3B30D7FE4CCE6CE3A75B4FE6A709D44743FE9F5B147AA659406B6875813E1DB3",
+                      "Length":  12332
+                  },
+                  {
+                      "Path":  "src/Admin/Location/LocationTableDataProvider.php",
+                      "SHA256":  "621AF5D0AC6EACF48DEA4F558543E1E538EA9CEF239CFAFB2B3CCAF14F482B99",
+                      "Length":  3509
+                  },
+                  {
+                      "Path":  "src/Admin/Location/View/ContactIcon.php",
+                      "SHA256":  "12900BE5C9A8346EF45BF2821191DF473D7CBA28AB078FF109CE824BEA0D365E",
+                      "Length":  4057
+                  },
+                  {
+                      "Path":  "src/Admin/Location/View/location-editor.php",
+                      "SHA256":  "34B671EF44ED2DD432B6B001778EFF87153AE0C27CDCCC343D0D901B534A87A3",
+                      "Length":  22299
+                  },
+                  {
+                      "Path":  "src/Admin/Location/View/LocationTableRenderer.php",
+                      "SHA256":  "AE734C947D402AC58CE8710C77D96828881CFC1C6D6553026A60C72C3B332397",
+                      "Length":  5420
+                  },
+                  {
+                      "Path":  "src/Admin/Menu/AdminMenu.php",
+                      "SHA256":  "15A3BDA1CF4E02A57E8295628119C065A0836D15E02FD3C7A941AD6FBB57D7F9",
+                      "Length":  2974
+                  },
+                  {
+                      "Path":  "src/Admin/Menu/AdminTitleRegistry.php",
+                      "SHA256":  "A7B138500903C3EA13EB68D3AEA3BBA2448FEB8E9A986ADB97002B178703AD41",
+                      "Length":  647
+                  },
+                  {
+                      "Path":  "src/Admin/Notice/AdminNotices.php",
+                      "SHA256":  "DC88EAE9CB315201EDA118DBBA984CE3C502E9204003906137F9CFFDE020FBBD",
+                      "Length":  2610
+                  },
+                  {
+                      "Path":  "src/Admin/Request/AdminRequest.php",
+                      "SHA256":  "BF4C924B0EE9774889B47839328397A18F2153D478C4725FA42DEF897219B0FF",
+                      "Length":  3010
+                  },
+                  {
+                      "Path":  "src/Admin/Settings/Action/SaveSettingsAction.php",
+                      "SHA256":  "69D60F7D968CA57C9B89BC76A2BD1EC183064D939D1D1A76E5D1292CE1E80F18",
+                      "Length":  4710
+                  },
+                  {
+                      "Path":  "src/Admin/Settings/SettingsPage.php",
+                      "SHA256":  "BBEF49596700DC09EE036ACD4B8A563F03A45968FC21B5E1FDA18EBB2BB448D4",
+                      "Length":  1686
+                  },
+                  {
+                      "Path":  "src/Admin/Settings/View/SettingsRenderer.php",
+                      "SHA256":  "3CA15E5302401800E4EAEAE431A998D9208819E839939F044B69054B237D55BE",
+                      "Length":  17306
+                  },
+                  {
+                      "Path":  "src/Admin/Shared/AdminActionResponder.php",
+                      "SHA256":  "FF10BDCC4E0AC9472D80B4D16C6563E57020732315A39A6E9DDC68C7EFE359CC",
+                      "Length":  710
+                  },
+                  {
+                      "Path":  "src/Admin/Shared/AdminShell.php",
+                      "SHA256":  "F845B562EF5099DB558C1FC061B1019B20E069DC59A8636506E0361CD7887481",
+                      "Length":  6446
+                  },
+                  {
+                      "Path":  "src/Admin/Taxonomy/Action/DeleteTermAction.php",
+                      "SHA256":  "1E703C47BF3FFA1CF8937376F4F58A0279B6FC4EED6E18946FB8E8FF18EF0E6B",
+                      "Length":  1956
+                  },
+                  {
+                      "Path":  "src/Admin/Taxonomy/Action/DuplicateTermAction.php",
+                      "SHA256":  "EB04F0E2CC17C2F4892237746F7E5BE66D74322590FB0EA42A7DB8AD445C0AC2",
+                      "Length":  1932
+                  },
+                  {
+                      "Path":  "src/Admin/Taxonomy/Action/SaveTermAction.php",
+                      "SHA256":  "B7134783036F42E188E2A3CD5DB610262DA47519EC578280CFC16331EE60E976",
+                      "Length":  2661
+                  },
+                  {
+                      "Path":  "src/Admin/Taxonomy/TaxonomyOptionsProvider.php",
+                      "SHA256":  "8A6086CDF02BA7583BCF69BA9BF1C4CC68FE15DEA807574B3483E8F078A7C2A2",
+                      "Length":  585
+                  },
+                  {
+                      "Path":  "src/Admin/Taxonomy/TaxonomyPage.php",
+                      "SHA256":  "F21EFD4121673866C0B9A473AF65AC61D02A460B0F704605840573EEA138BD64",
+                      "Length":  45810
+                  },
+                  {
+                      "Path":  "src/Admin/Taxonomy/View/TermSelectRenderer.php",
+                      "SHA256":  "33DFFF3520C310EEE16BF5FB37FD20CB9DC246209ADA2B3AE103B50591579FB8",
+                      "Length":  621
+                  },
+                  {
+                      "Path":  "src/Application/Location/SearchLocationsHandler.php",
+                      "SHA256":  "228CBB3E126052168834B99FBB94B89B170684F4C31864FA8DFD35DE0178812F",
+                      "Length":  3083
+                  },
+                  {
+                      "Path":  "src/Application/Location/SearchLocationsQuery.php",
+                      "SHA256":  "9D44CAAE08C715AE5766E099624496909F0AF1BFCC7FA04F74C6D9EADFC88EE1",
+                      "Length":  4706
+                  },
+                  {
+                      "Path":  "src/Container.php",
+                      "SHA256":  "06B3D6B00E5908D411BC6CFFD9225839CD320DD41002C5FC0F32078F5A718C5B",
+                      "Length":  797
+                  },
+                  {
+                      "Path":  "src/Domain/Geo/BoundingBox.php",
+                      "SHA256":  "2B0911E672C0EEBA551F7CFFF8BB88094671FFD96F1E85EA9F12FBEA6CDA7AA5",
+                      "Length":  598
+                  },
+                  {
+                      "Path":  "src/Domain/Geo/Coordinates.php",
+                      "SHA256":  "E095D4BB5A22D7F21993866E4A8D926D3EE2D39DF3A8DAB021AFAEF68179D5E4",
+                      "Length":  515
+                  },
+                  {
+                      "Path":  "src/Domain/Geo/Distance.php",
+                      "SHA256":  "5C10095856FD79F34E0D28ED22C2518D1F2584CBABBACBE2E18401759C3FFF21",
+                      "Length":  368
+                  },
+                  {
+                      "Path":  "src/Domain/Geo/DistanceUnit.php",
+                      "SHA256":  "772AD5EE0284A802508F93C86ACBA18D3D219FBC771F6654EB2141BD6117372F",
+                      "Length":  271
+                  },
+                  {
+                      "Path":  "src/Domain/Location/LocationServiceCatalog.php",
+                      "SHA256":  "62C93D8FB813E02C684F771789A98881D5EC9799E7056FBC210625DDA2CAC8DB",
+                      "Length":  763
+                  },
+                  {
+                      "Path":  "src/Export/CsvFormulaEscaper.php",
+                      "SHA256":  "B09680D701BFEA9C8B156CBECBFEC7C16510EC1E17EA217BCABDEA29CFA87720",
+                      "Length":  323
+                  },
+                  {
+                      "Path":  "src/Export/LocationCsvExporter.php",
+                      "SHA256":  "DBAC9A6F78279EE9B28BD50B848598C566AFEFEF03A93FBB86D61B3A1A5BA925",
+                      "Length":  3587
+                  },
+                  {
+                      "Path":  "src/Import/Config/ImportLimits.php",
+                      "SHA256":  "5A949714EF1555B7192910919AF7B721341980688F680AEEAC7B8BB63DA07DEB",
+                      "Length":  1602
+                  },
+                  {
+                      "Path":  "src/Import/Csv/CsvException.php",
+                      "SHA256":  "3E9F7C518FB17CA53083510AB21AACD167676E4CD0EA39F967CDFC7EFA428818",
+                      "Length":  337
+                  },
+                  {
+                      "Path":  "src/Import/Csv/CsvReader.php",
+                      "SHA256":  "C9E1E1D43AC38255BAA43A4B06672198CFB269FCC22DE20413432459B3BC4CBD",
+                      "Length":  5020
+                  },
+                  {
+                      "Path":  "src/Import/Dto/ImportJob.php",
+                      "SHA256":  "3682D24CA4A4A326C2BF00D7903D7FB6C88836520C863835FA0539F75336586D",
+                      "Length":  1404
+                  },
+                  {
+                      "Path":  "src/Import/Dto/ImportJobCounters.php",
+                      "SHA256":  "1755E071A560C656572BA1A327E83AB48D7D95516480F5B9A024D93149A86725",
+                      "Length":  767
+                  },
+                  {
+                      "Path":  "src/Import/Dto/ImportJobError.php",
+                      "SHA256":  "01D925C26647D388778EC1EF0963A91C1B77F18E77C7E92FDDB6EF8FC1AA650F",
+                      "Length":  610
+                  },
+                  {
+                      "Path":  "src/Import/Dto/ImportJobSummary.php",
+                      "SHA256":  "77F0864CADC1E4E187EDC7814D7F9646248CCFC49B250C9F0365AA82311A2FB8",
+                      "Length":  222
+                  },
+                  {
+                      "Path":  "src/Import/Duplicate/DuplicateDetector.php",
+                      "SHA256":  "2E9F2B720926043F0D052FA0DCF3F0491355A47956B557B93D1DB4AEA96F36D7",
+                      "Length":  2697
+                  },
+                  {
+                      "Path":  "src/Import/Duplicate/ExistingLocationLookup.php",
+                      "SHA256":  "22E7B6EC8E5ABDB33947752150CB65749C2B4856D4330C39C3329CB9EFE5F7FC",
+                      "Length":  2022
+                  },
+                  {
+                      "Path":  "src/Import/Event/ImportJobEventRepository.php",
+                      "SHA256":  "7111C5D11D0C18CD02F5780627F7BDC8DBEFA88B2A5F4158AB14575BE4D49065",
+                      "Length":  987
+                  },
+                  {
+                      "Path":  "src/Import/Exception/ImportJobException.php",
+                      "SHA256":  "6A519A8BFC159AFF7F597DA40302B76863CE19530F9893872793710A5FA97D4C",
+                      "Length":  1804
+                  },
+                  {
+                      "Path":  "src/Import/ImportCleanupScheduler.php",
+                      "SHA256":  "A1A55FE2633F5F95D9E34DE907EBD3FAF3848911A403361F71484B302CC0B82A",
+                      "Length":  614
+                  },
+                  {
+                      "Path":  "src/Import/ImportManager.php",
+                      "SHA256":  "8CE14772BBFEEE76533B5668A85844AE3DB00596FEC108868BFB391C20572826",
+                      "Length":  26069
+                  },
+                  {
+                      "Path":  "src/Import/Job/ImportJobRepository.php",
+                      "SHA256":  "591DBEAADB15B3D2C8754C011CEE7F91E3C7AD5FF8C97AE85D51456970FA1809",
+                      "Length":  8318
+                  },
+                  {
+                      "Path":  "src/Import/Job/ImportJobRepositoryInterface.php",
+                      "SHA256":  "40F7B14225E395768493C9E1048FB1CD406D01756FBCEF97678170301329B062",
+                      "Length":  1283
+                  },
+                  {
+                      "Path":  "src/Import/Job/ImportJobRowRepository.php",
+                      "SHA256":  "EDF04B62DF1E643DA9C9E00AF1DEAF2CA28002167AE4DA550CD317C355759A95",
+                      "Length":  3841
+                  },
+                  {
+                      "Path":  "src/Import/Job/ImportJobStateMachine.php",
+                      "SHA256":  "D503B8A4BF6BAB606DE5C272C3CC2C8435969190F0C7794A173581BECAAF4143",
+                      "Length":  1422
+                  },
+                  {
+                      "Path":  "src/Import/Job/ImportJobStatus.php",
+                      "SHA256":  "5C122E17BB2212BB075AFF07363D3A20CED1796CD472C962D5DDADE6B35ECE88",
+                      "Length":  894
+                  },
+                  {
+                      "Path":  "src/Import/Job/SourceRowHasher.php",
+                      "SHA256":  "382F0837CCAA67DC8C908EAE696C0690BC9ABAF05513C1EBB20B658DB85AB99C",
+                      "Length":  608
+                  },
+                  {
+                      "Path":  "src/Import/Logging/ImportLogger.php",
+                      "SHA256":  "2E5F5689C7F7A0ACFD58314FB2B303DED2AC39F359206DB741E34A39CAF0D165",
+                      "Length":  1069
+                  },
+                  {
+                      "Path":  "src/Import/Mapping/ImportMapper.php",
+                      "SHA256":  "EC23B4FF7D6177175717EBD1EE1D2AF2E3CD826C63018AB7490B679B026D4169",
+                      "Length":  4020
+                  },
+                  {
+                      "Path":  "src/Import/Processing/LocationImporter.php",
+                      "SHA256":  "8AB5D88FE330ACB5788EE30C5458A710EA5E45593C2D302F90D4CF9185468FE6",
+                      "Length":  6415
+                  },
+                  {
+                      "Path":  "src/Import/Security/ImportDirectory.php",
+                      "SHA256":  "EB6CD709AEF5C6338CA27AE7AA941EBAD15DAF1C641E9E5B758DE60271121DA1",
+                      "Length":  1702
+                  },
+                  {
+                      "Path":  "src/Import/Security/UploadValidator.php",
+                      "SHA256":  "62BA3C912B0F618A14FE8C74DA19F08EF8D77C4A422EF18E339C2D4CC17511BD",
+                      "Length":  1760
+                  },
+                  {
+                      "Path":  "src/Import/Serialization/ImportJobPayloadSerializer.php",
+                      "SHA256":  "F6AD2F6E6C277769AB726AA4983B878A8BBFF80EF7207B0F4160B8871F21E45B",
+                      "Length":  2415
+                  },
+                  {
+                      "Path":  "src/Infrastructure/Database/LocationRepository.php",
+                      "SHA256":  "7DB025EA6BBD9D218EEFF4DBFFDFA1EF2D432D03E9D0B504970C31C31B16D564",
+                      "Length":  7875
+                  },
+                  {
+                      "Path":  "src/Infrastructure/Database/Migration/SchemaMigrator.php",
+                      "SHA256":  "37FF7BACE84B2D7937319FC8E6172D3EADD378911A66CCD3508D0EA846790589",
+                      "Length":  806
+                  },
+                  {
+                      "Path":  "src/Legacy/LegacyClassLoader.php",
+                      "SHA256":  "F3D32584C529CAE53E3D77D86A40969DFDED7A5F7290513241B27BA6E31D26F5",
+                      "Length":  2436
+                  },
+                  {
+                      "Path":  "src/Lifecycle/Activator.php",
+                      "SHA256":  "7B291438F05CEEBA8E6B8A21DA55C7511106F5049E6F6A3685DD594A6B2E0F46",
+                      "Length":  657
+                  },
+                  {
+                      "Path":  "src/Lifecycle/Deactivator.php",
+                      "SHA256":  "0EC6DB7F5CD3F081EAC495D6CA5D6ED8A2ADF9379A868F211B4066642914D22B",
+                      "Length":  277
+                  },
+                  {
+                      "Path":  "src/Migration/AreaMigrationService.php",
+                      "SHA256":  "0C525AE06F52361A75BD63FE6124F82E4E0D112FE6BCB538BC4E361AECA01CD3",
+                      "Length":  4212
+                  },
+                  {
+                      "Path":  "src/Migration/AreaRollbackService.php",
+                      "SHA256":  "417F5FBD32BC7AE6521DB28F8497733F14E03A467E75A7A96666585E27BD190D",
+                      "Length":  1146
+                  },
+                  {
+                      "Path":  "src/Migration/MigrationSnapshotStore.php",
+                      "SHA256":  "8CC9719C43AF37DCFD3FAC706D3DD965AF12D4342625444CB9B6378AA21F1CDC",
+                      "Length":  4067
+                  },
+                  {
+                      "Path":  "src/Migration/RollbackInterface.php",
+                      "SHA256":  "30E4B5C2BFD30FD290B6374FB961ED8DC408671482D77F4A1F33F6AB90914F10",
+                      "Length":  472
+                  },
+                  {
+                      "Path":  "src/Plugin.php",
+                      "SHA256":  "B494350E819572EAE1AB88DC8A6D770C9843765E018697A27E1A6910E715E1D7",
+                      "Length":  20700
+                  },
+                  {
+                      "Path":  "src/Rest/LocationDetailResponseFactory.php",
+                      "SHA256":  "FBD18E1ED28C3FA0F745C6A33C57C9188D683571DA9384E9423C644454C12984",
+                      "Length":  2057
+                  },
+                  {
+                      "Path":  "src/Rest/LocationResponseFactory.php",
+                      "SHA256":  "6584A5DBE676D14962DD38429F6073D04E8E5998B6C140C95CEFD927E48C51A5",
+                      "Length":  6384
+                  },
+                  {
+                      "Path":  "src/Rest/LocationsController.php",
+                      "SHA256":  "C28ACFAB8131C748180FB8D533BC35607004A9321BF21CB0C08C331CA67562BB",
+                      "Length":  7952
+                  },
+                  {
+                      "Path":  "src/Settings/Settings.php",
+                      "SHA256":  "E1089664A2172695E7AB2F121CC4641A53178A9085059BB71ED61A5317DC040F",
+                      "Length":  2559
+                  },
+                  {
+                      "Path":  "src/Support/SlugGenerator.php",
+                      "SHA256":  "A7692942AB44E46C8D2890C1B8762FB6E984837F6D3995DB5BF96C4BECA4DD8F",
+                      "Length":  1378
+                  },
+                  {
+                      "Path":  "src/WordPress/BlockRegistrar.php",
+                      "SHA256":  "A52F6E3D5B64F600A05287419B3659C2A0005A66FAB40F906518FE760A7CDA95",
+                      "Length":  525
+                  },
+                  {
+                      "Path":  "src/WordPress/Capabilities.php",
+                      "SHA256":  "A77E340C4714933063892A2FD30AF25E5A0337F197DF7AE16A0E9E794B4B29FA",
+                      "Length":  2489
+                  },
+                  {
+                      "Path":  "src/WordPress/ContentTypes.php",
+                      "SHA256":  "577DD274B597C93559EDC72BE34F83AC5ED2761CE4789CA0DD533638EBE68B2D",
+                      "Length":  3315
+                  },
+                  {
+                      "Path":  "src/WordPress/MetaRegistrar.php",
+                      "SHA256":  "2B53EE80EEE93039481700F28DC6C0A3140CD16AF18F418E057DD840BA8E0D49",
+                      "Length":  1443
+                  },
+                  {
+                      "Path":  "src/WordPress/PrivacyPolicy.php",
+                      "SHA256":  "0B2A8508CFA8FB8D066745109375C7AF12D855EE7F46626D23C144D8EA18B50C",
+                      "Length":  772
+                  },
+                  {
+                      "Path":  "src/WordPress/TextDomain.php",
+                      "SHA256":  "EC4721405B2BB254A7ED8DA6993DBCC5A63847D927CBCB368A0378CFC280FF7F",
+                      "Length":  305
+                  },
+                  {
+                      "Path":  "templates/frontend/list.php",
+                      "SHA256":  "859E3F4E06BD48494F234687C130E78FAA6D8A9E24CB1B141858F15C7FF9A176",
+                      "Length":  200
+                  },
+                  {
+                      "Path":  "templates/frontend/locator.php",
+                      "SHA256":  "956B0BF2AB7FBBD74998061F1121AB2886373207DBF87217BE46B033758F1924",
+                      "Length":  959
+                  },
+                  {
+                      "Path":  "templates/frontend/map.php",
+                      "SHA256":  "9085F4A8F09D6D9C9F6F34A102AC37B5C39F657BF64EE025C1FB9A8D295DDC03",
+                      "Length":  175
+                  },
+                  {
+                      "Path":  "templates/frontend/popup.php",
+                      "SHA256":  "9B33F3F3C018A7F800E26254150619BA08637B22D87A78BA70D588CAE9D58535",
+                      "Length":  1094
+                  },
+                  {
+                      "Path":  "templates/frontend/toolbar.php",
+                      "SHA256":  "228AFA13AFA9A556B127FFB01F824B83046607BFB53317AB06F642B8C651924C",
+                      "Length":  1038
+                  },
+                  {
+                      "Path":  "tools/fetch-vendor.sh",
+                      "SHA256":  "71C1CD789D637D7175031E742B61848F6B5AB9FAFC2152D55507D11C34CE9790",
+                      "Length":  1559
+                  },
+                  {
+                      "Path":  "uninstall.php",
+                      "SHA256":  "B1939A3023E0E430AC979DA1CE36B7CDB9B50803F57A11154C8D198ADD69DB8B",
+                      "Length":  1443
+                  }
+              ],
+    "parity":  "PASS",
+    "backup":  "D:\\WP plugins\\business-map-locator\\.codex\\backups\\2026-07-24_11-06-09_areas-phase-a"
+}

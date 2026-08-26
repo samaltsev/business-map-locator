@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Business Map Locator — CSV Import Reference</title>
+<style>
+body{margin:0;background:#f4f7fb;color:#172033;font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1100px;margin:40px auto;padding:0 22px}.hero,.card{background:#fff;border:1px solid #dfe7f1;border-radius:16px;box-shadow:0 10px 30px rgba(15,23,42,.05)}.hero{padding:30px}.card{margin-top:20px;padding:24px}h1{margin:5px 0 10px;font-size:30px}h2{margin:0 0 14px;font-size:21px}.eyebrow{color:#2563eb;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}p{color:#526074}code{padding:2px 6px;border-radius:5px;background:#eef3f8;color:#183b6b}table{width:100%;border-collapse:collapse}th,td{padding:11px 12px;border-bottom:1px solid #e6edf5;text-align:left;vertical-align:top}th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.04em}tr:last-child td{border-bottom:0}.note{padding:13px 15px;border-left:4px solid #2563eb;background:#eff6ff;border-radius:8px}.danger{border-left-color:#dc2626;background:#fef2f2}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:760px){.grid{grid-template-columns:1fr}.card{overflow:auto}}
+</style>
+</head>
+<body><main>
+<section class="hero"><span class="eyebrow">Business Map Locator</span><h1>CSV Import Reference</h1><p>Prepare UTF-8 CSV files for reliable location imports. Comma, semicolon and tab delimiters are supported and detected automatically.</p></section>
+<section class="card"><h2>Required structure</h2><div class="grid"><div class="note"><strong>Required columns</strong><p><code>title</code> or <code>name</code>, plus <code>lat</code> and <code>lng</code>.</p></div><div class="note"><strong>Recommended identity</strong><p>Always provide a stable and unique <code>external_id</code> for safe updates.</p></div></div></section>
+<section class="card"><h2>Supported columns</h2><table><thead><tr><th>Column</th><th>Purpose</th><th>Accepted format</th></tr></thead><tbody>
+<tr><td><code>external_id</code></td><td>Stable business-system identifier.</td><td>Unique text, for example <code>STORE-001</code>.</td></tr>
+<tr><td><code>title</code> / <code>name</code></td><td>Location name.</td><td>Required non-empty text.</td></tr>
+<tr><td><code>address</code></td><td>Street address.</td><td>Plain text.</td></tr>
+<tr><td><code>city</code></td><td>City taxonomy terms.</td><td>One or more values separated with <code>|</code>.</td></tr>
+<tr><td><code>category</code></td><td>Category taxonomy terms.</td><td>One or more values separated with <code>|</code>.</td></tr>
+<tr><td><code>region</code>, <code>country</code>, <code>postcode</code></td><td>Address details.</td><td>Plain text.</td></tr>
+<tr><td><code>lat</code>, <code>lng</code></td><td>Coordinates.</td><td>Decimal point only: <code>53.900601</code>, <code>-27.558972</code>.</td></tr>
+<tr><td><code>phone</code>, <code>email</code>, <code>website</code></td><td>Contact information.</td><td>Phone text, valid email, full URL.</td></tr>
+<tr><td><code>hours</code></td><td>Opening hours.</td><td>Plain text, quoted when it contains delimiters or line breaks.</td></tr>
+<tr><td><code>status</code></td><td>WordPress publication status.</td><td><code>publish</code> or <code>draft</code>. Values <code>0</code>, <code>false</code>, <code>no</code>, <code>inactive</code> and <code>disabled</code> become draft.</td></tr>
+<tr><td><code>visible</code></td><td>Frontend visibility flag.</td><td>True: <code>1</code>, <code>true</code>, <code>yes</code>, <code>on</code>, <code>visible</code>. Other values become <code>0</code>.</td></tr>
+</tbody></table></section>
+<section class="card"><h2>File rules</h2><ul><li>Use UTF-8 or UTF-8 with BOM.</li><li>Line endings may be LF or CRLF.</li><li>Quoted multiline fields are supported.</li><li>Empty rows are skipped.</li><li>Header names must be unique.</li><li>Unknown columns are rejected by default.</li></ul></section>
+<section class="card"><h2>Duplicate safety</h2><p class="note danger">A repeated external ID, an ambiguous fingerprint, or a conflict between external ID and fingerprint is reported as an error. The importer will not update a random location.</p><table><tbody><tr><td><code>duplicate_external_id_in_file</code></td><td>The same external ID appears more than once in the CSV.</td></tr><tr><td><code>duplicate_external_id_in_database</code></td><td>The database contains multiple locations with the same external ID.</td></tr><tr><td><code>ambiguous_fingerprint</code></td><td>Title, address and coordinates match multiple locations.</td></tr><tr><td><code>external_id_fingerprint_conflict</code></td><td>External ID and fingerprint point to different locations.</td></tr></tbody></table></section>
+</main></body></html>

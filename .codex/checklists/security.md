@@ -1,0 +1,11 @@
+# Security checklist
+- [ ] Capability checks
+- [ ] Nonces for admin mutations
+- [ ] REST permission callbacks
+- [ ] Input sanitization
+- [ ] Late escaping
+- [ ] Prepared SQL
+- [ ] No secrets in HTML/logs
+- [ ] Upload MIME/size/path validation
+- [ ] SSRF protection for remote media
+- [ ] Formula injection protection

@@ -1,0 +1,3 @@
+external_id,title,address,city,category,region,country,postcode,lat,lng,phone,email,website,hours,status
+loc-001,Main Office,"Independence Avenue 1",Minsk,Office,Minsk,Belarus,220030,53.9023,27.5619,+375290000001,office@example.com,https://example.com,"Mon-Fri 09:00-18:00",publish
+loc-002,Service Center North,"Pobediteley Avenue 84",Minsk,Service Center,Minsk,Belarus,220035,53.9294,27.5098,+375290000002,service@example.com,https://example.com,"Mon-Sat 09:00-19:00",publish

@@ -1,0 +1,11 @@
+# Code review checklist
+- [ ] Correctness
+- [ ] Data safety
+- [ ] Security
+- [ ] Backward compatibility
+- [ ] Legacy/new duplication
+- [ ] Performance
+- [ ] Accessibility
+- [ ] Localization
+- [ ] Test quality
+- [ ] Scope creep

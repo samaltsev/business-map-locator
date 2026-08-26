@@ -1,0 +1,11 @@
+# Release checklist
+- [ ] Clean working tree
+- [ ] Versions synchronized
+- [ ] Changelog updated
+- [ ] Tests/lint green
+- [ ] No debug/local paths/secrets
+- [ ] ZIP excludes dev artifacts
+- [ ] Extracted ZIP rechecked
+- [ ] Source/ZIP parity confirmed
+- [ ] SHA-256 generated
+- [ ] Release evidence written

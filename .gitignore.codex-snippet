@@ -1,0 +1,5 @@
+# Codex local environment and generated evidence
+.env.codex
+.codex/reports/*
+!.codex/reports/.gitkeep
+build/

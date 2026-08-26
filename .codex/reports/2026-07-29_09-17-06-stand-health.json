@@ -1,0 +1,70 @@
+﻿{
+    "php_lint":  {
+                     "status":  "PASS",
+                     "detail":  ""
+                 },
+    "conflict_markers":  {
+                             "status":  "FAIL",
+                             "detail":  "D:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:5:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:7:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:9:\u003e\u003e\u003e\u003e\u003e\u003e\u003e develop\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:12:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:14:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:16:\u003e\u003e\u003e\u003e\u003e\u003e\u003e develop\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:24:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:30:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.js:32:\u003e\u003e\u003e\u003e\u003e\u003e\u003e master\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.2.css:3:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.2.css:8:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.2.css:13:\u003e\u003e\u003e\u003e\u003e\u003e\u003e ref/heads/feature-branch\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.2.css:27:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.2.css:29:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.2.css:31:\u003e\u003e\u003e\u003e\u003e\u003e\u003e ref/heads/feature-branch\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:3:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:5:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:7:\u003e\u003e\u003e\u003e\u003e\u003e\u003e ref/heads/feature-branch\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:12:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:14:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:16:\u003e\u003e\u003e\u003e\u003e\u003e\u003e ref/heads/feature-branch\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:30:\u003c\u003c\u003c\u003c\u003c\u003c\u003c HEAD\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:32:=======\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Generic\\Tests\\VersionControl\\GitMergeConflictUnitTest.1.css:34:\u003e\u003e\u003e\u003e\u003e\u003e\u003e ref/heads/feature-branch"
+                         },
+    "debug_statements":  {
+                             "status":  "FAIL",
+                             "detail":  "D:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\sebastian\\exporter\\src\\Exporter.php:43:     * The output of this method is similar to the output of print_r(), but\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\sebastian\\exporter\\src\\Exporter.php:181:        // Format the output similarly to print_r() in this case\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\phpunit\\phpunit\\src\\Event\\Value\\ComparisonFailureBuilder.php:65:            return print_r($value, true);\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Squiz\\Tests\\Commenting\\InlineCommentUnitTest.js:126:console.log(foo); // An unrelated comment.\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Standards\\Squiz\\Tests\\Commenting\\InlineCommentUnitTest.js:129:console.log(foo); // some comment without capital or full stop\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\php-stubs\\wordpress-stubs\\wordpress-stubs.php:68307:     *    closing the SCRIPT from inside a JavaScript string. E.g. `console.log( \u0027\u003c/script\u003e\u0027 )`.\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\php-stubs\\wordpress-stubs\\wordpress-stubs.php:69678:     *  - SCRIPT content which has been escaped, e.g. `\u003cscript\u003e\u003c!-- document.write(\u0027\u003cscript\u003econsole.log(\"hi\")\u003c/script\u003e\u0027) --\u003e\u003c/script\u003e`.\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\php-stubs\\wordpress-stubs\\wordpress-stubs.php:142731:     *     $js = \u0027\u003cscript type=\"text/javascript\"\u003econsole.log( \"hi\" );\u003c/script\u003e\u0027;\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\squizlabs\\php_codesniffer\\src\\Sniffs\\Sniff.php:55:     *    print_r($tokens[$stackPtr]);"
+                         },
+    "absolute_paths":  {
+                           "status":  "FAIL",
+                           "detail":  "D:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\php-stubs\\wordpress-stubs\\wordpress-stubs.php:57163:     *                 \"\\x0bmple_smile:\\x04🙂\",\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\php-stubs\\wordpress-stubs\\wordpress-stubs.php:57165:     *                 \"\\x03ba:\\x04🍜\\x02b:\\x04😭\",\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\php-stubs\\wordpress-stubs\\wordpress-stubs.php:116747:     * For example, \u0027/foo/bar\u0027, or \u0027c:\\windows\u0027.\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\phpunit\\phpunit\\src\\TextUI\\Output\\Default\\ResultPrinter.php:431:                \"%d test%s triggered %d %s%s:\\n\\n\",\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\phpunit\\phpunit\\src\\TextUI\\Output\\Default\\ResultPrinter.php:445:                \"There %s %d %s%s:\\n\\n\",\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\phpunit\\phpunit\\src\\TextUI\\Configuration\\Merger.php:720:                    \"Test results may not be as expected because the XML configuration file did not pass validation:\\n\" .\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\phpunit\\phpunit\\src\\TextUI\\Configuration\\Xml\\Loader.php:232:        //  - C:\\Windows\nD:\\WP plugins\\business-map-locator\\business-map-locator\\vendor\\phpunit\\phpunit\\src\\TextUI\\Configuration\\Xml\\Loader.php:233:        //  - C:\\windows"
+                       },
+    "secrets":  {
+                    "status":  "PASS",
+                    "detail":  ""
+                },
+    "forbidden_cdn":  {
+                          "status":  "PASS",
+                          "detail":  ""
+                      },
+    "main_bootstrap":  {
+                           "status":  "FAIL",
+                           "detail":  "Plugin headers: 2"
+                       },
+    "plugin_version":  {
+                           "status":  "PASS",
+                           "detail":  "source=1.3.2-beta29 stand=1.3.2-beta29"
+                       },
+    "stand_dev_files":  {
+                            "status":  "PASS",
+                            "detail":  "Installed plugin does not contain excluded development directories."
+                        },
+    "http_":  {
+                  "status":  "PASS",
+                  "detail":  "HTTP 200, 3070 ms"
+              },
+    "http_wp-json_":  {
+                          "status":  "PASS",
+                          "detail":  "HTTP 200, 3052 ms"
+                      },
+    "http_wp-json_business-map_v1_health":  {
+                                                "status":  "PASS",
+                                                "detail":  "HTTP 200, 1591 ms"
+                                            },
+    "http_wp-json_business-map_v1_locations_per_page=1":  {
+                                                              "status":  "PASS",
+                                                              "detail":  "HTTP 200, 1793 ms"
+                                                          },
+    "phpunit":  {
+                    "status":  "FAIL",
+                    "detail":  "exit=1"
+                },
+    "phpcs":  {
+                  "status":  "FAIL",
+                  "detail":  "exit=3"
+              },
+    "phpstan":  {
+                    "status":  "FAIL",
+                    "detail":  "exit=1"
+                },
+    "javascript_syntax":  {
+                              "status":  "SKIPPED",
+                              "detail":  "Node unavailable."
+                          }
+}
