@@ -181,10 +181,15 @@ final readonly class LocationsController
     {
         $id = absint($request->get_param('id'));
         $post = $id > 0 ? get_post($id) : null;
-        if (!$post instanceof WP_Post || $post->post_type !== 'bml_location' || $post->post_status !== 'publish' || !$this->hasValidCoordinates($id)) {
+        if (!$post instanceof WP_Post || $post->post_type !== 'bml_location' || $post->post_status !== 'publish' || $this->hasHiddenOperationalStatus($id) || !$this->hasValidCoordinates($id)) {
             return new WP_Error('bml_location_not_found', __('Location not found.', 'business-map-locator'), ['status' => 404]);
         }
         return rest_ensure_response($this->detailResponseFactory->create($post));
+    }
+
+    private function hasHiddenOperationalStatus(int $id): bool
+    {
+        return sanitize_key((string) get_post_meta($id, 'bml_operational_status', true)) === 'hidden';
     }
 
     private function hasValidCoordinates(int $id): bool
