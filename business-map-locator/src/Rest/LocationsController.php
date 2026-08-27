@@ -12,6 +12,7 @@ use WP_REST_Response;
 use WP_REST_Server;
 use WP_Post;
 use BusinessMapLocator\Infrastructure\Database\LocationRepository;
+use BusinessMapLocator\Support\OperationalStatusResolver;
 
 final readonly class LocationsController
 {
@@ -189,7 +190,10 @@ final readonly class LocationsController
 
     private function hasHiddenOperationalStatus(int $id): bool
     {
-        return sanitize_key((string) get_post_meta($id, 'bml_operational_status', true)) === 'hidden';
+        return OperationalStatusResolver::resolve(
+            get_post_meta($id, 'bml_operational_status', true),
+            get_post_meta($id, 'bml_visible', true)
+        ) === OperationalStatusResolver::HIDDEN;
     }
 
     private function hasValidCoordinates(int $id): bool

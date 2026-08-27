@@ -6,6 +6,7 @@ namespace BusinessMapLocator\Import\Processing;
 use BusinessMapLocator\Import\Dto\ImportJob;
 use BusinessMapLocator\Import\Mapping\ImportMapper;
 use BusinessMapLocator\Import\Duplicate\ExistingLocationLookup;
+use BusinessMapLocator\Support\OperationalStatusResolver;
 use BusinessMapLocator\Support\SlugGenerator;
 
 final class LocationImporter
@@ -62,7 +63,7 @@ final class LocationImporter
             update_post_meta($postId, 'bml_import_job_id', (int) ($job['id'] ?? 0));
             update_post_meta($postId, 'bml_import_row_action', $isUpdate ? 'updated' : 'created');
         }
-        $this->saveLocation($postId, $data, $externalId, $fingerprint, $lat, $lng);
+        $this->saveLocation($postId, $data, $externalId, $fingerprint, $lat, $lng, $isUpdate);
         (new \BML_Location_Index())->upsert($postId);
 
         $job[$isUpdate ? 'updated' : 'added']++;
@@ -84,16 +85,19 @@ final class LocationImporter
         $postData = [
             'post_type' => 'bml_location',
             'post_title' => $title,
-            'post_status' => (($data['status'] ?? '') === 'draft') ? 'draft' : 'publish',
         ];
         if ($postId > 0) {
+            if (($data['status'] ?? '') !== '') {
+                $postData['post_status'] = $data['status'] === 'draft' ? 'draft' : 'publish';
+            }
             $postData['ID'] = $postId;
             return wp_update_post($postData, true);
         }
+        $postData['post_status'] = ($data['status'] ?? '') === 'draft' ? 'draft' : 'publish';
         return wp_insert_post($postData, true);
     }
 
-    private function saveLocation(int $postId, array $data, string $externalId, string $fingerprint, float $lat, float $lng): void
+    private function saveLocation(int $postId, array $data, string $externalId, string $fingerprint, float $lat, float $lng, bool $isUpdate): void
     {
         foreach (['address','region','country','postcode','phone','hours'] as $key) {
             update_post_meta($postId, 'bml_' . $key, sanitize_text_field((string) ($data[$key] ?? '')));
@@ -104,8 +108,12 @@ final class LocationImporter
         update_post_meta($postId, 'bml_lng', $lng);
         update_post_meta($postId, 'bml_external_id', $externalId);
         update_post_meta($postId, 'bml_import_fingerprint', $fingerprint);
-        if (array_key_exists('visible', $data)) {
-            update_post_meta($postId, 'bml_visible', (string) $data['visible'] === '1' ? '1' : '0');
+        $hasOperationalStatus = array_key_exists('operational_status', $data) && $data['operational_status'] !== '';
+        $hasVisible = array_key_exists('visible', $data);
+        if (!$isUpdate || $hasOperationalStatus || $hasVisible) {
+            $operationalStatus = $this->operationalStatus($postId, $data, $isUpdate, $hasOperationalStatus, $hasVisible);
+            update_post_meta($postId, 'bml_operational_status', $operationalStatus);
+            update_post_meta($postId, 'bml_visible', OperationalStatusResolver::visibleValue($operationalStatus));
         }
         if (!empty($data['category'])) {
             $this->assignTerms($postId, (string) $data['category'], 'bml_category');
@@ -113,6 +121,30 @@ final class LocationImporter
         if (!empty($data['city'])) {
             $this->assignTerms($postId, (string) $data['city'], 'bml_city');
         }
+    }
+
+    private function operationalStatus(int $postId, array $data, bool $isUpdate, bool $hasOperationalStatus, bool $hasVisible): string
+    {
+        if ($hasOperationalStatus) {
+            return (string) $data['operational_status'];
+        }
+
+        if ($hasVisible && (string) $data['visible'] === '0') {
+            return OperationalStatusResolver::HIDDEN;
+        }
+
+        if (!$isUpdate) {
+            return OperationalStatusResolver::ACTIVE;
+        }
+
+        $existing = OperationalStatusResolver::resolve(
+            get_post_meta($postId, 'bml_operational_status', true),
+            get_post_meta($postId, 'bml_visible', true)
+        );
+
+        return $hasVisible && $existing === OperationalStatusResolver::HIDDEN
+            ? OperationalStatusResolver::ACTIVE
+            : $existing;
     }
 
     private function assignTerms(int $postId, string $value, string $taxonomy): void

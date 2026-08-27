@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BusinessMapLocator\Rest;
 
+use BusinessMapLocator\Support\OperationalStatusResolver;
 use WP_Post;
 
 final readonly class LocationDetailResponseFactory
@@ -28,14 +29,13 @@ final readonly class LocationDetailResponseFactory
             'website' => $this->meta($id, 'bml_website'),
             'hours' => $this->meta($id, 'bml_hours'),
             'image' => (string) (get_the_post_thumbnail_url($id, 'medium') ?: ''),
-            'operational_status' => $this->status($this->meta($id, 'bml_operational_status')),
+            'operational_status' => OperationalStatusResolver::resolve($this->meta($id, 'bml_operational_status'), $this->meta($id, 'bml_visible')),
             'category' => $this->term($id, 'bml_category'),
             'city' => $this->term($id, 'bml_city'),
         ];
     }
 
     private function meta(int $id, string $key): string { return trim((string) get_post_meta($id, $key, true)); }
-    private function status(string $status): string { $status = $status === 'open' ? 'active' : $status; return in_array($status, ['active', 'temporarily_closed', 'hidden'], true) ? $status : 'active'; }
     /** @return array{name:string,slug:string}|null */
     private function term(int $id, string $taxonomy): ?array { $terms = wp_get_post_terms($id, $taxonomy); if (is_wp_error($terms) || empty($terms)) { return null; } return ['name' => (string) $terms[0]->name, 'slug' => (string) $terms[0]->slug]; }
 }

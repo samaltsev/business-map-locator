@@ -28,11 +28,10 @@ final class BML_Location_Index {
         $hours = $this->meta($post_id, 'bml_hours', 255);
         $excerpt = $this->truncate_string($post->post_excerpt !== '' ? $post->post_excerpt : wp_trim_words($post->post_content, 35, ''), 1000);
         $image_id = (int) get_post_thumbnail_id($post_id);
-        $operational_status = sanitize_key((string) get_post_meta($post_id, 'bml_operational_status', true));
-        $operational_status = $operational_status === 'open' ? 'active' : $operational_status;
-        if (!in_array($operational_status, ['active', 'temporarily_closed', 'hidden'], true)) {
-            $operational_status = 'active';
-        }
+        $operational_status = \BusinessMapLocator\Support\OperationalStatusResolver::resolve(
+            get_post_meta($post_id, 'bml_operational_status', true),
+            get_post_meta($post_id, 'bml_visible', true)
+        );
 
         $latitude = $this->coordinate(get_post_meta($post_id, 'bml_lat', true), -90, 90);
         $longitude = $this->coordinate(get_post_meta($post_id, 'bml_lng', true), -180, 180);

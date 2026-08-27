@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BusinessMapLocator\Rest;
 
 use BusinessMapLocator\Application\Location\SearchLocationsQuery;
+use BusinessMapLocator\Support\OperationalStatusResolver;
 use WP_REST_Response;
 
 final readonly class LocationResponseFactory
@@ -48,7 +49,10 @@ final readonly class LocationResponseFactory
     {
         $postId = (int) ($item['id'] ?? 0);
         $phone = $this->value($item, 'phone', $postId, 'bml_phone');
-        $operationalStatus = $this->normalizeOperationalStatus($this->value($item, 'operational_status', $postId, 'bml_operational_status'));
+        $operationalStatus = OperationalStatusResolver::resolve(
+            $this->value($item, 'operational_status', $postId, 'bml_operational_status'),
+            $this->meta($postId, 'bml_visible')
+        );
         return [
             'id' => $postId,
             'title' => $this->string($item['title'] ?? ''),
@@ -91,12 +95,6 @@ final readonly class LocationResponseFactory
     private function value(array $item, string $field, int $postId, string $metaKey): string
     {
         return $this->string($item[$field] ?? '') ?: $this->meta($postId, $metaKey);
-    }
-
-    private function normalizeOperationalStatus(string $status): string
-    {
-        $status = $status === 'open' ? 'active' : $status;
-        return in_array($status, ['active', 'temporarily_closed', 'hidden'], true) ? $status : 'active';
     }
 
     private function image(int $postId): string

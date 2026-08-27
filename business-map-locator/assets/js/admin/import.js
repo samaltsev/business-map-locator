@@ -424,7 +424,7 @@
 
     var fieldInput = root.querySelector('[data-bml-export-form] input[name="fields"]');
     var presets = {
-        full: 'external_id,title,address,city,category,region,country,postcode,lat,lng,phone,email,website,hours,status',
+        full: 'external_id,title,address,city,category,region,country,postcode,lat,lng,phone,email,website,hours,status,operational_status,visible',
         basic: 'external_id,title,address,city,category,lat,lng,status',
         contact: 'external_id,title,address,city,phone,email,website,status'
     };

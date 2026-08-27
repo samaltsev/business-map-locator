@@ -69,6 +69,15 @@ final class RestCardDetailContractTest extends TestCase
         self::assertSame(404, $result->get_error_data()['status']);
     }
 
+    public function testLegacyHiddenPublishedLocationUsesThePublicNotFoundContract(): void
+    {
+        $result = $this->showPublishedLocation('', 'publish', '0');
+
+        self::assertInstanceOf(WP_Error::class, $result);
+        self::assertSame('bml_location_not_found', $result->get_error_code());
+        self::assertSame(404, $result->get_error_data()['status']);
+    }
+
     public function testDraftLocationUsesThePublicNotFoundContract(): void
     {
         $result = $this->showPublishedLocation('active', 'draft');
@@ -78,7 +87,7 @@ final class RestCardDetailContractTest extends TestCase
         self::assertSame(404, $result->get_error_data()['status']);
     }
 
-    private function showPublishedLocation(string $operationalStatus, string $postStatus = 'publish'): WP_REST_Response|WP_Error
+    private function showPublishedLocation(string $operationalStatus, string $postStatus = 'publish', string $legacyVisible = ''): WP_REST_Response|WP_Error
     {
         $post = new WP_Post();
         $post->ID = 101;
@@ -89,6 +98,7 @@ final class RestCardDetailContractTest extends TestCase
         $GLOBALS['bml_test_posts'][101] = $post;
         $GLOBALS['bml_test_meta'][101] = [
             'bml_operational_status' => $operationalStatus,
+            'bml_visible' => $legacyVisible,
             'bml_lat' => '53.9',
             'bml_lng' => '27.56',
         ];
