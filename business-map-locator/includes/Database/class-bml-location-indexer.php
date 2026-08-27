@@ -16,6 +16,7 @@ final class BML_Location_Indexer {
         'bml_website',
         'bml_hours',
         'bml_operational_status',
+        'bml_visible',
         '_thumbnail_id',
     ];
 
