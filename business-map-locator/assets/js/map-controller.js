@@ -512,8 +512,6 @@
         this.providerData = this.globals.provider || {};
         this.strings = this.globals.strings || {};
         this.state = { items: [], markers: [], user: null, page: 1, perPage: safePerPage(this.settings.per_page), total: 0, totalPages: 0, loading: false, loadingMore: false, selectedId: null, cardSequence: 0, markerSequence: 0, detailSequence: 0 };
-        this.loadAllDirectory = this.settings.loadAll === true || this.settings.load_all === true || this.settings.load_all === 1 || this.settings.load_all === '1';
-        this.directoryBatchSize = this.loadAllDirectory ? 500 : this.state.perPage;
         this.data = new LocatorDataSource(root, this.settings, this.globals.restUrl || '');
         this.popup = new PopupController(root, this.strings, this.settings);
         this.map = null;
@@ -622,7 +620,6 @@
                     self.state.page = 1;
                     return self.load().then(function () {
                         self.state.selectedId = null;
-                        self.focusFilteredLocations();
                         window.setTimeout(function () { self.loadMarkers(); }, 350);
                     });
                 });
@@ -770,7 +767,7 @@
         if (append) { this.state.loadingMore = true; this.setLoadMoreStatus(''); } else { this.state.loading = true; this.state.total = 0; this.state.totalPages = 0; this.state.items = []; this.setLoading(true); }
         if (!append) { this.clearDetail(false); }
         this.updatePagination();
-        return this.data.loadLocations(requestPage, this.state.user, this.directoryBatchSize).then(function (data) {
+        return this.data.loadLocations(requestPage, this.state.user, this.state.perPage).then(function (data) {
             if (sequence !== self.state.cardSequence) { return; }
             var pagination = data.pagination || {};
             var incoming = data.items || [];
@@ -779,11 +776,6 @@
             self.state.total = Math.max(0, Number(pagination.total) || 0);
             self.state.totalPages = Math.max(0, Number(pagination.totalPages) || 0);
             self.renderList();
-            if (!append && self.loadAllDirectory && self.state.totalPages > 1) {
-                return self.loadRemainingDirectoryPages(sequence, 2).then(function () {
-                    return self.state.items;
-                });
-            }
             return self.state.items;
         }).catch(function (error) {
             if (error.name !== 'AbortError' && !append) {
@@ -795,23 +787,7 @@
         });
     };
 
-    LocatorController.prototype.loadRemainingDirectoryPages = function (sequence, page) {
-        var self = this;
-        if (sequence !== this.state.cardSequence || page > this.state.totalPages) { return Promise.resolve(this.state.items); }
-        return this.data.loadLocations(page, this.state.user, this.directoryBatchSize).then(function (data) {
-            if (sequence !== self.state.cardSequence) { return self.state.items; }
-            self.state.items = self.mergeItems(self.state.items, data.items || []);
-            self.state.page = page;
-            self.renderList();
-            return self.loadRemainingDirectoryPages(sequence, page + 1);
-        }).catch(function (error) {
-            if (error.name !== 'AbortError' && sequence === self.state.cardSequence) { self.setLoadMoreStatus(self.strings.requestError); }
-            return self.state.items;
-        });
-    };
-
     LocatorController.prototype.loadMore = function () {
-        if (this.loadAllDirectory) { return Promise.resolve(); }
         if (this.state.loading || this.state.loadingMore || this.state.page >= this.state.totalPages) { return Promise.resolve(); }
         return this.load(this.state.page + 1, true);
     };
@@ -823,30 +799,6 @@
             if (id && id !== 'undefined' && !ids[id]) { ids[id] = true; merged.push(item); }
         });
         return merged;
-    };
-
-    LocatorController.prototype.focusFilteredLocations = function () {
-        var provider = this.map && this.map.provider;
-        var coordinates = this.state.items.filter(function (item) {
-            return hasValidCoordinates(item && item.lat, item && item.lng);
-        }).map(function (item) {
-            return { lat: Number(item.lat), lng: Number(item.lng) };
-        });
-
-        if (!provider || !coordinates.length) { return false; }
-
-        if (coordinates.length === 1 && typeof provider.focusCoordinates === 'function') {
-            provider.focusCoordinates(coordinates[0].lat, coordinates[0].lng, 16);
-            return true;
-        }
-
-        if (typeof provider.fitCoordinates === 'function') {
-            provider.fitCoordinates(coordinates);
-            return true;
-        }
-
-        provider.focusCoordinates(coordinates[0].lat, coordinates[0].lng, 12);
-        return true;
     };
 
     LocatorController.prototype.loadMarkers = function () {
@@ -1062,7 +1014,7 @@
             return;
         }
 
-        (this.loadAllDirectory ? items : items.slice(0, 250)).forEach(function (location) {
+        items.forEach(function (location) {
             var card = document.createElement('article');
             var distance = location.distance !== null && location.distance !== undefined
                 ? formatDistance(location.distance, self.settings, true)
@@ -1249,7 +1201,7 @@
             count.textContent = template.replace('%1$d', String(this.state.items.length)).replace('%2$d', String(this.state.total));
         }
         if (button) {
-            button.hidden = this.loadAllDirectory || this.state.total === 0 || this.state.items.length >= this.state.total || this.state.page >= this.state.totalPages;
+            button.hidden = this.state.total === 0 || this.state.items.length >= this.state.total || this.state.page >= this.state.totalPages;
             button.disabled = this.state.loadingMore;
             button.setAttribute('aria-busy', this.state.loadingMore ? 'true' : 'false');
         }
