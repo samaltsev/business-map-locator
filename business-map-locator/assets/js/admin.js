@@ -184,7 +184,8 @@
         var marker = L.marker([initialLat, initialLng], { draggable: true, opacity: 0 }).addTo(map);
 
         L.tileLayer(BMLAdmin.settings.tile_url, {
-            maxZoom: 20,
+            maxZoom: 19,
+            maxNativeZoom: 19,
             attribution: BMLAdmin.settings.attribution
         }).addTo(map);
 

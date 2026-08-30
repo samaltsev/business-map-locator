@@ -3,7 +3,7 @@
 
     function OpenStreetMapProvider() {
         window.BMLBaseMapProvider.call(this);
-        this.layer = null;
+        this.markerLayer = null;
         this.userMarker = null;
         this._bounds = [];
     }
@@ -77,25 +77,30 @@
         );
 
         window.L.tileLayer(tileUrl, {
-            maxZoom: 20,
+            maxZoom: 19,
+            maxNativeZoom: 19,
             attribution: config.attribution || ''
         }).addTo(this.map);
 
-        this.layer = config.cluster && window.L.markerClusterGroup
-            ? window.L.markerClusterGroup()
-            : window.L.layerGroup();
-        this.layer.addTo(this.map);
+        this.markerLayer = this.createMarkerLayer();
+        this.markerLayer.addTo(this.map);
 
         return this;
     };
 
-    OpenStreetMapProvider.prototype.addMarker = function (location, popupHtml, onSelect) {
+    OpenStreetMapProvider.prototype.createMarkerLayer = function () {
+        return this.config && this.config.cluster && window.L.markerClusterGroup
+            ? window.L.markerClusterGroup()
+            : window.L.layerGroup();
+    };
+
+    OpenStreetMapProvider.prototype.createMarker = function (location, popupHtml, onSelect, layer, registry, bounds) {
         var latLng = this._latLng(location);
         var marker;
         var markerIcon;
         var markerOptions = {};
 
-        if (!latLng || !this.layer) { return null; }
+        if (!latLng || !layer) { return null; }
 
         markerIcon = this._markerIcon(location);
         if (markerIcon) {
@@ -103,7 +108,7 @@
         }
 
         marker = window.L.marker(latLng, markerOptions);
-        if (popupHtml && !(this.config && this.config.suppressPopup)) {
+        if (popupHtml) {
             marker.bindPopup(popupHtml);
         }
         marker.on('click', function () {
@@ -111,59 +116,97 @@
                 onSelect(location);
             }
         });
-        this.markersById[location.id] = marker;
-        this.layer.addLayer(marker);
-        this._bounds.push(latLng);
+        registry[location.id] = marker;
+        layer.addLayer(marker);
+        bounds.push(latLng);
 
         return marker;
+    };
+
+    OpenStreetMapProvider.prototype.addMarker = function (location, popupHtml, onSelect) {
+        return this.createMarker(location, popupHtml, onSelect, this.markerLayer, this.markersById, this._bounds);
+    };
+
+    OpenStreetMapProvider.prototype.replaceMarkers = function (locations, popupRenderer, onSelect) {
+        var self = this;
+        var oldLayer = this.markerLayer;
+        var newLayer;
+        var newRegistry = {};
+        var newBounds = [];
+
+        if (!this.map) { return false; }
+        newLayer = this.createMarkerLayer();
+        if (!newLayer) { return false; }
+
+        (locations || []).forEach(function (location) {
+            self.createMarker(
+                location,
+                popupRenderer ? popupRenderer(location) : '',
+                onSelect,
+                newLayer,
+                newRegistry,
+                newBounds
+            );
+        });
+
+        newLayer.addTo(this.map);
+        this.markerLayer = newLayer;
+        this.markersById = newRegistry;
+        this._bounds = newBounds;
+
+        if (oldLayer && oldLayer !== newLayer && this.map.hasLayer(oldLayer)) {
+            this.map.removeLayer(oldLayer);
+        }
+
+        return true;
     };
 
     OpenStreetMapProvider.prototype.removeMarker = function (id) {
         var marker = this.markersById[id];
         if (!marker) { return; }
-        if (this.layer) {
-            this.layer.removeLayer(marker);
+        if (this.markerLayer) {
+            this.markerLayer.removeLayer(marker);
         }
         delete this.markersById[id];
     };
 
     OpenStreetMapProvider.prototype.clearMarkers = function () {
-        if (this.layer) {
-            this.layer.clearLayers();
+        if (this.markerLayer) {
+            this.markerLayer.clearLayers();
         }
         this.markersById = {};
         this._bounds = [];
     };
 
     OpenStreetMapProvider.prototype.cluster = function (enabled) {
-        return Boolean(enabled && window.L && window.L.markerClusterGroup && this.layer && this.layer.addLayer);
+        return Boolean(enabled && window.L && window.L.markerClusterGroup && this.markerLayer && this.markerLayer.addLayer);
+    };
+
+    OpenStreetMapProvider.prototype.openMarkerPopup = function (id, content) {
+        var marker = this.markersById[id];
+        if (!marker) { return false; }
+        if (content) { marker.bindPopup(content); }
+        marker.openPopup();
+        return true;
+    };
+
+    OpenStreetMapProvider.prototype.closePopup = function () {
+        if (this.map && typeof this.map.closePopup === 'function') { this.map.closePopup(); }
     };
 
     OpenStreetMapProvider.prototype.openPopup = function (id) {
-        var marker = this.markersById[id];
-        if (marker) {
-            marker.openPopup();
-        }
+        return this.openMarkerPopup(id);
     };
 
     OpenStreetMapProvider.prototype.focusMarker = function (id, zoom) {
-        var self = this;
         var marker = this.markersById[id];
         var latLng;
 
         if (!marker || !this.map) { return; }
 
         latLng = marker.getLatLng();
-        if (this.layer && typeof this.layer.zoomToShowLayer === 'function') {
-            this.layer.zoomToShowLayer(marker, function () {
-                self.map.setView(latLng, zoom || 16, { animate: true });
-                if (!(self.config && self.config.suppressPopup)) { marker.openPopup(); }
-            });
-            return;
-        }
-
         this.map.setView(latLng, zoom || 16, { animate: true });
-        if (!(this.config && this.config.suppressPopup)) { marker.openPopup(); }
+        marker.openPopup();
     };
 
     OpenStreetMapProvider.prototype.focusCoordinates = function (lat, lng, zoom) {
@@ -242,7 +285,7 @@
             this.map.remove();
         }
         this.map = null;
-        this.layer = null;
+        this.markerLayer = null;
         this.userMarker = null;
         this.markersById = {};
         this._bounds = [];

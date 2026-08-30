@@ -17,7 +17,7 @@ final class SplitDirectoryPaginationContractTest extends TestCase
         self::assertStringNotContainsString('loadAllDirectory', $controller);
         self::assertStringNotContainsString('directoryBatchSize', $controller);
         self::assertStringNotContainsString('loadRemainingDirectoryPages', $controller);
-        self::assertStringContainsString('this.data.loadLocations(requestPage, this.state.user, this.state.perPage)', $controller);
+        self::assertStringContainsString('this.data.loadLocations(requestPage, this.state.user, this.state.perPage, bounds)', $controller);
         self::assertStringContainsString('return this.load(this.state.page + 1, true);', $controller);
         self::assertStringContainsString("'locations/markers?'", $controller);
         self::assertStringContainsString("'locations/' + encodeURIComponent(id)", $controller);
@@ -28,6 +28,7 @@ final class SplitDirectoryPaginationContractTest extends TestCase
         $controller = (string) file_get_contents(dirname(__DIR__) . '/assets/js/map-controller.js');
 
         self::assertStringNotContainsString('focusFilteredLocations', $controller);
-        self::assertStringContainsString('window.setTimeout(function () { self.loadMarkers(); }, 350);', $controller);
+        self::assertStringContainsString('LocatorController.prototype.refreshResults', $controller);
+        self::assertStringNotContainsString('fitBounds(this.state.items', $controller);
     }
 }

@@ -377,6 +377,63 @@
     background: var(--bml-color-primary);
 }
 
+.bml-locator .bml-location-card.is-selected {
+    border-color: var(--bml-color-selected-border);
+    background: var(--bml-color-selected-bg);
+}
+
+.bml-locator .bml-location-card__expanded {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--bml-color-border);
+    margin-top: 4px;
+    padding-top: 12px;
+}
+
+.bml-locator .bml-inline-detail__row,
+.bml-locator .bml-inline-detail__actions {
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin: 7px 0;
+}
+
+.bml-locator .bml-inline-detail__text,
+.bml-locator .bml-inline-detail__content,
+.bml-locator .bml-inline-detail__address,
+.bml-locator .bml-inline-detail__category {
+    margin: 7px 0;
+}
+
+.bml-map-popup-detail {
+    max-width: 260px;
+    color: #172033;
+}
+
+.bml-map-popup-detail strong,
+.bml-map-popup-detail span {
+    display: block;
+}
+
+.bml-map-popup-detail p {
+    margin: 6px 0;
+}
+
+.bml-map-popup-detail__actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.bml-map-popup-detail__actions button {
+    border: 0;
+    padding: 0;
+    color: var(--bml-color-primary);
+    background: transparent;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .bml-locator .bml-location-card__media {
     width: 92px;
     height: 92px;
@@ -2479,8 +2536,38 @@
         overflow: auto;
     }
 
-    .bml-locator.bml-layout-split .leaflet-pane,
-    .bml-locator.bml-layout-split .leaflet-control-container {
-        z-index: auto;
+    /* Keep Leaflet's pane ordering intact: marker and popup panes must remain above tiles. */
+    .bml-locator.bml-layout-split .bml-map .leaflet-tile-pane { z-index: 200; }
+    .bml-locator.bml-layout-split .bml-map .leaflet-overlay-pane { z-index: 400; }
+    .bml-locator.bml-layout-split .bml-map .leaflet-shadow-pane { z-index: 500; }
+    .bml-locator.bml-layout-split .bml-map .leaflet-marker-pane { z-index: 600; }
+    .bml-locator.bml-layout-split .bml-map .leaflet-tooltip-pane { z-index: 650; }
+    .bml-locator.bml-layout-split .bml-map .leaflet-popup-pane { z-index: 700; }
+    .bml-locator.bml-layout-split .bml-map .leaflet-marker-icon,
+    .bml-locator.bml-layout-split .bml-map .leaflet-marker-shadow,
+    .bml-locator.bml-layout-split .bml-map .leaflet-tile {
+        max-width: none !important;
+        max-height: none !important;
+    }
+}
+
+/* Selected Split cards must grow with their inline detail in the directory flow. */
+.bml-locator.bml-layout-split .bml-location-card.is-expanded {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+
+.bml-locator.bml-layout-split .bml-location-card.is-expanded .bml-location-card__expanded {
+    position: static;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+
+@media (min-width: 1024px) {
+    .bml-locator.bml-layout-split .bml-location-card.is-expanded {
+        display: block;
+        min-height: 0;
     }
 }
