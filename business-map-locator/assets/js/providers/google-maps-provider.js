@@ -197,7 +197,7 @@
         marker = new window.google.maps.Marker(markerOptions);
 
         marker.addListener('click', function () {
-            if (popupHtml && self.infoWindow && !(self.config && self.config.suppressPopup)) {
+            if (popupHtml && self.infoWindow) {
                 self.infoWindow.setContent(popupHtml);
                 self.infoWindow.open({ anchor: marker, map: self.map });
             }
@@ -232,11 +232,20 @@
         return false;
     };
 
-    GoogleMapsProvider.prototype.openPopup = function (id) {
+    GoogleMapsProvider.prototype.openMarkerPopup = function (id, content) {
         var marker = this.markersById[id];
-        if (marker) {
-            window.google.maps.event.trigger(marker, 'click');
-        }
+        if (!marker || !this.infoWindow || !this.map) { return false; }
+        if (content) { this.infoWindow.setContent(content); }
+        this.infoWindow.open({ anchor: marker, map: this.map });
+        return true;
+    };
+
+    GoogleMapsProvider.prototype.closePopup = function () {
+        if (this.infoWindow) { this.infoWindow.close(); }
+    };
+
+    GoogleMapsProvider.prototype.openPopup = function (id) {
+        return this.openMarkerPopup(id);
     };
 
     GoogleMapsProvider.prototype.focusMarker = function (id, zoom) {
@@ -244,7 +253,7 @@
         if (!marker || !this.map) { return; }
         this.map.panTo(marker.getPosition());
         this.map.setZoom(zoom || 16);
-        if (!(this.config && this.config.suppressPopup)) { this.openPopup(id); }
+        this.openPopup(id);
     };
 
     GoogleMapsProvider.prototype.focusCoordinates = function (lat, lng, zoom) {

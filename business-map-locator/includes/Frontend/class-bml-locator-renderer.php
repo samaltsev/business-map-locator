@@ -26,7 +26,6 @@ final class BML_Locator_Renderer {
             'show_phone' => $settings['show_phone'] ?? 1,
             'show_navigation' => $settings['show_navigation'] ?? 1,
             'preview_mode' => false,
-            'load_all' => true,
         ]);
 
         $layout = in_array($attributes['layout'], ['split', 'map', 'cards'], true) ? $attributes['layout'] : 'split';
@@ -66,7 +65,6 @@ final class BML_Locator_Renderer {
                 'showPhone' => (bool) $attributes['show_phone'],
                 'showNavigation' => (bool) $attributes['show_navigation'],
                 'previewMode' => (bool) $attributes['preview_mode'],
-                'loadAll' => $layout === 'split' ? (bool) $attributes['load_all'] : false,
             ],
         ];
     }

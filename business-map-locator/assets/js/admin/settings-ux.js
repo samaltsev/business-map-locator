@@ -177,7 +177,7 @@
         var markerSequence = 0;
         var markerDebounceTimer = null;
         var boundsAbortController = null;
-        var PREVIEW_MARKER_LIMIT = 200;
+        var PREVIEW_MARKER_LIMIT = 1000;
         var leafletEventsBound = false;
         var googleEventsBound = false;
         var previewView = { lat: parseFloat((window.BMLAdmin && BMLAdmin.settings && BMLAdmin.settings.center_lat) || 53.9006), lng: parseFloat((window.BMLAdmin && BMLAdmin.settings && BMLAdmin.settings.center_lng) || 27.5590), zoom: parseInt((window.BMLAdmin && BMLAdmin.settings && BMLAdmin.settings.zoom) || 11, 10) };
@@ -262,7 +262,8 @@
                 leafletMap.removeLayer(leafletTileLayer);
             }
             leafletTileLayer = L.tileLayer(tileUrl, {
-                maxZoom: 20,
+                maxZoom: 19,
+                maxNativeZoom: 19,
                 attribution: (window.BMLAdmin && BMLAdmin.settings && BMLAdmin.settings.attribution) || '&copy; OpenStreetMap contributors'
             });
             leafletTileLayer.on('tileerror', function () {

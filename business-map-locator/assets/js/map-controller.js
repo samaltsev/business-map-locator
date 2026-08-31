@@ -75,7 +75,16 @@
         return Math.max(12, Math.min(500, parseInt(value, 10) || 24));
     }
 
-    function createParams(root, settings, page, origin, perPage) {
+    function appendBoundsParams(params, bounds) {
+        if (!bounds || !Number.isFinite(Number(bounds.north)) || !Number.isFinite(Number(bounds.south)) || !Number.isFinite(Number(bounds.east)) || !Number.isFinite(Number(bounds.west))) { return; }
+        if (Number(bounds.north) < Number(bounds.south) || Number(bounds.east) < Number(bounds.west)) { return; }
+        params.set('north', String(bounds.north));
+        params.set('south', String(bounds.south));
+        params.set('east', String(bounds.east));
+        params.set('west', String(bounds.west));
+    }
+
+    function createParams(root, settings, page, origin, perPage, bounds) {
         var params = new URLSearchParams();
         var searchInput = root.querySelector('.bml-search-input');
         var search = searchInput ? searchInput.value.trim() : '';
@@ -93,6 +102,7 @@
         if (category) { params.set('category', category); }
         if (city) { params.set('city', city); }
         appendNearParams(params, settings, origin);
+        appendBoundsParams(params, bounds);
 
         return params;
     }
@@ -297,6 +307,24 @@
         return node;
     };
 
+    PopupController.prototype.renderDetail = function (detail) {
+        var title = detail.title || this.strings.location || 'Location';
+        var category = detail.category && detail.category.name ? detail.category.name : '';
+        var city = detail.city && detail.city.name ? detail.city.name : '';
+        var address = [detail.address, detail.postcode, city, detail.region, detail.country].filter(Boolean).join(', ');
+        var directions = hasValidCoordinates(detail.lat, detail.lng) ? automaticNavigationUrl(detail.lat, detail.lng) : '';
+        var status = detail.operational_status === 'temporarily_closed' ? (this.strings.temporarilyClosed || 'Temporarily closed') : '';
+
+        return '<div class="bml-map-popup-detail"><strong>' + escapeHtml(title) + '</strong>' +
+            (category ? '<span>' + escapeHtml(category) + '</span>' : '') +
+            (address ? '<p>' + escapeHtml(address) + '</p>' : '') +
+            (detail.hours ? '<p>' + escapeHtml(detail.hours) + '</p>' : '') +
+            (status ? '<p>' + escapeHtml(status) + '</p>' : '') +
+            '<p class="bml-map-popup-detail__actions">' +
+            (directions ? '<a href="' + escapeHtml(directions) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(this.strings.directions || 'Directions') + '</a>' : '') +
+            '<button type="button" data-bml-popup-action="details" data-location-id="' + escapeHtml(detail.id) + '">' + escapeHtml(this.strings.details || 'Details') + '</button></p></div>';
+    };
+
     /* Map */
     function MapEngine(providerId, container, options) {
         this.providerId = providerId;
@@ -375,18 +403,26 @@
 
     MarkerController.prototype.setLocations = function (locations) {
         var self = this;
+        var provider = this.map.provider;
+
+        if (!provider) { return false; }
         this.locations = locations || [];
 
-        if (!this.map.provider) { return; }
+        if (typeof provider.replaceMarkers === 'function') {
+            return provider.replaceMarkers(this.locations, function (location) {
+                return self.options.suppressPopup ? '' : self.popup.render(location);
+            }, self.onSelect);
+        }
 
-        this.map.provider.clearMarkers();
+        provider.clearMarkers();
         this.locations.forEach(function (location) {
-            self.map.provider.addMarker(
+            provider.addMarker(
                 location,
                 self.options.suppressPopup ? '' : self.popup.render(location),
                 self.onSelect
             );
         });
+        return true;
     };
 
     MarkerController.prototype.focus = function (id, zoom) {
@@ -467,7 +503,7 @@
         this.root = root;
         this.settings = settings || {};
         this.restUrl = restUrl;
-        this.cardAbortController = null; this.markerAbortController = null; this.detailAbortController = null;
+        this.cardAbortController = null; this.markerAbortController = null; this.detailAbortController = null; this.boundsAbortController = null;
     }
 
     LocatorDataSource.prototype.abort = function (type) {
@@ -481,9 +517,9 @@
         return fetchJson(this.restUrl + 'filters' + (query ? '?' + query : ''));
     };
 
-    LocatorDataSource.prototype.loadLocations = function (page, origin, perPage) {
+    LocatorDataSource.prototype.loadLocations = function (page, origin, perPage, bounds) {
         var self = this; this.abort('card'); if (window.AbortController) { this.cardAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations?' + createParams(this.root, this.settings, page || 1, origin, perPage).toString(), this.cardAbortController && this.cardAbortController.signal);
+        return fetchJson(this.restUrl + 'locations?' + createParams(this.root, this.settings, page || 1, origin, perPage, bounds).toString(), this.cardAbortController && this.cardAbortController.signal);
     };
     LocatorDataSource.prototype.loadMarkers = function (bounds, origin) {
         var params = new URLSearchParams(bounds); var filters = createFilterParams(this.root);
@@ -494,13 +530,19 @@
         this.abort('marker'); if (window.AbortController) { this.markerAbortController = new AbortController(); }
         return fetchJson(this.restUrl + 'locations/markers?' + params.toString(), this.markerAbortController && this.markerAbortController.signal);
     };
+    LocatorDataSource.prototype.loadCityBounds = function (city) {
+        var params = new URLSearchParams();
+        if (city) { params.set('city', city); }
+        this.abort('bounds'); if (window.AbortController) { this.boundsAbortController = new AbortController(); }
+        return fetchJson(this.restUrl + 'locations/bounds?' + params.toString(), this.boundsAbortController && this.boundsAbortController.signal);
+    };
     LocatorDataSource.prototype.loadDetail = function (id) {
         this.abort('detail'); if (window.AbortController) { this.detailAbortController = new AbortController(); }
         return fetchJson(this.restUrl + 'locations/' + encodeURIComponent(id), this.detailAbortController && this.detailAbortController.signal);
     };
 
     LocatorDataSource.prototype.destroy = function () {
-        this.abort('card'); this.abort('marker'); this.abort('detail');
+        this.abort('card'); this.abort('marker'); this.abort('detail'); this.abort('bounds');
     };
 
     /* Locator */
@@ -511,9 +553,8 @@
         this.settings = Object.assign({}, this.globals.settings || {}, this.instanceSettings());
         this.providerData = this.globals.provider || {};
         this.strings = this.globals.strings || {};
-        this.state = { items: [], markers: [], user: null, page: 1, perPage: safePerPage(this.settings.per_page), total: 0, totalPages: 0, loading: false, loadingMore: false, selectedId: null, cardSequence: 0, markerSequence: 0, detailSequence: 0 };
-        this.loadAllDirectory = this.settings.loadAll === true || this.settings.load_all === true || this.settings.load_all === 1 || this.settings.load_all === '1';
-        this.directoryBatchSize = this.loadAllDirectory ? 500 : this.state.perPage;
+        this.state = { items: [], markers: [], user: null, page: 1, perPage: safePerPage(this.settings.per_page), total: 0, totalPages: 0, loading: false, loadingMore: false, selectedId: null, selectedLocationId: null, selectedLocationDetail: null, cardSequence: 0, markerSequence: 0, detailSequence: 0, boundsSequence: 0, directoryBounds: null };
+        this.detailCache = {};
         this.data = new LocatorDataSource(root, this.settings, this.globals.restUrl || '');
         this.popup = new PopupController(root, this.strings, this.settings);
         this.map = null;
@@ -528,6 +569,7 @@
         this.boundImageError = null;
         this.boundLoadMore = null;
         this.boundCardAction = null;
+        this.boundPopupAction = null;
         this.boundDetailAction = null;
         this.boundKeydown = null;
         this.boundCardHover = null;
@@ -562,7 +604,7 @@
             return Promise.reject(new Error('Locator map element is missing.'));
         }
 
-        var suppressProviderPopup = this.root.classList.contains('bml-layout-split');
+        var suppressProviderPopup = false;
         var providerConfig = Object.assign({}, this.providerData.config || {}, { suppressPopup: suppressProviderPopup });
         if (providerConfig.fallbackConfig) {
             providerConfig.fallbackConfig = Object.assign({}, providerConfig.fallbackConfig, { suppressPopup: suppressProviderPopup });
@@ -577,16 +619,13 @@
             }
         });
         this.markers = new MarkerController(this.map, this.popup, function (location) {
-            self.state.selectedId = String(location.id);
-            self.selectCard(location.id, true);
-            self.loadDetail(location.id);
+            self.handleMarkerSelection(location);
         }, { suppressPopup: suppressProviderPopup });
         this.clustering = new ClusteringController(this.map);
         this.viewport = new ViewportController(this.map);
         this.geolocation = new GeolocationController(this.map, this.strings, function (user) {
             self.state.user = user;
-            self.state.page = 1;
-            self.load().then(function () { return self.loadMarkers(); });
+            self.refreshResults();
         }, function () {
             self.showMessage(self.strings.geolocationError);
         });
@@ -594,9 +633,9 @@
         return this.map.init().then(function () {
             self.clustering.enable(self.providerData.config && self.providerData.config.cluster);
             self.bindEvents();
-            if (self.map.provider && self.map.provider.onBoundsChanged) { self.map.provider.onBoundsChanged(debounce(function () { self.loadMarkers(); }, 300)); }
+            if (self.map.provider && self.map.provider.onBoundsChanged) { self.map.provider.onBoundsChanged(debounce(function () { self.refreshViewport(); }, 300)); }
             return self.refreshFilters().then(function () {
-                return self.load().then(function () { return self.loadMarkers(); });
+                return self.refreshResults();
             });
         }).catch(function (error) {
             self.showMessage(self.strings.providerError);
@@ -612,25 +651,29 @@
 
         this.boundInput = debounce(function (event) {
             if (event.target.matches('.bml-search-input')) {
-                self.state.page = 1; self.load(); self.loadMarkers();
+                self.refreshResults();
             }
         }, 300);
 
         this.boundChange = function (event) {
             if (event.target.matches('.bml-category-filter,.bml-city-filter')) {
+                self.state.boundsSequence += 1;
+                self.data.abort('bounds');
                 self.refreshFilters().then(function () {
-                    self.state.page = 1;
-                    return self.load().then(function () {
+                    var selectedCity = effectiveFilterValue(self.root, '.bml-city-filter', 'city');
+                    var centerCity = event.target.matches('.bml-city-filter') && self.isViewportBoundDirectory() && Boolean(selectedCity);
+                    var reload = centerCity ? self.centerOnSelectedCity(selectedCity) : Promise.resolve(false);
+
+                    return reload.then(function () {
+                        return self.refreshResults();
+                    }).then(function () {
                         self.state.selectedId = null;
-                        self.focusFilteredLocations();
-                        window.setTimeout(function () { self.loadMarkers(); }, 350);
                     });
                 });
                 return;
             }
             if (event.target.matches('.bml-sort-filter')) {
-                self.state.page = 1;
-                self.load();
+                self.refreshResults();
             }
         };
 
@@ -649,7 +692,7 @@
             event.preventDefault();
 
             if (action.dataset.bmlCardAction === 'map') {
-                self.focusLocationOnMap(id);
+                self.selectLocation(id, 'directory', action);
                 return;
             }
 
@@ -658,7 +701,7 @@
                     bubbles: true,
                     detail: { id: id }
                 }));
-                self.loadDetail(id, action);
+                self.selectLocation(id, 'directory', action);
             }
         };
         this.root.addEventListener('click', this.boundCardAction);
@@ -667,10 +710,17 @@
             var card = event.target.closest && event.target.closest('.bml-location-card');
             if (!card || !self.root.contains(card) || !card.dataset.id) { return; }
             if (event.target.closest('a,button,select,input,textarea')) { return; }
-            self.focusLocationOnMap(card.dataset.id);
-            self.loadDetail(card.dataset.id, card);
+            self.selectLocation(card.dataset.id, 'directory', card);
         };
         this.root.addEventListener('click', this.boundCardSelect);
+
+        this.boundPopupAction = function (event) {
+            var action = event.target.closest && event.target.closest('[data-bml-popup-action="details"]');
+            if (!action || !self.root.contains(action) || !action.dataset.locationId) { return; }
+            event.preventDefault();
+            self.selectLocation(action.dataset.locationId, 'popup', action);
+        };
+        this.root.addEventListener('click', this.boundPopupAction);
 
         this.boundDetailAction = function (event) {
             var action = event.target.closest('[data-bml-detail-action]');
@@ -764,13 +814,22 @@
         }
     };
 
-    LocatorController.prototype.load = function (page, append) {
+    LocatorController.prototype.load = function (page, append, bounds) {
         var self = this; var requestPage = page || 1; var sequence = ++this.state.cardSequence;
         append = Boolean(append);
+        if (this.isViewportBoundDirectory()) {
+            if (append) {
+                bounds = this.state.directoryBounds;
+            } else {
+                this.state.directoryBounds = bounds || null;
+            }
+        } else {
+            bounds = null;
+        }
         if (append) { this.state.loadingMore = true; this.setLoadMoreStatus(''); } else { this.state.loading = true; this.state.total = 0; this.state.totalPages = 0; this.state.items = []; this.setLoading(true); }
-        if (!append) { this.clearDetail(false); }
+        if (!append && !this.isViewportBoundDirectory()) { this.clearDetail(false); }
         this.updatePagination();
-        return this.data.loadLocations(requestPage, this.state.user, this.directoryBatchSize).then(function (data) {
+        return this.data.loadLocations(requestPage, this.state.user, this.state.perPage, bounds).then(function (data) {
             if (sequence !== self.state.cardSequence) { return; }
             var pagination = data.pagination || {};
             var incoming = data.items || [];
@@ -779,11 +838,7 @@
             self.state.total = Math.max(0, Number(pagination.total) || 0);
             self.state.totalPages = Math.max(0, Number(pagination.totalPages) || 0);
             self.renderList();
-            if (!append && self.loadAllDirectory && self.state.totalPages > 1) {
-                return self.loadRemainingDirectoryPages(sequence, 2).then(function () {
-                    return self.state.items;
-                });
-            }
+            if (self.state.selectedLocationDetail) { self.renderDetail(self.state.selectedLocationDetail); }
             return self.state.items;
         }).catch(function (error) {
             if (error.name !== 'AbortError' && !append) {
@@ -795,25 +850,93 @@
         });
     };
 
-    LocatorController.prototype.loadRemainingDirectoryPages = function (sequence, page) {
+    LocatorController.prototype.loadMore = function () {
+        if (this.state.loading || this.state.loadingMore || this.state.page >= this.state.totalPages) { return Promise.resolve(); }
+        return this.load(this.state.page + 1, true);
+    };
+
+    LocatorController.prototype.isViewportBoundDirectory = function () {
+        return this.root.classList.contains('bml-layout-split');
+    };
+
+    LocatorController.prototype.currentMapBounds = function () {
+        var provider = this.map && this.map.provider;
+        var bounds = provider && typeof provider.getBounds === 'function' ? provider.getBounds() : null;
+
+        return bounds && Number.isFinite(Number(bounds.north)) && Number.isFinite(Number(bounds.south)) &&
+            Number.isFinite(Number(bounds.east)) && Number.isFinite(Number(bounds.west)) &&
+            Number(bounds.north) >= Number(bounds.south) && Number(bounds.east) >= Number(bounds.west)
+            ? bounds : null;
+    };
+
+    LocatorController.prototype.refreshResults = function () {
+        var bounds = this.currentMapBounds();
+
+        this.state.page = 1;
+        if (this.isViewportBoundDirectory()) {
+            this.state.directoryBounds = bounds;
+        }
+
+        return Promise.all([
+            this.load(1, false, this.isViewportBoundDirectory() ? bounds : null),
+            this.loadMarkers(bounds)
+        ]);
+    };
+
+    LocatorController.prototype.refreshViewport = function () {
+        if (!this.isViewportBoundDirectory()) {
+            return this.loadMarkers();
+        }
+
+        return this.refreshResults();
+    };
+
+    LocatorController.prototype.centerOnSelectedCity = function (city) {
         var self = this;
-        if (sequence !== this.state.cardSequence || page > this.state.totalPages) { return Promise.resolve(this.state.items); }
-        return this.data.loadLocations(page, this.state.user, this.directoryBatchSize).then(function (data) {
-            if (sequence !== self.state.cardSequence) { return self.state.items; }
-            self.state.items = self.mergeItems(self.state.items, data.items || []);
-            self.state.page = page;
-            self.renderList();
-            return self.loadRemainingDirectoryPages(sequence, page + 1);
+        var sequence = ++this.state.boundsSequence;
+
+        if (!city) { return Promise.resolve(false); }
+
+        return this.data.loadCityBounds(city).then(function (bounds) {
+            if (sequence !== self.state.boundsSequence) { return false; }
+            return self.fitAggregateBounds(bounds);
         }).catch(function (error) {
-            if (error.name !== 'AbortError' && sequence === self.state.cardSequence) { self.setLoadMoreStatus(self.strings.requestError); }
-            return self.state.items;
+            if (error.name !== 'AbortError') { self.showMessage(self.strings.requestError); }
+            return false;
         });
     };
 
-    LocatorController.prototype.loadMore = function () {
-        if (this.loadAllDirectory) { return Promise.resolve(); }
-        if (this.state.loading || this.state.loadingMore || this.state.page >= this.state.totalPages) { return Promise.resolve(); }
-        return this.load(this.state.page + 1, true);
+    LocatorController.prototype.fitAggregateBounds = function (bounds) {
+        var provider = this.map && this.map.provider;
+        var north = Number(bounds && bounds.north);
+        var south = Number(bounds && bounds.south);
+        var east = Number(bounds && bounds.east);
+        var west = Number(bounds && bounds.west);
+        var centerLat;
+        var centerLng;
+
+        if (!provider || !bounds || Number(bounds.total) < 1 || !Number.isFinite(north) || !Number.isFinite(south) || !Number.isFinite(east) || !Number.isFinite(west) || north < south || east < west) {
+            return false;
+        }
+
+        centerLat = (north + south) / 2;
+        centerLng = (east + west) / 2;
+        if (Math.abs(north - south) < 0.00001 && Math.abs(east - west) < 0.00001 && typeof provider.focusCoordinates === 'function') {
+            provider.focusCoordinates(centerLat, centerLng, 14);
+            return true;
+        }
+
+        if (typeof provider.fitCoordinates === 'function') {
+            provider.fitCoordinates([{ lat: south, lng: west }, { lat: north, lng: east }]);
+            return true;
+        }
+
+        if (typeof provider.focusCoordinates === 'function') {
+            provider.focusCoordinates(centerLat, centerLng, 12);
+            return true;
+        }
+
+        return false;
     };
 
     LocatorController.prototype.mergeItems = function (existing, incoming) {
@@ -825,37 +948,14 @@
         return merged;
     };
 
-    LocatorController.prototype.focusFilteredLocations = function () {
-        var provider = this.map && this.map.provider;
-        var coordinates = this.state.items.filter(function (item) {
-            return hasValidCoordinates(item && item.lat, item && item.lng);
-        }).map(function (item) {
-            return { lat: Number(item.lat), lng: Number(item.lng) };
-        });
-
-        if (!provider || !coordinates.length) { return false; }
-
-        if (coordinates.length === 1 && typeof provider.focusCoordinates === 'function') {
-            provider.focusCoordinates(coordinates[0].lat, coordinates[0].lng, 16);
-            return true;
-        }
-
-        if (typeof provider.fitCoordinates === 'function') {
-            provider.fitCoordinates(coordinates);
-            return true;
-        }
-
-        provider.focusCoordinates(coordinates[0].lat, coordinates[0].lng, 12);
-        return true;
-    };
-
-    LocatorController.prototype.loadMarkers = function () {
-        var self = this; var bounds = this.map.provider && this.map.provider.getBounds ? this.map.provider.getBounds() : null; var sequence;
+    LocatorController.prototype.loadMarkers = function (bounds) {
+        var self = this; bounds = bounds || this.currentMapBounds(); var sequence;
         if (!bounds) { return Promise.resolve(); } sequence = ++this.state.markerSequence;
         return this.data.loadMarkers(bounds, this.state.user).then(function (data) {
             if (sequence !== self.state.markerSequence) { return; }
             self.state.markers = data.items || [];
             self.markers.setLocations(self.state.markers);
+            self.reconcileSelectionWithMarkers();
             if (self.pendingMapFocusId) {
                 var focusId = self.pendingMapFocusId;
                 self.pendingMapFocusId = null;
@@ -864,6 +964,44 @@
         }).catch(function (error) {
             if (error.name !== 'AbortError') { self.showMessage(self.strings.requestError); }
         });
+    };
+
+    LocatorController.prototype.handleMarkerSelection = function (location) {
+        if (!location || location.id === undefined || location.id === null) { return; }
+        this.selectLocation(location.id, 'marker');
+    };
+
+    LocatorController.prototype.selectLocation = function (id, source, trigger) {
+        var normalizedId = String(id);
+
+        this.state.selectedId = normalizedId;
+        this.state.selectedLocationId = normalizedId;
+        this.selectCard(normalizedId, source === 'marker');
+        if (source === 'directory') { this.focusLocationOnMap(normalizedId); }
+        return this.loadDetail(normalizedId, trigger);
+    };
+
+    LocatorController.prototype.openSelectedMarkerPopup = function () {
+        var provider = this.map && this.map.provider;
+        var detail = this.state.selectedLocationDetail;
+        var id = this.state.selectedLocationId;
+
+        if (!provider || !detail || !id || typeof provider.openMarkerPopup !== 'function') { return false; }
+        return provider.openMarkerPopup(id, this.popup.renderDetail(detail));
+    };
+
+    LocatorController.prototype.reconcileSelectionWithMarkers = function () {
+        var id = this.state.selectedLocationId;
+        var exists;
+
+        if (!id) { return; }
+        exists = this.state.markers.some(function (location) { return String(location && location.id) === String(id); });
+        if (!exists && this.pendingMapFocusId !== String(id)) {
+            this.clearSelection(false);
+            return;
+        }
+        this.selectCard(id);
+        this.openSelectedMarkerPopup();
     };
 
     LocatorController.prototype.focusLocationOnMap = function (id) {
@@ -907,12 +1045,19 @@
     };
 
     LocatorController.prototype.usesInlineDirectoryDetail = function () {
-        return false;
+        return this.root.classList.contains('bml-layout-split');
     };
 
     LocatorController.prototype.inlineDetailHost = function (id) {
         var card = this.root.querySelector('.bml-location-card[data-id="' + String(id).replace(/"/g, '') + '"]');
-        if (!card) { return null; }
+        if (!card) {
+            var results = this.root.querySelector('.bml-results');
+            if (!results) { return null; }
+            card = document.createElement('article');
+            card.className = 'bml-selected-location bml-location-card is-selected is-expanded';
+            card.dataset.id = String(id);
+            results.insertBefore(card, results.firstChild);
+        }
         var host = card.querySelector('.bml-location-card__expanded');
         if (!host) {
             host = document.createElement('div');
@@ -924,25 +1069,32 @@
 
     LocatorController.prototype.clearInlineDetails = function () {
         this.root.querySelectorAll('.bml-location-card__expanded').forEach(function (node) { node.remove(); });
+        this.root.querySelectorAll('.bml-selected-location').forEach(function (node) { node.remove(); });
     };
 
     LocatorController.prototype.loadDetail = function (id, trigger) {
-        var self = this; var sequence = ++this.state.detailSequence; this.state.selectedId = id;
+        var self = this; var sequence = ++this.state.detailSequence; this.state.selectedId = String(id); this.state.selectedLocationId = String(id);
         if (trigger) { this.detailTrigger = trigger; }
         this.showDetailLoading();
+        if (this.detailCache[id]) {
+            return Promise.resolve(this.detailCache[id]).then(function (detail) {
+                if (sequence !== self.state.detailSequence || String(id) !== String(self.state.selectedLocationId)) { return; }
+                self.state.selectedLocationDetail = detail;
+                self.renderDetail(detail);
+                self.openSelectedMarkerPopup();
+                return detail;
+            });
+        }
         return this.data.loadDetail(id).then(function (detail) {
             if (sequence !== self.state.detailSequence || String(id) !== String(self.state.selectedId)) { return; }
+            self.detailCache[id] = detail;
+            self.state.selectedLocationDetail = detail;
             self.selectCard(id);
-            if (hasValidCoordinates(detail.lat, detail.lng) && self.map && self.map.provider && typeof self.map.provider.focusCoordinates === 'function') {
-                self.pendingMapFocusId = String(id);
-                self.map.provider.focusCoordinates(Number(detail.lat), Number(detail.lng), 16);
-            } else {
-                self.viewport.focus(id, 16);
-            }
             self.renderDetail(detail);
+            self.openSelectedMarkerPopup();
             return detail;
         }).catch(function (error) {
-            if (error.name !== 'AbortError' && sequence === self.state.detailSequence) { self.showDetailError(); }
+            if (error.name !== 'AbortError' && sequence === self.state.detailSequence) { self.clearSelection(false); self.showDetailError(); }
         });
     };
 
@@ -985,10 +1137,14 @@
             var inlineHost = this.inlineDetailHost(detail.id);
             if (inlineHost) {
                 inlineHost.innerHTML =
+                    '<h3>' + escapeHtml(detail.title || this.strings.location || 'Location') + '</h3>' +
+                    (category ? '<p class="bml-inline-detail__category">' + escapeHtml(category) + '</p>' : '') +
+                    (address ? '<p class="bml-inline-detail__address">' + escapeHtml(address) + '</p>' : '') + status +
                     (detail.hours ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.hours || 'Hours') + '</strong><span>' + escapeHtml(detail.hours) + '</span></div>' : '') +
                     (phone ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.call || 'Phone') + '</strong><a href="' + escapeHtml(phone) + '">' + escapeHtml(detail.phone || this.strings.call || 'Call') + '</a></div>' : '') +
                     (website ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.visitWebsite || 'Website') + '</strong><a href="' + escapeHtml(website) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(this.strings.visitWebsite || 'Website') + '</a></div>' : '') +
                     (detail.excerpt ? '<p class="bml-inline-detail__text">' + escapeHtml(detail.excerpt) + '</p>' : '') +
+                    (detail.content ? '<div class="bml-inline-detail__content">' + detail.content + '</div>' : '') +
                     '<div class="bml-inline-detail__actions">' +
                     (directions ? '<a href="' + escapeHtml(directions) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(this.strings.directions || 'Directions') + '</a>' : '') +
                     '<button type="button" data-bml-detail-action="map">' + escapeHtml(this.strings.showOnMap || 'Show on map') + '</button></div>';
@@ -1028,12 +1184,18 @@
     };
     LocatorController.prototype.clearDetail = function (restoreFocus) {
         var trigger = this.detailTrigger;
-        this.state.detailSequence++; this.data.abort('detail'); this.state.selectedId = null; this.clearInlineDetails(); this.selectCard('');
+        this.clearSelection(false);
         if (this.detailPanel) { this.detailPanel.hidden = true; this.detailPanel.setAttribute('aria-hidden', 'true'); }
         if (this.detailBackdrop) { this.detailBackdrop.hidden = true; }
         if (this.detailBody) { this.detailBody.textContent = ''; this.detailBody.setAttribute('aria-busy', 'false'); }
         this.detailTrigger = null;
         if (restoreFocus) { if (trigger && document.contains(trigger)) { trigger.focus(); } else { this.root.focus(); } }
+    };
+
+    LocatorController.prototype.clearSelection = function (restoreFocus) {
+        this.state.detailSequence++; this.data.abort('detail'); this.state.selectedId = null; this.state.selectedLocationId = null; this.state.selectedLocationDetail = null; this.clearInlineDetails(); this.selectCard('');
+        if (this.map && this.map.provider && typeof this.map.provider.closePopup === 'function') { this.map.provider.closePopup(); }
+        if (restoreFocus && this.detailTrigger && document.contains(this.detailTrigger)) { this.detailTrigger.focus(); }
     };
 
     LocatorController.prototype.refreshFilters = function () {
@@ -1062,7 +1224,7 @@
             return;
         }
 
-        (this.loadAllDirectory ? items : items.slice(0, 250)).forEach(function (location) {
+        items.forEach(function (location) {
             var card = document.createElement('article');
             var distance = location.distance !== null && location.distance !== undefined
                 ? formatDistance(location.distance, self.settings, true)
@@ -1092,7 +1254,7 @@
             if (distance) { secondaryMeta.push(distance); }
             if (location.hours) { secondaryMeta.push(location.hours); }
 
-            card.className = 'bml-location-card';
+            card.className = 'bml-location-card' + (String(location.id) === String(self.state.selectedLocationId) ? ' is-selected is-expanded' : '');
             card.dataset.id = location.id;
             card.tabIndex = 0;
             card.setAttribute('aria-selected', String(location.id) === String(self.state.selectedId) ? 'true' : 'false');
@@ -1171,25 +1333,48 @@
         if (city && filterMode(this.root, 'city') === 'visible') { city.value = ''; }
 
         this.state.user = null;
-        this.state.page = 1;
         return this.refreshFilters().then(function () {
-            return self.load().then(function () { return self.loadMarkers(); });
+            return self.refreshResults();
         });
     };
 
     LocatorController.prototype.selectCard = function (id, scrollIntoView) {
         var selectedCard = null;
+        var self = this;
         this.root.querySelectorAll('.bml-location-card').forEach(function (card) {
             var selected = String(card.dataset.id) === String(id);
             var mapButton = card.querySelector('[data-bml-card-action="map"]');
             card.classList.toggle('is-active', selected);
+            card.classList.toggle('is-selected', selected);
+            card.classList.toggle('is-expanded', selected && Boolean(self.state.selectedLocationDetail));
             card.setAttribute('aria-selected', selected ? 'true' : 'false');
             if (selected) { selectedCard = card; }
             if (mapButton) { mapButton.setAttribute('aria-pressed', selected ? 'true' : 'false'); }
         });
-        if (selectedCard && scrollIntoView && typeof selectedCard.scrollIntoView === 'function') {
-            selectedCard.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        if (selectedCard && scrollIntoView) {
+            this.scrollSelectedCardIntoDirectoryView(selectedCard);
         }
+    };
+
+    LocatorController.prototype.scrollSelectedCardIntoDirectoryView = function (card) {
+        var container = this.root.querySelector('.bml-results');
+        var cardRect;
+        var containerRect;
+        var safePadding = 12;
+        var top;
+
+        if (!card || !container || !container.contains(card) || !container.clientHeight) { return; }
+
+        cardRect = card.getBoundingClientRect();
+        containerRect = container.getBoundingClientRect();
+        if (cardRect.top >= containerRect.top + safePadding && cardRect.top <= containerRect.bottom - safePadding) { return; }
+
+        top = container.scrollTop + (cardRect.top - containerRect.top) - safePadding;
+        if (typeof container.scrollTo === 'function') {
+            container.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            return;
+        }
+        container.scrollTop = Math.max(0, top);
     };
 
     LocatorController.prototype.emphasizeMarker = function (id, enabled) {
@@ -1249,7 +1434,7 @@
             count.textContent = template.replace('%1$d', String(this.state.items.length)).replace('%2$d', String(this.state.total));
         }
         if (button) {
-            button.hidden = this.loadAllDirectory || this.state.total === 0 || this.state.items.length >= this.state.total || this.state.page >= this.state.totalPages;
+            button.hidden = this.state.total === 0 || this.state.items.length >= this.state.total || this.state.page >= this.state.totalPages;
             button.disabled = this.state.loadingMore;
             button.setAttribute('aria-busy', this.state.loadingMore ? 'true' : 'false');
         }
@@ -1268,6 +1453,9 @@
         }
         if (this.boundCardAction) {
             this.root.removeEventListener('click', this.boundCardAction);
+        }
+        if (this.boundPopupAction) {
+            this.root.removeEventListener('click', this.boundPopupAction);
         }
         if (this.boundCardSelect) {
             this.root.removeEventListener('click', this.boundCardSelect);
@@ -1304,6 +1492,7 @@
         this.boundImageError = null;
         this.boundLoadMore = null;
         this.boundCardAction = null;
+        this.boundPopupAction = null;
         this.boundDetailAction = null;
         this.boundKeydown = null;
         this.boundCardHover = null;
