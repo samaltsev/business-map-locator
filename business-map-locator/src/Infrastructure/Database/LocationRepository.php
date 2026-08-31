@@ -92,16 +92,12 @@ final readonly class LocationRepository
 
         $this->appendPublicFilters($where, $values, $query->category, $query->city, $query->search);
 
-        $bbox = $query->boundingBox;
-        if ($query->origin && $query->radius) {
-            $bbox = $this->radiusBoundingBox($query->origin, $query->radius);
+        if ($query->boundingBox) {
+            $this->appendBoundingBox($where, $values, $query->boundingBox);
         }
 
-        if ($bbox) {
-            $where[] = 'latitude BETWEEN %f AND %f';
-            array_push($values, $bbox->south, $bbox->north);
-            $where[] = 'longitude BETWEEN %f AND %f';
-            array_push($values, $bbox->west, $bbox->east);
+        if ($query->origin && $query->radius) {
+            $this->appendBoundingBox($where, $values, $this->radiusBoundingBox($query->origin, $query->radius));
         }
 
         $distanceSql = '';
@@ -158,6 +154,15 @@ final readonly class LocationRepository
             $east,
             min(90, $origin->latitude + $latDelta)
         );
+    }
+
+    /** @param list<string> $where @param list<mixed> $values */
+    private function appendBoundingBox(array &$where, array &$values, BoundingBox $boundingBox): void
+    {
+        $where[] = 'latitude BETWEEN %f AND %f';
+        array_push($values, $boundingBox->south, $boundingBox->north);
+        $where[] = 'longitude BETWEEN %f AND %f';
+        array_push($values, $boundingBox->west, $boundingBox->east);
     }
 
     private function distanceSql(Coordinates $origin, ?Distance $radius = null): string
