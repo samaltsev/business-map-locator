@@ -49,6 +49,24 @@
         });
     }
 
+    function buildRestUrl(restBase, endpoint, params) {
+        var url = new URL(String(restBase || ''), window.location.href);
+        var route = url.searchParams.get('rest_route');
+        var path = String(endpoint || '').replace(/^\/+/, '');
+
+        if (route !== null) {
+            url.searchParams.set('rest_route', route.replace(/\/?$/, '/') + path);
+        } else {
+            url.pathname = url.pathname.replace(/\/?$/, '/') + path;
+        }
+
+        new URLSearchParams(params || '').forEach(function (value, key) {
+            url.searchParams.set(key, value);
+        });
+
+        return url.toString();
+    }
+
     function filterMode(root, dimension) {
         var mode = (root.dataset[dimension + 'Mode'] || 'visible').toLowerCase();
         return ['visible', 'locked', 'hidden'].indexOf(mode) !== -1 ? mode : 'visible';
@@ -514,12 +532,12 @@
         var params = createFilterParams(this.root);
         var query = params.toString();
 
-        return fetchJson(this.restUrl + 'filters' + (query ? '?' + query : ''));
+        return fetchJson(buildRestUrl(this.restUrl, 'filters', query));
     };
 
     LocatorDataSource.prototype.loadLocations = function (page, origin, perPage, bounds) {
         var self = this; this.abort('card'); if (window.AbortController) { this.cardAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations?' + createParams(this.root, this.settings, page || 1, origin, perPage, bounds).toString(), this.cardAbortController && this.cardAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations', createParams(this.root, this.settings, page || 1, origin, perPage, bounds)), this.cardAbortController && this.cardAbortController.signal);
     };
     LocatorDataSource.prototype.loadMarkers = function (bounds, origin) {
         var params = new URLSearchParams(bounds); var filters = createFilterParams(this.root);
@@ -528,17 +546,17 @@
         if (search && search.value.trim()) { params.set('search', search.value.trim()); }
         appendNearParams(params, this.settings, origin);
         this.abort('marker'); if (window.AbortController) { this.markerAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations/markers?' + params.toString(), this.markerAbortController && this.markerAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations/markers', params), this.markerAbortController && this.markerAbortController.signal);
     };
     LocatorDataSource.prototype.loadCityBounds = function (city) {
         var params = new URLSearchParams();
         if (city) { params.set('city', city); }
         this.abort('bounds'); if (window.AbortController) { this.boundsAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations/bounds?' + params.toString(), this.boundsAbortController && this.boundsAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations/bounds', params), this.boundsAbortController && this.boundsAbortController.signal);
     };
     LocatorDataSource.prototype.loadDetail = function (id) {
         this.abort('detail'); if (window.AbortController) { this.detailAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations/' + encodeURIComponent(id), this.detailAbortController && this.detailAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations/' + encodeURIComponent(id)), this.detailAbortController && this.detailAbortController.signal);
     };
 
     LocatorDataSource.prototype.destroy = function () {
