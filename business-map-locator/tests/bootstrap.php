@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+if (!defined('ABSPATH')) {
+    define('ABSPATH', __DIR__ . '/');
+}
+
 $autoload = dirname(__DIR__) . '/vendor/autoload.php';
 if (is_file($autoload)) {
     require_once $autoload;
@@ -136,11 +140,23 @@ if (!function_exists('update_post_meta')) {
     }
 }
 
+if (!function_exists('delete_post_meta')) {
+    function delete_post_meta(int $id, string $key): bool { unset($GLOBALS['bml_test_meta'][$id][$key]); return true; }
+}
+
 if (!function_exists('sanitize_text_field')) {
     function sanitize_text_field(string $value): string
     {
         return trim($value);
     }
+}
+
+if (!function_exists('sanitize_textarea_field')) {
+    function sanitize_textarea_field(string $value): string { return trim($value); }
+}
+
+if (!function_exists('wp_kses_post')) {
+    function wp_kses_post(string $value): string { return $value; }
 }
 
 if (!function_exists('sanitize_email')) {
@@ -155,6 +171,26 @@ if (!function_exists('esc_url_raw')) {
     {
         return trim($value);
     }
+}
+
+if (!function_exists('term_exists')) {
+    function term_exists(int $termId, string $taxonomy): bool { return isset($GLOBALS['bml_test_terms'][$taxonomy][$termId]); }
+}
+
+if (!function_exists('wp_set_object_terms')) {
+    function wp_set_object_terms(int $id, array $terms, string $taxonomy): array { $GLOBALS['bml_test_object_terms'][$id][$taxonomy] = $terms; return $terms; }
+}
+
+if (!function_exists('delete_post_thumbnail')) {
+    function delete_post_thumbnail(int $id): bool { unset($GLOBALS['bml_test_thumbnail'][$id]); return true; }
+}
+
+if (!function_exists('set_post_thumbnail')) {
+    function set_post_thumbnail(int $id, int $imageId): bool { $GLOBALS['bml_test_thumbnail'][$id] = $imageId; return true; }
+}
+
+if (!function_exists('get_post_type')) {
+    function get_post_type(int $id): string { return $GLOBALS['bml_test_post_types'][$id] ?? ''; }
 }
 
 if (!function_exists('get_posts')) {
@@ -192,6 +228,8 @@ if (!function_exists('wp_insert_post')) {
         $post->post_type = (string) ($data['post_type'] ?? 'post');
         $post->post_title = (string) ($data['post_title'] ?? '');
         $post->post_status = (string) ($data['post_status'] ?? 'draft');
+        $post->post_content = (string) ($data['post_content'] ?? '');
+        $post->post_excerpt = (string) ($data['post_excerpt'] ?? '');
         $GLOBALS['bml_test_posts'][$id] = $post;
 
         return $id;
@@ -208,6 +246,8 @@ if (!function_exists('wp_update_post')) {
         }
         $post->post_title = (string) ($data['post_title'] ?? $post->post_title);
         $post->post_status = (string) ($data['post_status'] ?? $post->post_status);
+        $post->post_content = (string) ($data['post_content'] ?? $post->post_content);
+        $post->post_excerpt = (string) ($data['post_excerpt'] ?? $post->post_excerpt);
 
         return $id;
     }
@@ -223,6 +263,10 @@ if (!class_exists('BML_Location_Index')) {
             return true;
         }
     }
+}
+
+if (!class_exists('BML_Location_Cache')) {
+    class BML_Location_Cache { public static function invalidate(): void { $GLOBALS['bml_test_cache_invalidations'] = ($GLOBALS['bml_test_cache_invalidations'] ?? 0) + 1; } }
 }
 
 if (!function_exists('rest_ensure_response')) {

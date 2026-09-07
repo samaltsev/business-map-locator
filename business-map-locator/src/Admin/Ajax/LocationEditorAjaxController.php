@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BusinessMapLocator\Admin\Ajax;
 
+use BusinessMapLocator\Admin\Location\LocationWriteService;
 use BusinessMapLocator\WordPress\Capabilities;
 use BusinessMapLocator\Support\SlugGenerator;
 
@@ -12,6 +13,10 @@ if (!defined('ABSPATH')) {
 
 final class LocationEditorAjaxController
 {
+    public function __construct(private LocationWriteService $writer)
+    {
+    }
+
     public function createTerm(): void
     {
         check_ajax_referer('bml_location_editor', 'nonce');
@@ -95,53 +100,13 @@ final class LocationEditorAjaxController
             ? 'publish'
             : 'draft';
 
-        $postData = [
-            'post_type' => 'bml_location',
-            'post_title' => $title,
-            'post_content' => '',
-            'post_status' => $postStatus,
-        ];
-        if ($id > 0) {
-            $postData['ID'] = $id;
-            $result = wp_update_post($postData, true);
-        } else {
-            $result = wp_insert_post($postData, true);
+        $input = ['title' => $title, 'status' => $postStatus];
+        foreach (['content', 'excerpt', 'address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours', 'lat', 'lng', 'operational_status', 'category_id', 'city_id', 'featured_image_id', 'remove_featured_image'] as $field) {
+            if (isset($_POST[$field]) && !is_array($_POST[$field])) { $input[$field] = (string) wp_unslash($_POST[$field]); }
         }
-        if (is_wp_error($result)) {
-            wp_send_json_error(['message' => $result->get_error_message()], 400);
-        }
+        $result = $this->writer->save($id, $input);
+        if (is_wp_error($result)) { wp_send_json_error(['message' => $result->get_error_message()], 422); }
         $id = (int) $result;
-
-        foreach (['address','region','country','postcode','phone'] as $key) {
-            $value = isset($_POST[$key]) && !is_array($_POST[$key])
-                ? sanitize_text_field(wp_unslash($_POST[$key]))
-                : '';
-            update_post_meta($id, 'bml_' . $key, $value);
-        }
-        foreach (['lat','lng'] as $key) {
-            $raw = isset($_POST[$key]) && !is_array($_POST[$key]) ? trim((string) wp_unslash($_POST[$key])) : '';
-            if ($raw === '' || !is_numeric($raw)) {
-                delete_post_meta($id, 'bml_' . $key);
-            } else {
-                update_post_meta($id, 'bml_' . $key, (float) $raw);
-            }
-        }
-        $operational = isset($_POST['operational_status']) && !is_array($_POST['operational_status'])
-            ? sanitize_key(wp_unslash($_POST['operational_status']))
-            : 'open';
-        if (!in_array($operational, ['open', 'temporarily_closed', 'hidden'], true)) {
-            $operational = 'open';
-        }
-        update_post_meta($id, 'bml_operational_status', $operational);
-
-        foreach (['bml_category' => 'category_id', 'bml_city' => 'city_id'] as $taxonomy => $field) {
-            $termId = isset($_POST[$field]) ? absint(wp_unslash($_POST[$field])) : 0;
-            wp_set_object_terms($id, $termId ? [$termId] : [], $taxonomy);
-        }
-
-        if (class_exists('BML_Location_Cache')) {
-            \BML_Location_Cache::invalidate();
-        }
 
         wp_send_json_success([
             'id' => $id,
