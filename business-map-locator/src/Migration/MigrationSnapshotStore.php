@@ -7,7 +7,7 @@ use RuntimeException;
 
 final class MigrationSnapshotStore
 {
-    private const SCHEMA_VERSION = 1;
+    private const SCHEMA_VERSION = 2;
 
     public function __construct(private readonly ?string $baseDirectory = null)
     {
@@ -83,7 +83,7 @@ final class MigrationSnapshotStore
             }
         }
 
-        if (($snapshot['schema_version'] ?? null) !== self::SCHEMA_VERSION) {
+        if (!in_array(($snapshot['schema_version'] ?? null), [1, self::SCHEMA_VERSION], true)) {
             $errors[] = 'Unsupported snapshot schema version.';
         }
         if (($snapshot['migration'] ?? null) !== 'bml_city_to_area_v1') {
@@ -100,6 +100,9 @@ final class MigrationSnapshotStore
         }
         if (!is_array($snapshot['taxonomies'] ?? null) || !is_array($snapshot['terms'] ?? null)) {
             $errors[] = 'Snapshot taxonomies and terms must be arrays.';
+        }
+        if (($snapshot['schema_version'] ?? null) === self::SCHEMA_VERSION && (!is_array($snapshot['locations'] ?? null) || !is_array($snapshot['plan'] ?? null))) {
+            $errors[] = 'Version 2 snapshots require locations and plan evidence.';
         }
 
         return ['valid' => $errors === [], 'errors' => $errors];

@@ -5,8 +5,13 @@ namespace BusinessMapLocator\Migration;
 
 final class AreaMigrationService
 {
-    public function __construct(private readonly MigrationSnapshotStore $snapshots)
+    private AreaMigrationPlanner $planner;
+    private AreaMigrationStateStore $state;
+
+    public function __construct(private readonly MigrationSnapshotStore $snapshots, ?AreaMigrationPlanner $planner = null, ?AreaMigrationStateStore $state = null)
     {
+        $this->planner = $planner ?? new AreaMigrationPlanner();
+        $this->state = $state ?? new AreaMigrationStateStore();
     }
 
     /** @return array<string, int|bool> */
@@ -15,14 +20,7 @@ final class AreaMigrationService
         return [
             'bml_city_exists' => taxonomy_exists('bml_city'),
             'bml_area_exists' => taxonomy_exists('bml_area'),
-            'location_count' => count(get_posts([
-                'post_type' => 'bml_location',
-                'post_status' => 'any',
-                'fields' => 'ids',
-                'numberposts' => -1,
-                'nopaging' => true,
-                'suppress_filters' => true,
-            ])),
+            'location_count' => count($this->locations(true)),
             'city_terms_count' => count($this->terms('bml_city')),
             'area_terms_count' => count($this->terms('bml_area')),
         ];
@@ -31,8 +29,9 @@ final class AreaMigrationService
     /** @return array{snapshot: array<string, mixed>, path: string} */
     public function createSnapshot(?int $createdByUserId = null): array
     {
+        $simulation = $this->simulateMigration();
         $snapshot = [
-            'schema_version' => 1,
+            'schema_version' => 2,
             'migration' => 'bml_city_to_area_v1',
             'created_at' => gmdate('c'),
             'created_by_user_id' => $createdByUserId ?? get_current_user_id(),
@@ -46,46 +45,42 @@ final class AreaMigrationService
             ],
             'taxonomies' => ['bml_city', 'bml_area'],
             'terms' => [
-                'bml_city' => $this->snapshotTerms('bml_city'),
-                'bml_area' => $this->snapshotTerms('bml_area'),
+                'bml_city' => $this->inventory('bml_city'),
+                'bml_area' => $this->inventory('bml_area'),
             ],
+            'locations' => $this->locations(true),
+            'plan' => $simulation['plan'],
         ];
 
         return ['snapshot' => $snapshot, 'path' => $this->snapshots->write($snapshot)];
     }
 
-    /** @return array{locations: int, city_terms: int, would_create_areas: int, would_migrate_relationships: int, warnings: list<string>, errors: list<string>} */
+    /** @return array<string, mixed> */
     public function simulateMigration(): array
     {
-        $state = $this->inspect();
-        $warnings = [];
-        $errors = [];
-
-        if (!$state['bml_city_exists']) {
-            $errors[] = 'Legacy bml_city taxonomy is not registered.';
-        }
-        if (!$state['bml_area_exists']) {
-            $errors[] = 'Canonical bml_area taxonomy is not registered.';
-        }
-
-        $cityTerms = $this->snapshotTerms('bml_city');
-        $relationships = array_sum(array_map(static fn (array $term): int => (int) $term['relationships_count'], $cityTerms));
-        if ($state['city_terms_count'] === 0) {
-            $warnings[] = 'No legacy City terms exist.';
-        }
+        $cities = $this->inventory('bml_city'); $areas = $this->inventory('bml_area'); $decisions = [];
+        $cityCounts = array_fill_keys([AreaMigrationPlanner::CREATE, AreaMigrationPlanner::ALREADY_MAPPED, AreaMigrationPlanner::COLLISION, AreaMigrationPlanner::AMBIGUOUS, AreaMigrationPlanner::REQUIRES_DECISION], 0);
+        foreach ($cities as $city) { $decision = $this->planner->decide($city, $areas); $decisions[(int) $city['id']] = $decision; $cityCounts[$decision['status']]++; }
+        $locationPlan = $this->planner->planLocations($this->locations(true), $decisions);
+        $plan = ['city_decisions' => array_values($decisions), 'location_decisions' => $locationPlan['records'], 'counts' => ['cities' => $cityCounts, 'locations' => $locationPlan['counts']], 'collision_list' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::COLLISION)), 'ambiguous_list' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::AMBIGUOUS)), 'decision_required_list' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === AreaMigrationPlanner::REQUIRES_DECISION)), 'planned_area_creations' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::CREATE)), 'planned_area_relationship_additions' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === 'ADD_AREA')), 'no_op_records' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === 'NOOP'))];
 
         return [
-            'locations' => (int) $state['location_count'],
-            'city_terms' => (int) $state['city_terms_count'],
-            'would_create_areas' => (int) $state['city_terms_count'],
-            'would_migrate_relationships' => $relationships,
-            'warnings' => $warnings,
-            'errors' => $errors,
+            'locations' => count($locationPlan['records']), 'city_terms' => count($cities), 'would_create_areas' => $cityCounts[AreaMigrationPlanner::CREATE], 'would_migrate_relationships' => $locationPlan['counts']['ADD_AREA'], 'warnings' => [], 'errors' => [], 'plan' => $plan,
         ];
     }
 
+    /** @return array<string,mixed> */
+    public function startPlanningRun(?int $createdByUserId = null): array
+    {
+        $run = $this->state->create(); $this->state->transition($run['run_id'], AreaMigrationStateStore::INSPECTED, ['inspection' => $this->inspect()]);
+        $snapshot = $this->createSnapshot($createdByUserId); $this->state->transition($run['run_id'], AreaMigrationStateStore::SNAPSHOTTED, ['snapshot_path' => $snapshot['path']]);
+        $simulation = $this->simulateMigration(); $run = $this->state->transition($run['run_id'], AreaMigrationStateStore::SIMULATED, ['plan_counts' => $simulation['plan']['counts']]);
+        $blocked = (int) $simulation['plan']['counts']['cities'][AreaMigrationPlanner::COLLISION] + (int) $simulation['plan']['counts']['cities'][AreaMigrationPlanner::AMBIGUOUS] + (int) $simulation['plan']['counts']['cities'][AreaMigrationPlanner::REQUIRES_DECISION] + (int) $simulation['plan']['counts']['locations'][AreaMigrationPlanner::REQUIRES_DECISION] > 0;
+        return $this->state->transition($run['run_id'], $blocked ? AreaMigrationStateStore::BLOCKED : AreaMigrationStateStore::READY, ['snapshot_path' => $snapshot['path']]);
+    }
+
     /** @return list<array{id: int, parent: int, slug: string, count: int, relationships_count: int}> */
-    private function snapshotTerms(string $taxonomy): array
+    private function inventory(string $taxonomy): array
     {
         $terms = [];
         foreach ($this->terms($taxonomy) as $term) {
@@ -94,9 +89,11 @@ final class AreaMigrationService
             $terms[] = [
                 'id' => $termId,
                 'parent' => (int) $term->parent,
-                'slug' => (string) $term->slug,
+                'name' => (string) $term->name, 'slug' => (string) $term->slug,
                 'count' => (int) $term->count,
                 'relationships_count' => is_array($relationships) ? count($relationships) : 0,
+                'area_term_id' => (int) get_term_meta($termId, '_bml_area_term_id', true),
+                'migrated_from_city_term_id' => (int) get_term_meta($termId, '_bml_migrated_from_city_term_id', true),
             ];
         }
 
@@ -110,8 +107,21 @@ final class AreaMigrationService
             return [];
         }
 
-        $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
+        $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false, 'number' => 0, 'orderby' => 'term_id', 'order' => 'ASC']);
 
         return is_array($terms) ? $terms : [];
+    }
+
+    /** @return list<array<string,mixed>> */
+    private function locations(bool $affectedOnly): array
+    {
+        $rows = [];
+        foreach (get_posts(['post_type' => 'bml_location', 'post_status' => 'any', 'fields' => 'ids', 'numberposts' => -1, 'nopaging' => true, 'suppress_filters' => true]) as $id) {
+            $post = get_post((int) $id); if ($post === null) { continue; }
+            $cities = wp_get_post_terms((int) $id, 'bml_city', ['fields' => 'ids']); $areas = wp_get_post_terms((int) $id, 'bml_area', ['fields' => 'ids']);
+            $cityIds = is_array($cities) ? array_map('intval', $cities) : []; if ($affectedOnly && $cityIds === []) { continue; }
+            $rows[] = ['location_id' => (int) $id, 'post_status' => (string) $post->post_status, 'city_ids' => $cityIds, 'area_ids' => is_array($areas) ? array_map('intval', $areas) : []];
+        }
+        return $rows;
     }
 }

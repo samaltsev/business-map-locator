@@ -177,6 +177,16 @@ if (!function_exists('term_exists')) {
     function term_exists(int $termId, string $taxonomy): bool { return isset($GLOBALS['bml_test_terms'][$taxonomy][$termId]); }
 }
 
+if (!function_exists('taxonomy_exists')) { function taxonomy_exists(string $taxonomy): bool { return $GLOBALS['bml_test_taxonomies'][$taxonomy] ?? true; } }
+if (!function_exists('get_terms')) { function get_terms(array $args = []): array { $terms = array_values($GLOBALS['bml_test_terms'][$args['taxonomy'] ?? ''] ?? []); usort($terms, static fn ($a, $b): int => (int)$a->term_id <=> (int)$b->term_id); return $terms; } }
+if (!function_exists('get_term_meta')) { function get_term_meta(int $id, string $key, bool $single = false): mixed { return $GLOBALS['bml_test_term_meta'][$id][$key] ?? ''; } }
+if (!function_exists('get_objects_in_term')) { function get_objects_in_term(array $termIds, string $taxonomy): array { $ids=[]; foreach ($GLOBALS['bml_test_post_terms'] ?? [] as $postId => $sets) { if (array_intersect($termIds, $sets[$taxonomy] ?? [])) $ids[]=$postId; } return $ids; } }
+if (!function_exists('get_option')) { function get_option(string $key, mixed $default = false): mixed { return $GLOBALS['bml_test_options'][$key] ?? $default; } }
+if (!function_exists('update_option')) { function update_option(string $key, mixed $value, mixed $autoload = null): bool { $GLOBALS['bml_test_options'][$key]=$value; return true; } }
+if (!function_exists('add_option')) { function add_option(string $key, mixed $value, string $deprecated = '', bool $autoload = true): bool { if (isset($GLOBALS['bml_test_options'][$key])) return false; $GLOBALS['bml_test_options'][$key]=$value; return true; } }
+if (!function_exists('delete_option')) { function delete_option(string $key): bool { unset($GLOBALS['bml_test_options'][$key]); return true; } }
+if (!function_exists('wp_generate_uuid4')) { function wp_generate_uuid4(): string { return 'test-' . bin2hex(random_bytes(8)); } }
+
 if (!function_exists('wp_set_object_terms')) {
     function wp_set_object_terms(int $id, array $terms, string $taxonomy): array { $GLOBALS['bml_test_object_terms'][$id][$taxonomy] = $terms; return $terms; }
 }

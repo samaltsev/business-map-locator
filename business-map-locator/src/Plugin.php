@@ -15,6 +15,9 @@ use BusinessMapLocator\Lifecycle\Deactivator;
 use BusinessMapLocator\Migration\AreaMigrationService;
 use BusinessMapLocator\Migration\AreaRollbackService;
 use BusinessMapLocator\Migration\MigrationSnapshotStore;
+use BusinessMapLocator\Migration\AreaMigrationStateStore;
+use BusinessMapLocator\Migration\AreaMigrationPlanner;
+use BusinessMapLocator\Migration\AreaMigrationLock;
 use BusinessMapLocator\Settings\Settings;
 use BusinessMapLocator\WordPress\BlockRegistrar;
 use BusinessMapLocator\WordPress\ContentTypes;
@@ -82,7 +85,10 @@ final class Plugin
         $this->container->set(PrivacyPolicy::class, static fn (): PrivacyPolicy => new PrivacyPolicy());
         $this->container->set(ImportCleanupScheduler::class, static fn (): ImportCleanupScheduler => new ImportCleanupScheduler());
         $this->container->set(MigrationSnapshotStore::class, static fn (): MigrationSnapshotStore => new MigrationSnapshotStore());
-        $this->container->set(AreaMigrationService::class, static fn (Container $container): AreaMigrationService => new AreaMigrationService($container->get(MigrationSnapshotStore::class)));
+        $this->container->set(AreaMigrationPlanner::class, static fn (): AreaMigrationPlanner => new AreaMigrationPlanner());
+        $this->container->set(AreaMigrationStateStore::class, static fn (): AreaMigrationStateStore => new AreaMigrationStateStore());
+        $this->container->set(AreaMigrationLock::class, static fn (): AreaMigrationLock => new AreaMigrationLock());
+        $this->container->set(AreaMigrationService::class, static fn (Container $container): AreaMigrationService => new AreaMigrationService($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationPlanner::class), $container->get(AreaMigrationStateStore::class)));
         $this->container->set(AreaRollbackService::class, static fn (Container $container): AreaRollbackService => new AreaRollbackService($container->get(MigrationSnapshotStore::class)));
 
         $this->container->set(
