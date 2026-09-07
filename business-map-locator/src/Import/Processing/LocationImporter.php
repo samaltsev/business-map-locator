@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace BusinessMapLocator\Import\Processing;
 
+use BusinessMapLocator\Import\Config\ImportUpdatePolicy;
 use BusinessMapLocator\Import\Dto\ImportJob;
 use BusinessMapLocator\Import\Mapping\ImportMapper;
 use BusinessMapLocator\Import\Duplicate\ExistingLocationLookup;
@@ -45,6 +46,18 @@ final class LocationImporter
         }
         $postId = (int) ($match['postId'] ?? 0);
         $isUpdate = $postId > 0;
+        $updatePolicy = ImportUpdatePolicy::normalize((string) ($job['updatePolicy'] ?? ''));
+        $updatePolicy ??= ImportUpdatePolicy::NON_EMPTY_ONLY;
+
+        if (($isUpdate && $updatePolicy === ImportUpdatePolicy::CREATE_ONLY) || (!$isUpdate && $updatePolicy === ImportUpdatePolicy::UPDATE_ONLY)) {
+            if (!empty($job['dryRun'])) {
+                $job['wouldSkip']++;
+                return ['job' => $job, 'message' => 'dry run: would skip.', 'action' => 'would_skip', 'locationId' => $postId];
+            }
+
+            $job['skipped']++;
+            return ['job' => $job, 'message' => 'skipped by update policy.', 'action' => 'skipped', 'locationId' => $postId];
+        }
 
         if (!empty($job['dryRun'])) {
             $job[$isUpdate ? 'wouldUpdate' : 'wouldCreate']++;
@@ -63,7 +76,7 @@ final class LocationImporter
             update_post_meta($postId, 'bml_import_job_id', (int) ($job['id'] ?? 0));
             update_post_meta($postId, 'bml_import_row_action', $isUpdate ? 'updated' : 'created');
         }
-        $this->saveLocation($postId, $data, $externalId, $fingerprint, $lat, $lng, $isUpdate);
+        $this->saveLocation($postId, $title, $data, $externalId, $lat, $lng, $isUpdate, $updatePolicy);
         (new \BML_Location_Index())->upsert($postId);
 
         $job[$isUpdate ? 'updated' : 'added']++;
@@ -97,30 +110,58 @@ final class LocationImporter
         return wp_insert_post($postData, true);
     }
 
-    private function saveLocation(int $postId, array $data, string $externalId, string $fingerprint, float $lat, float $lng, bool $isUpdate): void
+    private function saveLocation(int $postId, string $title, array $data, string $externalId, float $lat, float $lng, bool $isUpdate, string $updatePolicy): void
     {
         foreach (['address','region','country','postcode','phone','hours'] as $key) {
-            update_post_meta($postId, 'bml_' . $key, sanitize_text_field((string) ($data[$key] ?? '')));
+            if ($this->shouldWrite($data, $key, $isUpdate, $updatePolicy)) {
+                update_post_meta($postId, 'bml_' . $key, sanitize_text_field((string) ($data[$key] ?? '')));
+            }
         }
-        update_post_meta($postId, 'bml_email', sanitize_email((string) ($data['email'] ?? '')));
-        update_post_meta($postId, 'bml_website', esc_url_raw((string) ($data['website'] ?? '')));
+        if ($this->shouldWrite($data, 'email', $isUpdate, $updatePolicy)) {
+            update_post_meta($postId, 'bml_email', sanitize_email((string) ($data['email'] ?? '')));
+        }
+        if ($this->shouldWrite($data, 'website', $isUpdate, $updatePolicy)) {
+            update_post_meta($postId, 'bml_website', esc_url_raw((string) ($data['website'] ?? '')));
+        }
         update_post_meta($postId, 'bml_lat', $lat);
         update_post_meta($postId, 'bml_lng', $lng);
-        update_post_meta($postId, 'bml_external_id', $externalId);
-        update_post_meta($postId, 'bml_import_fingerprint', $fingerprint);
-        $hasOperationalStatus = array_key_exists('operational_status', $data) && $data['operational_status'] !== '';
-        $hasVisible = array_key_exists('visible', $data);
+        if ($this->shouldWrite($data, 'external_id', $isUpdate, $updatePolicy)) {
+            update_post_meta($postId, 'bml_external_id', $externalId);
+        }
+        $effectiveAddress = $this->shouldWrite($data, 'address', $isUpdate, $updatePolicy)
+            ? sanitize_text_field((string) ($data['address'] ?? ''))
+            : (string) get_post_meta($postId, 'bml_address', true);
+        update_post_meta($postId, 'bml_import_fingerprint', $this->mapper->fingerprint($title, $effectiveAddress, (string) $lat, (string) $lng));
+        $hasOperationalStatus = $this->shouldWrite($data, 'operational_status', $isUpdate, $updatePolicy) && (string) ($data['operational_status'] ?? '') !== '';
+        $hasVisible = $this->shouldWrite($data, 'visible', $isUpdate, $updatePolicy) && (string) ($data['visible'] ?? '') !== '';
         if (!$isUpdate || $hasOperationalStatus || $hasVisible) {
             $operationalStatus = $this->operationalStatus($postId, $data, $isUpdate, $hasOperationalStatus, $hasVisible);
             update_post_meta($postId, 'bml_operational_status', $operationalStatus);
             update_post_meta($postId, 'bml_visible', OperationalStatusResolver::visibleValue($operationalStatus));
         }
-        if (!empty($data['category'])) {
-            $this->assignTerms($postId, (string) $data['category'], 'bml_category');
+        if ($this->shouldWrite($data, 'category', $isUpdate, $updatePolicy)) {
+            $this->assignTerms($postId, (string) ($data['category'] ?? ''), 'bml_category');
         }
-        if (!empty($data['city'])) {
-            $this->assignTerms($postId, (string) $data['city'], 'bml_city');
+        if ($this->shouldWrite($data, 'city', $isUpdate, $updatePolicy)) {
+            $this->assignTerms($postId, (string) ($data['city'] ?? ''), 'bml_city');
         }
+    }
+
+    private function shouldWrite(array $data, string $key, bool $isUpdate, string $updatePolicy): bool
+    {
+        if (!$isUpdate) {
+            return true;
+        }
+
+        if (!array_key_exists($key, $data)) {
+            return false;
+        }
+
+        if ($updatePolicy === ImportUpdatePolicy::OVERWRITE_MAPPED) {
+            return true;
+        }
+
+        return trim((string) $data[$key]) !== '';
     }
 
     private function operationalStatus(int $postId, array $data, bool $isUpdate, bool $hasOperationalStatus, bool $hasVisible): string

@@ -20,7 +20,11 @@ final class ImportAjaxController
 
     public function prepareImport(): void
     {
-        $this->respond(fn (): array => $this->manager->prepare($_FILES['csv'] ?? [], $this->request->postBool('dry_run')));
+        $this->respond(fn (): array => $this->manager->prepare(
+            $_FILES['csv'] ?? [],
+            $this->request->postBool('dry_run'),
+            $this->request->postString('update_policy')
+        ));
     }
 
     public function processImport(): void
