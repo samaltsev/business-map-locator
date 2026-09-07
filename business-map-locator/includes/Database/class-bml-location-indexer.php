@@ -64,7 +64,7 @@ final class BML_Location_Indexer {
     }
 
     public function sync_terms(int $object_id, $terms, $tt_ids, string $taxonomy): void {
-        if (($taxonomy === 'bml_category' || $taxonomy === 'bml_city') && get_post_type($object_id) === 'bml_location') {
+        if (in_array($taxonomy, BML_Location_Relation_Index::TAXONOMIES, true) && get_post_type($object_id) === 'bml_location') {
             $this->mark_dirty($object_id);
         }
     }

@@ -4,6 +4,23 @@ if (!defined('ABSPATH')) {
 }
 
 final class BML_Schema {
+    public static function location_terms_sql(): string {
+        global $wpdb;
+
+        $table = BML_Database::location_terms_table();
+        $charset_collate = $wpdb->get_charset_collate();
+
+        return "CREATE TABLE {$table} (
+            location_id BIGINT UNSIGNED NOT NULL,
+            taxonomy VARCHAR(32) NOT NULL,
+            term_id BIGINT UNSIGNED NOT NULL,
+            is_primary TINYINT(1) NOT NULL DEFAULT 0,
+            UNIQUE KEY location_taxonomy_term (location_id, taxonomy, term_id),
+            KEY taxonomy_term_location (taxonomy, term_id, location_id),
+            KEY location_taxonomy_primary (location_id, taxonomy, is_primary)
+        ) {$charset_collate};";
+    }
+
     public static function locations_index_sql(): string {
         global $wpdb;
 

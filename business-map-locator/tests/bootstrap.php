@@ -298,9 +298,9 @@ if (!function_exists('get_the_post_thumbnail_url')) {
 }
 
 if (!function_exists('wp_get_post_terms')) {
-    function wp_get_post_terms(int $id, string $taxonomy): array
+    function wp_get_post_terms(int $id, string $taxonomy, array $args = []): array|WP_Error
     {
-        return [];
+        return $GLOBALS['bml_test_post_terms'][$id][$taxonomy] ?? [];
     }
 }
 

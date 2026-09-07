@@ -4,6 +4,12 @@ if (!defined('ABSPATH')) {
 }
 
 final class BML_Location_Index {
+    private BML_Location_Relation_Index $relation_index;
+
+    public function __construct(?BML_Location_Relation_Index $relation_index = null) {
+        $this->relation_index = $relation_index ?: new BML_Location_Relation_Index();
+    }
+
     public function upsert(int $post_id): bool {
         global $wpdb;
 
@@ -113,7 +119,11 @@ final class BML_Location_Index {
             current_time('mysql'),
         ]);
 
-        return $wpdb->query($wpdb->prepare($sql, $values)) !== false;
+        if ($wpdb->query($wpdb->prepare($sql, $values)) === false) {
+            return false;
+        }
+
+        return $this->relation_index->sync($post_id);
     }
 
     public function delete(int $post_id): bool {
@@ -123,7 +133,9 @@ final class BML_Location_Index {
             return false;
         }
 
-        return $wpdb->delete(BML_Database::locations_index_table(), ['post_id' => $post_id], ['%d']) !== false;
+        $scalar_deleted = $wpdb->delete(BML_Database::locations_index_table(), ['post_id' => $post_id], ['%d']) !== false;
+
+        return $scalar_deleted && $this->relation_index->delete($post_id);
     }
 
     public function rebuild(int $offset = 0, int $limit = 100): array {

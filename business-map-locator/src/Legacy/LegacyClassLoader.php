@@ -53,6 +53,7 @@ final class LegacyClassLoader
             'BML_Database' => 'includes/Database/class-bml-database.php',
             'BML_Schema' => 'includes/Database/class-bml-schema.php',
             'BML_Migrator' => 'includes/Database/class-bml-migrator.php',
+            'BML_Location_Relation_Index' => 'includes/Database/class-bml-location-relation-index.php',
             'BML_Location_Index' => 'includes/Database/class-bml-location-index.php',
             'BML_Location_Indexer' => 'includes/Database/class-bml-location-indexer.php',
         ];
