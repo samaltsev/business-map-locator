@@ -19,6 +19,8 @@ use BusinessMapLocator\Migration\AreaMigrationStateStore;
 use BusinessMapLocator\Migration\AreaMigrationPlanner;
 use BusinessMapLocator\Migration\AreaMigrationLock;
 use BusinessMapLocator\Migration\AreaMigrationJournal;
+use BusinessMapLocator\Migration\AreaMigrationExecutor;
+use BusinessMapLocator\Migration\AreaMigrationRevalidator;
 use BusinessMapLocator\Settings\Settings;
 use BusinessMapLocator\WordPress\BlockRegistrar;
 use BusinessMapLocator\WordPress\ContentTypes;
@@ -90,8 +92,10 @@ final class Plugin
         $this->container->set(AreaMigrationStateStore::class, static fn (): AreaMigrationStateStore => new AreaMigrationStateStore());
         $this->container->set(AreaMigrationLock::class, static fn (): AreaMigrationLock => new AreaMigrationLock());
         $this->container->set(AreaMigrationJournal::class, static fn (): AreaMigrationJournal => new AreaMigrationJournal());
+        $this->container->set(AreaMigrationRevalidator::class, static fn (): AreaMigrationRevalidator => new AreaMigrationRevalidator());
         $this->container->set(AreaMigrationService::class, static fn (Container $container): AreaMigrationService => new AreaMigrationService($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationPlanner::class), $container->get(AreaMigrationStateStore::class)));
-        $this->container->set(AreaRollbackService::class, static fn (Container $container): AreaRollbackService => new AreaRollbackService($container->get(MigrationSnapshotStore::class)));
+        $this->container->set(AreaMigrationExecutor::class, static fn (Container $container): AreaMigrationExecutor => new AreaMigrationExecutor($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationStateStore::class), $container->get(AreaMigrationLock::class), $container->get(AreaMigrationJournal::class), $container->get(AreaMigrationRevalidator::class)));
+        $this->container->set(AreaRollbackService::class, static fn (Container $container): AreaRollbackService => new AreaRollbackService($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationStateStore::class), $container->get(AreaMigrationLock::class), $container->get(AreaMigrationJournal::class), $container->get(AreaMigrationRevalidator::class)));
 
         $this->container->set(
             Activator::class,
