@@ -186,6 +186,10 @@ if (!function_exists('update_option')) { function update_option(string $key, mix
 if (!function_exists('add_option')) { function add_option(string $key, mixed $value, string $deprecated = '', bool $autoload = true): bool { if (isset($GLOBALS['bml_test_options'][$key])) return false; $GLOBALS['bml_test_options'][$key]=$value; return true; } }
 if (!function_exists('delete_option')) { function delete_option(string $key): bool { unset($GLOBALS['bml_test_options'][$key]); return true; } }
 if (!function_exists('wp_generate_uuid4')) { function wp_generate_uuid4(): string { return 'test-' . bin2hex(random_bytes(8)); } }
+if (!function_exists('wp_json_encode')) { function wp_json_encode(mixed $value, int $flags = 0): string|false { return json_encode($value, $flags); } }
+if (!function_exists('wp_mkdir_p')) { function wp_mkdir_p(string $path): bool { return is_dir($path) || mkdir($path, 0777, true); } }
+if (!function_exists('trailingslashit')) { function trailingslashit(string $value): string { return rtrim($value, '/\\') . '/'; } }
+if (!function_exists('wp_upload_dir')) { function wp_upload_dir(): array { return ['basedir' => sys_get_temp_dir(), 'error' => '']; } }
 
 if (!function_exists('wp_set_object_terms')) {
     function wp_set_object_terms(int $id, array $terms, string $taxonomy): array { $GLOBALS['bml_test_object_terms'][$id][$taxonomy] = $terms; return $terms; }
