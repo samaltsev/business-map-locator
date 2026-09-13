@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace BusinessMapLocator\Admin\Location;
 
+use BusinessMapLocator\Domain\Area\AreaAssignment;
+
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -10,8 +12,9 @@ if (!defined('ABSPATH')) {
 /** Canonical write contract shared by the form and editor AJAX entry points. */
 final class LocationWriteService
 {
-    public function __construct(private \BML_Location_Index $index)
+    public function __construct(private \BML_Location_Index $index, private ?AreaAssignment $areas = null)
     {
+        $this->areas ??= new AreaAssignment();
     }
 
     /** @param array<string, mixed> $input */
@@ -141,17 +144,7 @@ final class LocationWriteService
         }
         $id = $this->integer($raw);
         if ($id === 0) return 0;
-        if (!term_exists($id, 'bml_area')) return new \WP_Error('location_area_invalid', __('Invalid Area.', 'business-map-locator'));
-        foreach ((array) get_terms(['taxonomy' => 'bml_area', 'hide_empty' => false]) as $term) {
-            if ((int) $term->parent === $id) return new \WP_Error('location_area_not_leaf', __('Only leaf Areas can be assigned.', 'business-map-locator'));
-        }
-        if ((string) get_term_meta($id, 'bml_area_active', true) === '0') {
-            $existing = $locationId > 0 ? wp_get_post_terms($locationId, 'bml_area', ['fields' => 'ids']) : [];
-            if (is_wp_error($existing) || !in_array($id, array_map('intval', $existing), true)) {
-                return new \WP_Error('location_area_inactive', __('Inactive Areas cannot be newly assigned.', 'business-map-locator'));
-            }
-        }
-        return $id;
+        return $this->areas->byId($id, $locationId);
     }
 
     private function boolean(mixed $value): bool

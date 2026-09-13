@@ -7,14 +7,16 @@ use BusinessMapLocator\Import\Config\ImportUpdatePolicy;
 use BusinessMapLocator\Import\Dto\ImportJob;
 use BusinessMapLocator\Import\Mapping\ImportMapper;
 use BusinessMapLocator\Import\Duplicate\ExistingLocationLookup;
+use BusinessMapLocator\Domain\Area\AreaAssignment;
 use BusinessMapLocator\Support\OperationalStatusResolver;
 use BusinessMapLocator\Support\SlugGenerator;
 
 final class LocationImporter
 {
-    public function __construct(private ImportMapper $mapper, private ?ExistingLocationLookup $lookup = null)
+    public function __construct(private ImportMapper $mapper, private ?ExistingLocationLookup $lookup = null, private ?AreaAssignment $areas = null)
     {
         $this->lookup ??= new ExistingLocationLookup();
+        $this->areas ??= new AreaAssignment();
     }
 
     public function importRow(array $row, ImportJob $job, string $sourceRowHash = ''): array
@@ -59,6 +61,13 @@ final class LocationImporter
             return ['job' => $job, 'message' => 'skipped by update policy.', 'action' => 'skipped', 'locationId' => $postId];
         }
 
+        $area = $this->areaForRow($data, $postId, $isUpdate, $updatePolicy);
+        if (is_wp_error($area)) {
+            $job['processingErrors']++;
+            if (!empty($job['dryRun'])) { $job['wouldFail']++; }
+            return ['job' => $job, 'error' => $area->get_error_message(), 'code' => $area->get_error_code(), 'action' => 'error', 'locationId' => 0];
+        }
+
         if (!empty($job['dryRun'])) {
             $job[$isUpdate ? 'wouldUpdate' : 'wouldCreate']++;
             return ['job' => $job, 'message' => 'dry run: would ' . ($isUpdate ? 'update' : 'create') . '.', 'action' => $isUpdate ? 'would_update' : 'would_create', 'locationId' => $postId];
@@ -76,8 +85,13 @@ final class LocationImporter
             update_post_meta($postId, 'bml_import_job_id', (int) ($job['id'] ?? 0));
             update_post_meta($postId, 'bml_import_row_action', $isUpdate ? 'updated' : 'created');
         }
-        $this->saveLocation($postId, $title, $data, $externalId, $lat, $lng, $isUpdate, $updatePolicy);
+        $saved = $this->saveLocation($postId, $title, $data, $externalId, $lat, $lng, $isUpdate, $updatePolicy, $area);
+        if (is_wp_error($saved)) {
+            $job['processingErrors']++;
+            return ['job' => $job, 'error' => $saved->get_error_message(), 'code' => $saved->get_error_code(), 'action' => 'error', 'locationId' => 0];
+        }
         (new \BML_Location_Index())->upsert($postId);
+        \BML_Location_Cache::invalidate();
 
         $job[$isUpdate ? 'updated' : 'added']++;
 
@@ -110,7 +124,7 @@ final class LocationImporter
         return wp_insert_post($postData, true);
     }
 
-    private function saveLocation(int $postId, string $title, array $data, string $externalId, float $lat, float $lng, bool $isUpdate, string $updatePolicy): void
+    private function saveLocation(int $postId, string $title, array $data, string $externalId, float $lat, float $lng, bool $isUpdate, string $updatePolicy, ?int $area): \WP_Error|null
     {
         foreach (['address','region','country','postcode','phone','hours'] as $key) {
             if ($this->shouldWrite($data, $key, $isUpdate, $updatePolicy)) {
@@ -145,6 +159,34 @@ final class LocationImporter
         if ($this->shouldWrite($data, 'city', $isUpdate, $updatePolicy)) {
             $this->assignTerms($postId, (string) ($data['city'] ?? ''), 'bml_city');
         }
+        if ($area !== null) {
+            $terms = wp_set_object_terms($postId, [$area], 'bml_area');
+            if (is_wp_error($terms)) return $terms;
+        }
+        return null;
+    }
+
+    private function areaForRow(array $data, int $postId, bool $isUpdate, string $updatePolicy): int|\WP_Error|null
+    {
+        $explicit = null;
+        if ($this->shouldWrite($data, 'area', $isUpdate, $updatePolicy) && trim((string) ($data['area'] ?? '')) !== '') {
+            $explicit = $this->areas->bySlug((string) $data['area']);
+            if (is_wp_error($explicit)) return $explicit;
+        }
+        $cityArea = null;
+        if ($this->shouldWrite($data, 'city', $isUpdate, $updatePolicy) && trim((string) ($data['city'] ?? '')) !== '') $cityArea = $this->trustedAreaForCity((string) $data['city']);
+        if ($explicit !== null && $cityArea !== null && $explicit !== $cityArea) return new \WP_Error('bml_conflicting_area_fields', __('Area conflicts with the Area mapped by City provenance.', 'business-map-locator'));
+        return $explicit ?? $cityArea;
+    }
+
+    private function trustedAreaForCity(string $cityValue): ?int
+    {
+        $city = term_exists(trim($cityValue), 'bml_city'); $cityId = is_array($city) ? (int) ($city['term_id'] ?? 0) : (int) $city;
+        if ($cityId <= 0) return null;
+        $areaId = (int) get_term_meta($cityId, '_bml_area_term_id', true);
+        if ($areaId <= 0 || (int) get_term_meta($areaId, '_bml_migrated_from_city_term_id', true) !== $cityId) return null;
+        $area = $this->areas->byId($areaId, 0, false);
+        return is_wp_error($area) ? null : $area;
     }
 
     private function shouldWrite(array $data, string $key, bool $isUpdate, string $updatePolicy): bool

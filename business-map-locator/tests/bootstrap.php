@@ -174,7 +174,7 @@ if (!function_exists('esc_url_raw')) {
 }
 
 if (!function_exists('term_exists')) {
-    function term_exists(int $termId, string $taxonomy): bool { return isset($GLOBALS['bml_test_terms'][$taxonomy][$termId]); }
+    function term_exists(int|string $termId, string $taxonomy): int|array|false { if (is_int($termId) || ctype_digit($termId)) return isset($GLOBALS['bml_test_terms'][$taxonomy][(int) $termId]) ? (int) $termId : false; foreach ($GLOBALS['bml_test_terms'][$taxonomy] ?? [] as $term) if ((string) $term->slug === (string) $termId || (string) $term->name === (string) $termId) return (int) $term->term_id; return false; }
 }
 
 if (!function_exists('taxonomy_exists')) { function taxonomy_exists(string $taxonomy): bool { return $GLOBALS['bml_test_taxonomies'][$taxonomy] ?? true; } }

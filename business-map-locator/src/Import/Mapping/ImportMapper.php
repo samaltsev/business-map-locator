@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace BusinessMapLocator\Import\Mapping;
 final class ImportMapper {
-    public const ALLOWED_COLUMNS=['external_id','title','name','address','city','category','region','country','postcode','lat','lng','phone','email','website','hours','status','operational_status','visible'];
+    public const ALLOWED_COLUMNS=['external_id','title','name','address','city','category','area','region','country','postcode','lat','lng','phone','email','website','hours','status','operational_status','visible'];
     public function headers(array $headers): array {return array_map(static function(mixed $value):string{$clean=preg_replace('/^\xEF\xBB\xBF/','',(string)$value);$clean=strtolower(trim((string)$clean));$clean=preg_replace('/[^a-z0-9]+/','_',(string)$clean);return trim(sanitize_key((string)$clean),'_');},$headers);}
     public function validateHeaders(array $headers): array {
         $errors=[];$counts=array_count_values($headers);foreach($counts as $header=>$count){if($header===''||$count>1){$errors[]=['code'=>'duplicate_headers','message'=>'CSV contains empty or duplicate headers.'];break;}}
