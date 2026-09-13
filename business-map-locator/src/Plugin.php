@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BusinessMapLocator;
 
 use BusinessMapLocator\Application\Location\SearchLocationsHandler;
+use BusinessMapLocator\Domain\Area\AreaDescendantResolver;
 use BusinessMapLocator\Infrastructure\Cache\LocationCache;
 use BusinessMapLocator\Infrastructure\Database\LocationRepository;
 use BusinessMapLocator\Import\ImportCleanupScheduler;
@@ -106,7 +107,8 @@ final class Plugin
         );
         $this->container->set(Deactivator::class, static fn (): Deactivator => new Deactivator());
 
-        $this->container->set(LocationRepository::class, static fn (): LocationRepository => new LocationRepository());
+        $this->container->set(AreaDescendantResolver::class, static fn (): AreaDescendantResolver => new AreaDescendantResolver());
+        $this->container->set(LocationRepository::class, static fn (Container $container): LocationRepository => new LocationRepository($container->get(AreaDescendantResolver::class)));
         $this->container->set(LocationCache::class, static fn (): LocationCache => new LocationCache());
         $this->container->set(
             SearchLocationsHandler::class,
@@ -180,7 +182,8 @@ final class Plugin
         $this->container->set(
             \BML_REST::class,
             static fn (Container $container): \BML_REST => new \BML_REST(
-                $container->get(LocationsController::class)
+                $container->get(LocationsController::class),
+                $container->get(AreaDescendantResolver::class)
             )
         );
         $this->container->set(\BML_Cache_Invalidator::class, static fn (): \BML_Cache_Invalidator => new \BML_Cache_Invalidator());
@@ -204,12 +207,14 @@ final class Plugin
         $privacyPolicy = $this->container->get(PrivacyPolicy::class);
         $importCleanup = $this->container->get(ImportCleanupScheduler::class);
         $areaTermMeta = new \BusinessMapLocator\Admin\Taxonomy\AreaTermMeta();
+        $areaDescendants = $this->container->get(AreaDescendantResolver::class);
 
         add_action('init', [$contentTypes, 'register']);
         add_action('init', [$meta, 'register']);
         add_action('init', [$blocks, 'register']);
         add_action('init', [$textDomain, 'load']);
         add_action('init', [$areaTermMeta, 'register']);
+        $areaDescendants->hooks();
         add_action('admin_init', [\BML_Capabilities::class, 'maybeInstall'], 1);
         add_action('admin_init', [$privacyPolicy, 'register']);
         $importCleanup->register();

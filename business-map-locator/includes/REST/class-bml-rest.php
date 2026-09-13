@@ -5,9 +5,11 @@ if (!defined('ABSPATH')) {
 
 class BML_REST {
     private BusinessMapLocator\Rest\LocationsController $locations_controller;
+    private BusinessMapLocator\Domain\Area\AreaDescendantResolver $areas;
 
-    public function __construct(BusinessMapLocator\Rest\LocationsController $locations_controller) {
+    public function __construct(BusinessMapLocator\Rest\LocationsController $locations_controller, BusinessMapLocator\Domain\Area\AreaDescendantResolver $areas) {
         $this->locations_controller = $locations_controller;
+        $this->areas = $areas;
     }
 
     public function hooks(): void {
@@ -33,6 +35,7 @@ class BML_REST {
             'args' => [
                 'category' => ['sanitize_callback' => 'sanitize_title'],
                 'city' => ['sanitize_callback' => 'sanitize_title'],
+                'area' => ['sanitize_callback' => 'sanitize_title'],
             ],
         ]);
     }
@@ -95,6 +98,7 @@ class BML_REST {
         $payload = [
             'categories' => $this->filter_terms_from_index('category', $city),
             'cities' => $this->filter_terms_from_index('city', $category),
+            'areas' => $this->areas->publicOptions(),
         ];
         BML_Location_Cache::set('filters', $params, $payload);
         return rest_ensure_response($payload);

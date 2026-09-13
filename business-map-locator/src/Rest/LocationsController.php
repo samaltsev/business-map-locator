@@ -44,6 +44,7 @@ final readonly class LocationsController
                 'search' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
                 'category' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
                 'city' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+                'area' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
                 'lat' => ['type' => 'number', 'minimum' => -90, 'maximum' => 90],
                 'lng' => ['type' => 'number', 'minimum' => -180, 'maximum' => 180],
                 'radius' => ['type' => 'number', 'minimum' => 1, 'maximum' => 500],
@@ -60,6 +61,7 @@ final readonly class LocationsController
                 'search' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
                 'category' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
                 'city' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+                'area' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
             ],
         ]);
         register_rest_route('business-map/v1', '/locations/(?P<id>[1-9][0-9]*)', [
@@ -94,6 +96,7 @@ final readonly class LocationsController
         try {
             $category = sanitize_title(self::optionalString($request->get_param('category'), 'category'));
             $city = sanitize_title(self::optionalString($request->get_param('city'), 'city'));
+            $area = sanitize_title(self::optionalString($request->get_param('area'), 'area'));
             $search = sanitize_text_field(self::optionalString($request->get_param('search'), 'search'));
             $nearQuery = SearchLocationsQuery::fromArray([
                 'lat' => $request->get_param('lat'),
@@ -111,7 +114,7 @@ final readonly class LocationsController
 
         $limit = max(1, min(1000, absint($request->get_param('limit') ?: 1000)));
 
-        return rest_ensure_response($this->repository->markers($values['north'], $values['south'], $values['east'], $values['west'], $category, $city, $search, $limit, $fullWorld, $nearQuery->origin, $nearQuery->radius));
+        return rest_ensure_response($this->repository->markers($values['north'], $values['south'], $values['east'], $values['west'], $category, $city, $area, $search, $limit, $fullWorld, $nearQuery->origin, $nearQuery->radius));
     }
 
     public function bounds(WP_REST_Request $request): WP_REST_Response|WP_Error
@@ -119,12 +122,13 @@ final readonly class LocationsController
         try {
             $category = sanitize_title(self::optionalString($request->get_param('category'), 'category'));
             $city = sanitize_title(self::optionalString($request->get_param('city'), 'city'));
+            $area = sanitize_title(self::optionalString($request->get_param('area'), 'area'));
             $search = sanitize_text_field(self::optionalString($request->get_param('search'), 'search'));
         } catch (InvalidArgumentException $exception) {
             return new WP_Error('bml_invalid_location_query', $exception->getMessage(), ['status' => 400]);
         }
 
-        return rest_ensure_response($this->repository->publicBounds($category, $city, $search));
+        return rest_ensure_response($this->repository->publicBounds($category, $city, $area, $search));
     }
 
     private static function optionalString(mixed $value, string $parameter): string
@@ -220,6 +224,11 @@ final readonly class LocationsController
                 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value),
             ],
             'city' => [
+                'type' => 'string',
+                'default' => '',
+                'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value),
+            ],
+            'area' => [
                 'type' => 'string',
                 'default' => '',
                 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value),
