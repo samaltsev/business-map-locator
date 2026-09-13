@@ -1,72 +1,31 @@
 <?php
 declare(strict_types=1);
-
 namespace BusinessMapLocator\Migration;
-
+/** Ownership-gated source rollback for one migration run. */
 final class AreaRollbackService implements RollbackInterface
 {
-    public function __construct(private readonly MigrationSnapshotStore $snapshots, private readonly ?AreaMigrationStateStore $state = null, private readonly ?AreaMigrationLock $lock = null, private readonly ?AreaMigrationJournal $journal = null, private readonly ?AreaMigrationRevalidator $revalidator = null)
-    {
-    }
-
-    public function detectSnapshots(): array
-    {
-        return $this->snapshots->list();
-    }
-
-    public function validateSnapshot(string $path): array
-    {
-        $snapshot = $this->snapshots->read($path);
-        if ($snapshot === null) {
-            return ['valid' => false, 'errors' => ['Snapshot is unavailable or unreadable.']];
-        }
-
-        return $this->snapshots->validate($snapshot);
-    }
-
-    public function reportStatus(): array
-    {
-        $snapshots = $this->detectSnapshots();
-        $valid = 0;
-        foreach ($snapshots as $snapshot) {
-            if ($this->validateSnapshot($snapshot)['valid']) {
-                $valid++;
-            }
-        }
-
-        return [
-            'snapshots' => $snapshots,
-            'valid_snapshots' => $valid,
-            'invalid_snapshots' => count($snapshots) - $valid,
-            'restoration_supported' => false,
-        ];
-    }
-
-    /** Read-only rollback preflight. A later slice owns source restoration. @return array<string,mixed> */
-    public function inspectEligibility(string $runId): array
-    {
-        $run = $this->state?->get($runId);
-        if ($run === null) return ['eligible' => false, 'blocked' => true, 'code' => 'RUN_NOT_FOUND'];
-        $snapshot = isset($run['snapshot_path']) && is_string($run['snapshot_path']) ? $this->snapshots->read($run['snapshot_path']) : null;
-        if ($snapshot === null) return ['eligible' => false, 'blocked' => true, 'code' => 'SNAPSHOT_UNAVAILABLE', 'run_state' => $run['state']];
-        if (($snapshot['schema_version'] ?? null) !== 2) return ['eligible' => false, 'blocked' => true, 'code' => 'SNAPSHOT_VERSION_UNSUPPORTED', 'run_state' => $run['state'], 'snapshot_version' => $snapshot['schema_version'] ?? null];
-        if (!in_array($run['state'] ?? null, AreaMigrationStateStore::rollbackEligibleStates(), true)) return ['eligible' => false, 'blocked' => true, 'code' => 'RUN_NOT_ROLLBACK_ELIGIBLE', 'run_state' => $run['state'], 'snapshot_version' => 2];
-        $owner = $this->lock?->owner();
-        if ($this->lock === null || !$this->lock->isLocked() || $owner === null || (string) $owner['run_id'] !== $runId) return ['eligible' => false, 'blocked' => true, 'code' => 'LOCK_NOT_OWNED', 'run_state' => $run['state'], 'snapshot_version' => 2];
-        $operations = $this->journal?->listRunOperations($runId) ?? [];
-        if ($operations === []) return ['eligible' => false, 'blocked' => true, 'code' => 'EXECUTION_EVIDENCE_MISSING', 'run_state' => $run['state'], 'snapshot_version' => 2];
-        $drift = $this->revalidator?->inspect($snapshot) ?? ['valid' => false, 'drift' => [], 'summary' => ['count' => 0]];
-        if (!$drift['valid']) return ['eligible' => false, 'blocked' => true, 'code' => 'DRIFT_DETECTED', 'run_state' => $run['state'], 'snapshot_version' => 2, 'drift' => $drift];
-        return ['eligible' => true, 'blocked' => false, 'code' => 'ELIGIBLE', 'run_state' => $run['state'], 'snapshot_version' => 2, 'lock' => ['owned_by_run' => true], 'journal' => ['available' => true, 'operations' => count($operations)], 'drift' => $drift];
-    }
-
-    /** State-only entry gate; no source restoration occurs in this slice. @return array<string,mixed> */
-    public function beginRollback(string $runId): array
-    {
-        $result = $this->inspectEligibility($runId);
-        if (!$result['eligible']) return $result;
-        $run = $this->state->transition($runId, AreaMigrationStateStore::ROLLBACK_RUNNING);
-        $result['code'] = 'ROLLBACK_PHASE_ENTERED'; $result['run_state'] = $run['state'];
-        return $result;
-    }
+    /** @var null|callable(string):void */ private $failureInjector;
+    public function __construct(private readonly MigrationSnapshotStore $snapshots,private readonly ?AreaMigrationStateStore $state=null,private readonly ?AreaMigrationLock $lock=null,private readonly ?AreaMigrationJournal $journal=null,private readonly ?AreaMigrationRevalidator $revalidator=null,?callable $failureInjector=null){$this->failureInjector=$failureInjector;}
+    public function detectSnapshots(): array{return $this->snapshots->list();}
+    public function validateSnapshot(string $path): array{$s=$this->snapshots->read($path);return $s===null?['valid'=>false,'errors'=>['Snapshot is unavailable or unreadable.']]:$this->snapshots->validate($s);}
+    public function reportStatus(): array{$all=$this->detectSnapshots();$valid=0;foreach($all as $path)if($this->validateSnapshot($path)['valid'])$valid++;return ['snapshots'=>$all,'valid_snapshots'=>$valid,'invalid_snapshots'=>count($all)-$valid,'restoration_supported'=>true];}
+    /** @return array<string,mixed> */ public function inspectEligibility(string $id): array{$run=$this->state?->get($id);if($run===null)return $this->blocked('RUN_NOT_FOUND');$s=isset($run['snapshot_path'])?$this->snapshots->read((string)$run['snapshot_path']):null;if($s===null)return $this->blocked('SNAPSHOT_UNAVAILABLE',$run);if(($s['schema_version']??null)!==2)return $this->blocked('SNAPSHOT_VERSION_UNSUPPORTED',$run,$s);if(!in_array($run['state']??null,AreaMigrationStateStore::rollbackEligibleStates(),true))return $this->blocked('RUN_NOT_ROLLBACK_ELIGIBLE',$run,$s);if(!$this->owns($id))return $this->blocked('LOCK_NOT_OWNED',$run,$s);$ops=$this->journal?->listRunOperations($id)??[];if($ops===[])return $this->blocked('EXECUTION_EVIDENCE_MISSING',$run,$s);$revalidator=$this->revalidator;unset($revalidator);return ['eligible'=>true,'blocked'=>false,'code'=>'ELIGIBLE','run_state'=>$run['state'],'snapshot_version'=>2,'journal'=>['available'=>true,'operations'=>count($ops)]];}
+    /** @return array<string,mixed> */ public function beginRollback(string $id): array{$r=$this->inspectEligibility($id);if(!$r['eligible'])return $r;$run=$this->state->transition($id,AreaMigrationStateStore::ROLLBACK_RUNNING);$r['code']='ROLLBACK_PHASE_ENTERED';$r['run_state']=$run['state'];return $r;}
+    /** @return array<string,mixed> */ public function executeRollback(string $id): array{$run=$this->state?->get($id);if(($run['state']??null)!==AreaMigrationStateStore::ROLLBACK_RUNNING){$entry=$this->beginRollback($id);if(!$entry['eligible'])return $entry;}return $this->run($id);}
+    /** @return array<string,mixed> */ public function resumePartialRollback(string $id): array{$run=$this->state?->get($id);if($run===null||($run['state']??null)!==AreaMigrationStateStore::ROLLBACK_PARTIAL||!$this->owns($id))return $this->blocked('PARTIAL_ROLLBACK_RESUME_NOT_ALLOWED',$run??[]);$s=$this->snapshots->read((string)($run['snapshot_path']??''));if($s===null||($s['schema_version']??null)!==2||($this->journal?->listRunOperations($id)??[])===[])return $this->blocked('PARTIAL_ROLLBACK_RESUME_NOT_ALLOWED',$run,$s??[]);$this->state->transition($id,AreaMigrationStateStore::ROLLBACK_RUNNING);return $this->run($id);}
+    /** @return array<string,mixed> */ private function run(string $id): array{$run=$this->state?->get($id);if($run===null||($run['state']??null)!==AreaMigrationStateStore::ROLLBACK_RUNNING||!$this->owns($id))return $this->blocked('ROLLBACK_NOT_ALLOWED',$run??[]);$bad=[];foreach($this->forward($id,'ADD_LOCATION_AREA')as $o)if(($o['result']['relationship_added_by_run']??null)===true&&!$this->removeRelation($id,$o))$bad[]='REMOVE_LOCATION_AREA';foreach($this->forward($id,'WRITE_CITY_PROVENANCE')as $o)if(($o['result']['written_by_run']??null)===true&&!$this->removeMeta($id,$o,'REMOVE_CITY_PROVENANCE','_bml_area_term_id'))$bad[]='REMOVE_CITY_PROVENANCE';foreach($this->forward($id,'WRITE_AREA_PROVENANCE')as $o)if(($o['result']['written_by_run']??null)===true&&!$this->removeMeta($id,$o,'REMOVE_AREA_PROVENANCE','_bml_migrated_from_city_term_id'))$bad[]='REMOVE_AREA_PROVENANCE';foreach($this->forward($id,'CREATE_AREA')as $o)if(($o['result']['created_by_run']??null)===true&&!$this->deleteArea($id,$o))$bad[]='DELETE_RUN_CREATED_AREA';if($bad!==[]){$this->state->transition($id,AreaMigrationStateStore::ROLLBACK_PARTIAL,['rollback_failures'=>array_values(array_unique($bad))]);return ['eligible'=>false,'blocked'=>true,'code'=>'ROLLBACK_PARTIAL','failures'=>array_values(array_unique($bad))];}$this->state->transition($id,AreaMigrationStateStore::ROLLED_BACK);return ['eligible'=>true,'blocked'=>false,'code'=>'ROLLED_BACK'];}
+    /** @param array<string,mixed> $f */ private function removeRelation(string $id,array $f): bool{$r=(array)$f['result'];$l=(int)($r['location_id']??0);$c=(int)($r['city_term_id']??0);$a=(int)($r['area_term_id']??0);if($l<1||$c<1||$a<1||get_post($l)===null||$this->ids(wp_get_post_terms($l,'bml_city',['fields'=>'ids']))!==[$c])return false;$areas=$this->ids(wp_get_post_terms($l,'bml_area',['fields'=>'ids']));if($areas!==[]&&$areas!==[$a])return false;$o=$this->reverse($id,'REMOVE_LOCATION_AREA',$f,['location_id'=>$l,'city_term_id'=>$c,'area_term_id'=>$a]);if(($o['state']??null)===AreaMigrationJournal::ROLLED_BACK)return true;if($areas===[])return $this->done($id,$o,['reconciled_already_absent'=>true]);$o=$this->startReverse($id,$o);$w=wp_remove_object_terms($l,[$a],'bml_area');if(is_wp_error($w))return $this->failed($id,$o,'LOCATION_AREA_REMOVE_FAILED');$this->checkpoint('AFTER_LOCATION_AREA_REMOVED');if($this->ids(wp_get_post_terms($l,'bml_area',['fields'=>'ids']))!==[]||$this->ids(wp_get_post_terms($l,'bml_city',['fields'=>'ids']))!==[$c])return $this->failed($id,$o,'LOCATION_AREA_REMOVE_VERIFICATION_FAILED');return $this->done($id,$o,[]);}
+    /** @param array<string,mixed> $f */ private function removeMeta(string $id,array $f,string $type,string $key): bool{$r=(array)$f['result'];$term=(int)($r['term_id']??0);$value=(int)($r['written_value']??0);if($term<1||$value<1)return false;$o=$this->reverse($id,$type,$f,['term_id'=>$term,'meta_key'=>$key]);if(($o['state']??null)===AreaMigrationJournal::ROLLED_BACK)return true;$current=(int)get_term_meta($term,$key,true);if($current===0)return $this->done($id,$o,['reconciled_already_absent'=>true]);if($current!==$value)return false;$o=$this->startReverse($id,$o);if(!delete_term_meta($term,$key))return $this->failed($id,$o,'PROVENANCE_REMOVE_FAILED');$this->checkpoint($type==='REMOVE_CITY_PROVENANCE'?'AFTER_CITY_PROVENANCE_REMOVED':'AFTER_AREA_PROVENANCE_REMOVED');return (int)get_term_meta($term,$key,true)===0?$this->done($id,$o,[]):$this->failed($id,$o,'PROVENANCE_REMOVE_VERIFICATION_FAILED');}
+    /** @param array<string,mixed> $f */ private function deleteArea(string $id,array $f): bool{$r=(array)$f['result'];$a=(int)($r['area_term_id']??0);if($a<1||($f['precondition']['area_absent_before']??null)!==true)return false;$o=$this->reverse($id,'DELETE_RUN_CREATED_AREA',$f,['area_term_id'=>$a]);if(($o['state']??null)===AreaMigrationJournal::ROLLED_BACK)return true;$term=$this->term($a);if($term===null)return $this->done($id,$o,['reconciled_already_absent'=>true]);if($term['name']!==(string)($r['area_name']??'')||$term['slug']!==(string)($r['area_slug']??'')||$term['parent']!==(int)($r['parent']??0)||$this->children($a)||get_objects_in_term([$a],'bml_area')!==[]||(int)get_term_meta($a,'_bml_migrated_from_city_term_id',true)!==0)return false;$o=$this->startReverse($id,$o);$w=wp_delete_term($a,'bml_area');if(is_wp_error($w)||$w===false)return $this->failed($id,$o,'AREA_DELETE_FAILED');$this->checkpoint('AFTER_AREA_DELETED');return $this->term($a)===null?$this->done($id,$o,[]):$this->failed($id,$o,'AREA_DELETE_VERIFICATION_FAILED');}
+    /** @return list<array<string,mixed>> */ private function forward(string $id,string $type): array{return array_values(array_filter($this->journal?->listRunOperations($id)??[],static fn(array $o):bool=>($o['operation_type']??null)===$type&&($o['state']??null)===AreaMigrationJournal::COMPLETED));}
+    /** @param array<string,mixed> $f @param array<string,mixed> $identity @return array<string,mixed> */ private function reverse(string $id,string $type,array $f,array $identity): array{$identity=['forward_operation_key'=>$f['operation_key']]+$identity;$o=$this->journal->planOperation($id,2,$type,$identity);if(($o['state']??null)===AreaMigrationJournal::PLANNED){$o=$this->journal->beginOperation($id,$o['operation_key']);$o=$this->journal->markApplied($id,$o['operation_key'],[]);$o=$this->journal->markVerified($id,$o['operation_key'],[]);$o=$this->journal->completeOperation($id,$o['operation_key']);}if(($o['state']??null)===AreaMigrationJournal::COMPLETED)$o=$this->journal->planRollback($id,$o['operation_key']);return $o;}
+    /** @param array<string,mixed> $o @return array<string,mixed> */ private function startReverse(string $id,array $o): array{return ($o['state']??null)===AreaMigrationJournal::ROLLBACK_PLANNED?$this->journal->beginRollback($id,$o['operation_key']):$o;}
+    /** @param array<string,mixed> $o @param array<string,mixed> $r */ private function done(string $id,array $o,array $r): bool{if(($o['state']??null)===AreaMigrationJournal::ROLLBACK_PLANNED)$o=$this->startReverse($id,$o);if(($o['state']??null)===AreaMigrationJournal::ROLLBACK_STARTED)$this->journal->markRolledBack($id,$o['operation_key'],$r);return true;}
+    /** @param array<string,mixed> $o */ private function failed(string $id,array $o,string $reason): bool{if(($o['state']??null)===AreaMigrationJournal::ROLLBACK_STARTED)$this->journal->failOperation($id,$o['operation_key'],['reason'=>$reason]);return false;}
+    /** @return array{id:int,name:string,slug:string,parent:int}|null */ private function term(int $id): ?array{foreach((array)get_terms(['taxonomy'=>'bml_area','hide_empty'=>false,'number'=>0])as $t)if((int)$t->term_id===$id)return ['id'=>$id,'name'=>(string)$t->name,'slug'=>(string)$t->slug,'parent'=>(int)$t->parent];return null;}
+    private function children(int $id): bool{foreach((array)get_terms(['taxonomy'=>'bml_area','hide_empty'=>false,'number'=>0])as $t)if((int)$t->parent===$id)return true;return false;}
+    /** @param mixed $ids @return list<int> */ private function ids(mixed $ids): array{$ids=is_array($ids)?array_map('intval',$ids):[];sort($ids,SORT_NUMERIC);return array_values(array_unique($ids));}
+    private function owns(string $id): bool{$o=$this->lock?->owner();return $this->lock!==null&&$this->lock->isLocked()&&$o!==null&&(string)($o['run_id']??'')===$id;}
+    /** @param array<string,mixed> $run @param array<string,mixed> $s @return array<string,mixed> */ private function blocked(string $code,array $run=[],array $s=[]): array{return ['eligible'=>false,'blocked'=>true,'code'=>$code,'run_state'=>$run['state']??null,'snapshot_version'=>$s['schema_version']??null];}
+    private function checkpoint(string $p): void{if($this->failureInjector!==null)($this->failureInjector)($p);}
 }
