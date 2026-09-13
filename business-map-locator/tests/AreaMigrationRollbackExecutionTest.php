@@ -52,12 +52,12 @@ final class AreaMigrationRollbackExecutionTest extends TestCase
         $this->assertSame(AreaMigrationStateStore::ROLLBACK_PARTIAL,$state->get($id)['state']);
         $reverse=array_values(array_filter($journal->listRunOperations($id),static fn(array $op):bool=>str_starts_with((string)$op['operation_type'],'REMOVE_')||($op['operation_type']??'')==='DELETE_RUN_CREATED_AREA'));
         $failedType=$type==='ADD_LOCATION_AREA'?'REMOVE_LOCATION_AREA':($type==='WRITE_CITY_PROVENANCE'?'REMOVE_CITY_PROVENANCE':'DELETE_RUN_CREATED_AREA');$failedReverse=array_values(array_filter($reverse,static fn(array $op):bool=>($op['operation_type']??'')===$failedType));
-        $this->assertCount(1,$failedReverse);$this->assertSame(AreaMigrationJournal::ROLLBACK_FAILED,$failedReverse[0]['state']);$this->assertSame(1,$failedReverse[0]['attempt']);
+        $this->assertCount(1,$failedReverse);$this->assertSame(AreaMigrationJournal::ROLLBACK_FAILED,$failedReverse[0]['state']);$this->assertSame(2,$failedReverse[0]['attempt']);
         $calls=(int)$GLOBALS[$counter];$successfulCalls=(int)$GLOBALS['bml_test_wp_remove_object_terms_calls'];$GLOBALS[$failureFlag]=false;
         $this->assertSame('ROLLED_BACK',$service->resumePartialRollback($id)['code']);
         $reverse=array_values(array_filter($journal->listRunOperations($id),static fn(array $op):bool=>str_starts_with((string)$op['operation_type'],'REMOVE_')||($op['operation_type']??'')==='DELETE_RUN_CREATED_AREA'));
         $failedReverse=array_values(array_filter($reverse,static fn(array $op):bool=>($op['operation_type']??'')===$failedType));
-        $this->assertSame(AreaMigrationJournal::ROLLED_BACK,$failedReverse[0]['state']);$this->assertSame(2,$failedReverse[0]['attempt']);$this->assertSame($calls + 1,(int)$GLOBALS[$counter]);if($type!=='ADD_LOCATION_AREA')$this->assertSame($successfulCalls,(int)$GLOBALS['bml_test_wp_remove_object_terms_calls']);
+        $this->assertSame(AreaMigrationJournal::ROLLED_BACK,$failedReverse[0]['state']);$this->assertSame(3,$failedReverse[0]['attempt']);$this->assertSame($calls + 1,(int)$GLOBALS[$counter]);if($type!=='ADD_LOCATION_AREA')$this->assertSame($successfulCalls,(int)$GLOBALS['bml_test_wp_remove_object_terms_calls']);
     }
     public static function rollbackWriterFailureFixtures(): array {return [['ADD_LOCATION_AREA','bml_test_fail_wp_remove_object_terms','bml_test_wp_remove_object_terms_calls'],['WRITE_CITY_PROVENANCE','bml_test_fail_delete_term_meta','bml_test_delete_term_meta_calls'],['CREATE_AREA','bml_test_fail_wp_delete_term','bml_test_wp_delete_term_calls']];}
     public function testUnknownOwnershipIsPreserved(): void
