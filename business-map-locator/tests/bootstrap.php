@@ -195,6 +195,9 @@ if (!function_exists('wp_json_encode')) { function wp_json_encode(mixed $value, 
 if (!function_exists('wp_mkdir_p')) { function wp_mkdir_p(string $path): bool { return is_dir($path) || mkdir($path, 0777, true); } }
 if (!function_exists('trailingslashit')) { function trailingslashit(string $value): string { return rtrim($value, '/\\') . '/'; } }
 if (!function_exists('wp_upload_dir')) { function wp_upload_dir(): array { return ['basedir' => sys_get_temp_dir(), 'error' => '']; } }
+if (!function_exists('site_url')) { function site_url(string $path = ''): string { return 'https://example.test' . $path; } }
+if (!function_exists('get_current_user_id')) { function get_current_user_id(): int { return 1; } }
+if (!function_exists('get_bloginfo')) { function get_bloginfo(string $show = ''): string { return 'test'; } }
 
 if (!function_exists('wp_set_object_terms')) {
     function wp_set_object_terms(int $id, array $terms, string $taxonomy, bool $append = false): array|WP_Error
