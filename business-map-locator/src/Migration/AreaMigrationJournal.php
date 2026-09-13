@@ -45,6 +45,8 @@ final class AreaMigrationJournal
     public function planRollback(string $runId, string $key): array { return $this->transition($runId, $key, self::ROLLBACK_PLANNED); }
     public function beginRollback(string $runId, string $key): array { return $this->transition($runId, $key, self::ROLLBACK_STARTED, [], true); }
     public function markRolledBack(string $runId, string $key, array $result = []): array { return $this->transition($runId, $key, self::ROLLED_BACK, $result); }
+    /** @param array<string,mixed> $failure */
+    public function failRollback(string $runId, string $key, array $failure): array { return $this->transition($runId, $key, self::ROLLBACK_FAILED, [], false, $failure); }
 
     /** @return list<array<string,mixed>> */
     public function listRunOperations(string $runId): array { $files = glob($this->runDirectory($runId) . '/*.json') ?: []; sort($files, SORT_STRING); return array_values(array_filter(array_map(fn(string $p): ?array => $this->readPath($p), $files))); }

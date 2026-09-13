@@ -8,7 +8,7 @@ final class AreaMigrationRollbackExecutionTest extends TestCase
     protected function setUp(): void
     {
         $this->dir=dirname(__DIR__).'/.rollback-'.bin2hex(random_bytes(4)); mkdir($this->dir,0777,true);
-        $GLOBALS['bml_test_options']=$GLOBALS['bml_test_term_meta']=$GLOBALS['bml_test_post_terms']=$GLOBALS['bml_test_indexed']=[];$GLOBALS['bml_test_index_fail']=false;$GLOBALS['bml_test_wp_delete_term_calls']=$GLOBALS['bml_test_delete_term_meta_calls']=$GLOBALS['bml_test_wp_remove_object_terms_calls']=0;
+        $GLOBALS['bml_test_options']=$GLOBALS['bml_test_term_meta']=$GLOBALS['bml_test_post_terms']=$GLOBALS['bml_test_indexed']=[];$GLOBALS['bml_test_index_fail']=$GLOBALS['bml_test_fail_delete_term_meta']=$GLOBALS['bml_test_fail_wp_delete_term']=$GLOBALS['bml_test_fail_wp_remove_object_terms']=false;$GLOBALS['bml_test_wp_delete_term_calls']=$GLOBALS['bml_test_delete_term_meta_calls']=$GLOBALS['bml_test_wp_remove_object_terms_calls']=0;
         $GLOBALS['bml_test_terms']=['bml_city'=>[1=>(object)['term_id'=>1,'name'=>'Minsk','slug'=>'minsk','parent'=>0]],'bml_area'=>[2=>(object)['term_id'=>2,'name'=>'Minsk','slug'=>'minsk','parent'=>0]]];
         $post=new WP_Post(); $post->ID=7; $post->post_type='bml_location'; $GLOBALS['bml_test_posts']=[7=>$post]; $GLOBALS['bml_test_post_terms']=[7=>['bml_city'=>[1],'bml_area'=>[2]]]; $GLOBALS['bml_test_term_meta']=[1=>['_bml_area_term_id'=>2],2=>['_bml_migrated_from_city_term_id'=>1]];
     }
@@ -39,6 +39,27 @@ final class AreaMigrationRollbackExecutionTest extends TestCase
         $this->assertSame('ROLLBACK_PARTIAL',$service->executeRollback($id)['code']);$this->assertSame([],$GLOBALS['bml_test_post_terms'][7]['bml_area']);$calls=$GLOBALS['bml_test_wp_remove_object_terms_calls'];$GLOBALS['bml_test_index_fail']=false;
         $this->assertSame('ROLLED_BACK',$service->resumePartialRollback($id)['code']);$this->assertSame($calls,$GLOBALS['bml_test_wp_remove_object_terms_calls']);$this->assertSame([7,7],$GLOBALS['bml_test_indexed']);$this->assertSame(AreaMigrationStateStore::ROLLED_BACK,$state->get($id)['state']);
     }
+    /** @dataProvider rollbackWriterFailureFixtures */
+    public function testWriterFailuresAreDurableAndResumeWithoutRepeatingSuccessfulReverseWork(string $type,string $failureFlag,string $counter): void
+    {
+        [$service,$journal,$id,$state]=$this->fixture();
+        if($type!=='ADD_LOCATION_AREA')$this->forward($journal,$id,'ADD_LOCATION_AREA',['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2],['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2,'relationship_added_by_run'=>true]);
+        if($type==='ADD_LOCATION_AREA')$this->forward($journal,$id,$type,['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2],['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2,'relationship_added_by_run'=>true]);
+        elseif($type==='WRITE_CITY_PROVENANCE')$this->forward($journal,$id,$type,['city_term_id'=>1,'area_term_id'=>2],['term_id'=>1,'written_value'=>2,'written_by_run'=>true]);
+        else {$this->forward($journal,$id,'WRITE_CITY_PROVENANCE',['city_term_id'=>1,'area_term_id'=>2],['term_id'=>1,'written_value'=>2,'written_by_run'=>true]);$this->forward($journal,$id,'WRITE_AREA_PROVENANCE',['area_term_id'=>2,'city_term_id'=>1],['term_id'=>2,'written_value'=>1,'written_by_run'=>true]);$this->forward($journal,$id,$type,['city_term_id'=>1],['area_term_id'=>2,'area_name'=>'Minsk','area_slug'=>'minsk','parent'=>0,'created_by_run'=>true],['area_absent_before'=>true]);}
+        $GLOBALS[$failureFlag]=true;
+        $this->assertSame('ROLLBACK_PARTIAL',$service->executeRollback($id)['code']);
+        $this->assertSame(AreaMigrationStateStore::ROLLBACK_PARTIAL,$state->get($id)['state']);
+        $reverse=array_values(array_filter($journal->listRunOperations($id),static fn(array $op):bool=>str_starts_with((string)$op['operation_type'],'REMOVE_')||($op['operation_type']??'')==='DELETE_RUN_CREATED_AREA'));
+        $failedType=$type==='ADD_LOCATION_AREA'?'REMOVE_LOCATION_AREA':($type==='WRITE_CITY_PROVENANCE'?'REMOVE_CITY_PROVENANCE':'DELETE_RUN_CREATED_AREA');$failedReverse=array_values(array_filter($reverse,static fn(array $op):bool=>($op['operation_type']??'')===$failedType));
+        $this->assertCount(1,$failedReverse);$this->assertSame(AreaMigrationJournal::ROLLBACK_FAILED,$failedReverse[0]['state']);$this->assertSame(1,$failedReverse[0]['attempt']);
+        $calls=(int)$GLOBALS[$counter];$successfulCalls=(int)$GLOBALS['bml_test_wp_remove_object_terms_calls'];$GLOBALS[$failureFlag]=false;
+        $this->assertSame('ROLLED_BACK',$service->resumePartialRollback($id)['code']);
+        $reverse=array_values(array_filter($journal->listRunOperations($id),static fn(array $op):bool=>str_starts_with((string)$op['operation_type'],'REMOVE_')||($op['operation_type']??'')==='DELETE_RUN_CREATED_AREA'));
+        $failedReverse=array_values(array_filter($reverse,static fn(array $op):bool=>($op['operation_type']??'')===$failedType));
+        $this->assertSame(AreaMigrationJournal::ROLLED_BACK,$failedReverse[0]['state']);$this->assertSame(2,$failedReverse[0]['attempt']);$this->assertSame($calls + 1,(int)$GLOBALS[$counter]);if($type!=='ADD_LOCATION_AREA')$this->assertSame($successfulCalls,(int)$GLOBALS['bml_test_wp_remove_object_terms_calls']);
+    }
+    public static function rollbackWriterFailureFixtures(): array {return [['ADD_LOCATION_AREA','bml_test_fail_wp_remove_object_terms','bml_test_wp_remove_object_terms_calls'],['WRITE_CITY_PROVENANCE','bml_test_fail_delete_term_meta','bml_test_delete_term_meta_calls'],['CREATE_AREA','bml_test_fail_wp_delete_term','bml_test_wp_delete_term_calls']];}
     public function testUnknownOwnershipIsPreserved(): void
     {
         [$service,$journal,$id]=$this->fixture();
