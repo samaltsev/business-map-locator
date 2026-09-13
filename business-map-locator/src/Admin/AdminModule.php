@@ -16,6 +16,7 @@ use BusinessMapLocator\Admin\Settings\Action\SaveSettingsAction;
 use BusinessMapLocator\Admin\Demo\InstallDemoAction;
 use BusinessMapLocator\Admin\Export\ExportCsvAction;
 use BusinessMapLocator\Admin\Notice\AdminNotices;
+use BusinessMapLocator\Admin\Migration\Action\MigrationPlanningAction;
 if (!defined('ABSPATH')) { exit; }
 final class AdminModule
 {
@@ -34,7 +35,8 @@ final class AdminModule
         private ExportCsvAction $export,
         private ImportAjaxController $importAjax,
         private LocationEditorAjaxController $locationEditorAjax,
-        private AdminNotices $notices
+        private AdminNotices $notices,
+        private MigrationPlanningAction $migrationPlanning
     ) {}
     public function hooks(): void
     {
@@ -50,6 +52,7 @@ final class AdminModule
         add_action('admin_post_bml_save_settings',[$this->saveSettings,'handle']);
         add_action('admin_post_bml_install_demo',[$this->installDemo,'handle']);
         add_action('admin_post_bml_export_csv',[$this->export,'handle']);
+        add_action('admin_post_bml_migration_planning',[$this->migrationPlanning,'handle']);
         add_action('wp_ajax_bml_prepare_import',[$this->importAjax,'prepareImport']);
         add_action('wp_ajax_bml_process_import',[$this->importAjax,'processImport']);
         add_action('wp_ajax_bml_pause_import',[$this->importAjax,'pauseImport']);

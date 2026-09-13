@@ -72,11 +72,49 @@ final class AreaMigrationService
     /** @return array<string,mixed> */
     public function startPlanningRun(?int $createdByUserId = null): array
     {
-        $run = $this->state->create(); $this->state->transition($run['run_id'], AreaMigrationStateStore::INSPECTED, ['inspection' => $this->inspect()]);
-        $snapshot = $this->createSnapshot($createdByUserId); $this->state->transition($run['run_id'], AreaMigrationStateStore::SNAPSHOTTED, ['snapshot_path' => $snapshot['path']]);
-        $simulation = $this->simulateMigration(); $run = $this->state->transition($run['run_id'], AreaMigrationStateStore::SIMULATED, ['plan_counts' => $simulation['plan']['counts']]);
-        $blocked = (int) $simulation['plan']['counts']['cities'][AreaMigrationPlanner::COLLISION] + (int) $simulation['plan']['counts']['cities'][AreaMigrationPlanner::AMBIGUOUS] + (int) $simulation['plan']['counts']['cities'][AreaMigrationPlanner::REQUIRES_DECISION] + (int) $simulation['plan']['counts']['locations'][AreaMigrationPlanner::REQUIRES_DECISION] > 0;
-        return $this->state->transition($run['run_id'], $blocked ? AreaMigrationStateStore::BLOCKED : AreaMigrationStateStore::READY, ['snapshot_path' => $snapshot['path']]);
+        $run = $this->startInspectionRun();
+        $this->snapshotRun($run['run_id'], $createdByUserId);
+        return $this->simulateRun($run['run_id']);
+    }
+
+    /** @return array<string,mixed> */
+    public function startInspectionRun(): array
+    {
+        $run = $this->state->create();
+        return $this->state->transition($run['run_id'], AreaMigrationStateStore::INSPECTED, ['inspection' => $this->inspect()]);
+    }
+
+    /** @return array<string,mixed> */
+    public function snapshotRun(string $runId, ?int $createdByUserId = null): array
+    {
+        $run = $this->requireState($runId, AreaMigrationStateStore::INSPECTED);
+        $snapshot = $this->createSnapshot($createdByUserId);
+        return $this->state->transition($run['run_id'], AreaMigrationStateStore::SNAPSHOTTED, ['snapshot_path' => $snapshot['path']]);
+    }
+
+    /** @return array<string,mixed> */
+    public function simulateRun(string $runId): array
+    {
+        $run = $this->requireState($runId, AreaMigrationStateStore::SNAPSHOTTED);
+        $snapshot = $this->snapshots->read((string) ($run['snapshot_path'] ?? ''));
+        if ($snapshot === null || ($snapshot['schema_version'] ?? null) !== 2) {
+            throw new \LogicException('Migration snapshot is unavailable.');
+        }
+        $counts = (array) ($snapshot['plan']['counts'] ?? []);
+        $run = $this->state->transition($runId, AreaMigrationStateStore::SIMULATED, ['plan_counts' => $counts]);
+        $cities = (array) ($counts['cities'] ?? []); $locations = (array) ($counts['locations'] ?? []);
+        $blocked = (int) ($cities[AreaMigrationPlanner::COLLISION] ?? 0) + (int) ($cities[AreaMigrationPlanner::AMBIGUOUS] ?? 0) + (int) ($cities[AreaMigrationPlanner::REQUIRES_DECISION] ?? 0) + (int) ($locations[AreaMigrationPlanner::REQUIRES_DECISION] ?? 0) > 0;
+        return $this->state->transition($run['run_id'], $blocked ? AreaMigrationStateStore::BLOCKED : AreaMigrationStateStore::READY);
+    }
+
+    /** @return array<string,mixed> */
+    private function requireState(string $runId, string $expected): array
+    {
+        $run = $this->state->get($runId);
+        if ($run === null || ($run['state'] ?? null) !== $expected) {
+            throw new \LogicException('Migration action is not allowed in the current run state.');
+        }
+        return $run;
     }
 
     /** @return list<array{id: int, parent: int, slug: string, count: int, relationships_count: int}> */

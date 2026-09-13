@@ -11,6 +11,7 @@ final class AdminShell
             'bml-categories' => ['dashicons-category', __('Categories', 'business-map-locator')],
             'bml-cities' => ['dashicons-admin-site-alt3', __('Cities', 'business-map-locator')],
             'bml-import' => ['dashicons-migrate', __('Import / Export', 'business-map-locator')],
+            'bml-migration-control' => ['dashicons-controls-repeat', __('Migration control', 'business-map-locator')],
             'bml-settings' => ['dashicons-admin-generic', __('Settings', 'business-map-locator')],
         ];
     }
@@ -33,7 +34,7 @@ final class AdminShell
                             </a>
                         <?php endforeach; ?>
                         <span class="bml-nav-label"><?php esc_html_e('Manage', 'business-map-locator'); ?></span>
-                        <?php foreach (array_slice($this->navItems(), 2, 3, true) as $slug => $item) : ?>
+                        <?php foreach (array_slice($this->navItems(), 2, 4, true) as $slug => $item) : ?>
                             <a class="<?php echo $current === $slug ? 'is-active' : ''; ?>" href="<?php echo esc_url(admin_url('admin.php?page=' . $slug)); ?>" title="<?php echo esc_attr($item[1]); ?>" aria-label="<?php echo esc_attr($item[1]); ?>">
                                 <span class="dashicons <?php echo esc_attr($item[0]); ?>"></span><span><?php echo esc_html($item[1]); ?></span>
                             </a>
