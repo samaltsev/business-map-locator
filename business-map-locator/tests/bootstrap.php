@@ -293,6 +293,11 @@ if (!class_exists('BML_Location_Index')) {
         public function upsert(int $postId): bool
         {
             $GLOBALS['bml_test_indexed'][] = $postId;
+            $GLOBALS['bml_test_relation_index_rows'][$postId] = [
+                'bml_category' => array_map('intval', $GLOBALS['bml_test_post_terms'][$postId]['bml_category'] ?? []),
+                'bml_city' => array_map('intval', $GLOBALS['bml_test_post_terms'][$postId]['bml_city'] ?? []),
+                'bml_area' => array_map('intval', $GLOBALS['bml_test_post_terms'][$postId]['bml_area'] ?? []),
+            ];
 
             return !($GLOBALS['bml_test_index_fail'] ?? false);
         }

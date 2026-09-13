@@ -101,7 +101,7 @@ final class LocationEditorAjaxController
             : 'draft';
 
         $input = ['title' => $title, 'status' => $postStatus];
-        foreach (['content', 'excerpt', 'address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours', 'lat', 'lng', 'operational_status', 'category_id', 'city_id', 'featured_image_id', 'remove_featured_image'] as $field) {
+        foreach (['content', 'excerpt', 'address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours', 'lat', 'lng', 'operational_status', 'category_id', 'city_id', 'area_id', 'featured_image_id', 'remove_featured_image'] as $field) {
             if (isset($_POST[$field]) && !is_array($_POST[$field])) { $input[$field] = (string) wp_unslash($_POST[$field]); }
         }
         $result = $this->writer->save($id, $input);

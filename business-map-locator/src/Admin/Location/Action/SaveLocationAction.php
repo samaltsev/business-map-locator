@@ -26,7 +26,7 @@ final class SaveLocationAction
         $status = $statusOverride === 'draft' || $this->request->postString('status') === 'draft' ? 'draft' : ($this->request->hasPost('status') || $statusOverride !== '' ? 'publish' : (string) ($existing?->post_status ?? 'publish'));
         if ($status === 'publish' && !current_user_can(Capabilities::PUBLISH_LOCATIONS)) { $status = 'draft'; }
         $input = ['title' => $this->request->postRawString('title', (string) ($existing?->post_title ?? '')), 'status' => $status];
-        foreach (['content', 'excerpt', 'address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours', 'lat', 'lng', 'operational_status', 'category_id', 'city_id', 'featured_image_id', 'remove_featured_image'] as $field) {
+        foreach (['content', 'excerpt', 'address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours', 'lat', 'lng', 'operational_status', 'category_id', 'city_id', 'area_id', 'featured_image_id', 'remove_featured_image'] as $field) {
             if ($this->request->hasPost($field)) { $input[$field] = $this->request->postRawString($field); }
         }
         foreach (['address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours'] as $field) {

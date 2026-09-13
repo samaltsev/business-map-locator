@@ -35,6 +35,8 @@ final class LocationWriteService
                 return new \WP_Error('location_taxonomy_invalid', __('Invalid location taxonomy term.', 'business-map-locator'));
             }
         }
+        $area = $this->area($id, $input);
+        if (is_wp_error($area)) return $area;
 
         $postData = ['post_type' => 'bml_location', 'post_title' => $title, 'post_status' => $status];
         if ($this->has($input, 'content')) {
@@ -75,6 +77,10 @@ final class LocationWriteService
                     return $terms;
                 }
             }
+        }
+        if ($area !== null) {
+            $terms = wp_set_object_terms($id, $area > 0 ? [$area] : [], 'bml_area');
+            if (is_wp_error($terms)) return $terms;
         }
         if ($this->has($input, 'remove_featured_image') && $this->boolean($input['remove_featured_image'])) {
             delete_post_thumbnail($id);
@@ -121,6 +127,31 @@ final class LocationWriteService
     private function integer(mixed $value): int
     {
         return absint($value);
+    }
+
+    /** @param array<string,mixed> $input */
+    private function area(int $locationId, array $input): int|\WP_Error|null
+    {
+        if (!array_key_exists('area_id', $input)) return null;
+        if (is_array($input['area_id'])) return new \WP_Error('location_area_invalid', __('Invalid Area.', 'business-map-locator'));
+        $raw = $input['area_id'];
+        if ($raw === null || $raw === '' || $raw === 0 || $raw === '0') return 0;
+        if (!is_int($raw) && (!is_string($raw) || preg_match('/^[0-9]+$/', $raw) !== 1)) {
+            return new \WP_Error('location_area_invalid', __('Invalid Area.', 'business-map-locator'));
+        }
+        $id = $this->integer($raw);
+        if ($id === 0) return 0;
+        if (!term_exists($id, 'bml_area')) return new \WP_Error('location_area_invalid', __('Invalid Area.', 'business-map-locator'));
+        foreach ((array) get_terms(['taxonomy' => 'bml_area', 'hide_empty' => false]) as $term) {
+            if ((int) $term->parent === $id) return new \WP_Error('location_area_not_leaf', __('Only leaf Areas can be assigned.', 'business-map-locator'));
+        }
+        if ((string) get_term_meta($id, 'bml_area_active', true) === '0') {
+            $existing = $locationId > 0 ? wp_get_post_terms($locationId, 'bml_area', ['fields' => 'ids']) : [];
+            if (is_wp_error($existing) || !in_array($id, array_map('intval', $existing), true)) {
+                return new \WP_Error('location_area_inactive', __('Inactive Areas cannot be newly assigned.', 'business-map-locator'));
+            }
+        }
+        return $id;
     }
 
     private function boolean(mixed $value): bool
