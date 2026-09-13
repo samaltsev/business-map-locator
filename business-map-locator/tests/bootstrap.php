@@ -194,7 +194,22 @@ if (!function_exists('trailingslashit')) { function trailingslashit(string $valu
 if (!function_exists('wp_upload_dir')) { function wp_upload_dir(): array { return ['basedir' => sys_get_temp_dir(), 'error' => '']; } }
 
 if (!function_exists('wp_set_object_terms')) {
-    function wp_set_object_terms(int $id, array $terms, string $taxonomy): array { $GLOBALS['bml_test_object_terms'][$id][$taxonomy] = $terms; return $terms; }
+    function wp_set_object_terms(int $id, array $terms, string $taxonomy, bool $append = false): array|WP_Error
+    {
+        $GLOBALS['bml_test_wp_set_object_terms_calls'] = (int) ($GLOBALS['bml_test_wp_set_object_terms_calls'] ?? 0) + 1;
+        $override = $GLOBALS['bml_test_wp_set_object_terms_override'] ?? null;
+        if (is_callable($override)) {
+            $result = $override($id, $terms, $taxonomy, $append);
+            if ($result !== null) { return $result; }
+        }
+        $current = array_map('intval', $GLOBALS['bml_test_post_terms'][$id][$taxonomy] ?? []);
+        $incoming = array_map('intval', $terms);
+        $next = $append ? array_merge($current, $incoming) : $incoming;
+        $next = array_values(array_unique($next));
+        $GLOBALS['bml_test_post_terms'][$id][$taxonomy] = $next;
+
+        return $next;
+    }
 }
 
 if (!function_exists('delete_post_thumbnail')) {
