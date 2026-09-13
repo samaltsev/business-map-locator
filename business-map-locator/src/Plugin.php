@@ -203,11 +203,13 @@ final class Plugin
         $textDomain = $this->container->get(TextDomain::class);
         $privacyPolicy = $this->container->get(PrivacyPolicy::class);
         $importCleanup = $this->container->get(ImportCleanupScheduler::class);
+        $areaTermMeta = new \BusinessMapLocator\Admin\Taxonomy\AreaTermMeta();
 
         add_action('init', [$contentTypes, 'register']);
         add_action('init', [$meta, 'register']);
         add_action('init', [$blocks, 'register']);
         add_action('init', [$textDomain, 'load']);
+        add_action('init', [$areaTermMeta, 'register']);
         add_action('admin_init', [\BML_Capabilities::class, 'maybeInstall'], 1);
         add_action('admin_init', [$privacyPolicy, 'register']);
         $importCleanup->register();

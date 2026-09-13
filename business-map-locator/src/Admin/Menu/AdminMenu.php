@@ -29,6 +29,7 @@ final class AdminMenu
             ['bml-locations', __('Locations','business-map-locator'), Capabilities::EDIT_LOCATIONS, [$this->locations,'render']],
             ['bml-categories', __('Categories','business-map-locator'), Capabilities::MANAGE_TERMS, [$this->taxonomies,'categories']],
             ['bml-cities', __('Cities','business-map-locator'), Capabilities::MANAGE_TERMS, [$this->taxonomies,'cities']],
+            ['edit-tags.php?taxonomy=bml_area&post_type=bml_location', __('Areas','business-map-locator'), Capabilities::MANAGE_AREAS, static function (): void {}],
             ['bml-import', __('Import / Export','business-map-locator'), Capabilities::MANAGE_IMPORTS, [$this->importPage,'render']],
             ['bml-settings', __('Settings','business-map-locator'), Capabilities::MANAGE_SETTINGS, [$this->settings,'render']],
         ];

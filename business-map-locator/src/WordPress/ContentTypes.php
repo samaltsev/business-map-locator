@@ -69,7 +69,7 @@ final class ContentTypes
                 'singular_name' => __('Area', 'business-map-locator'),
             ],
             'public' => true,
-            'show_ui' => false,
+            'show_ui' => true,
             'show_in_menu' => false,
             'show_in_rest' => true,
             'hierarchical' => true,
