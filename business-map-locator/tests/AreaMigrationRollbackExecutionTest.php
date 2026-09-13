@@ -8,7 +8,7 @@ final class AreaMigrationRollbackExecutionTest extends TestCase
     protected function setUp(): void
     {
         $this->dir=dirname(__DIR__).'/.rollback-'.bin2hex(random_bytes(4)); mkdir($this->dir,0777,true);
-        $GLOBALS['bml_test_options']=$GLOBALS['bml_test_term_meta']=$GLOBALS['bml_test_post_terms']=[];$GLOBALS['bml_test_wp_delete_term_calls']=$GLOBALS['bml_test_delete_term_meta_calls']=$GLOBALS['bml_test_wp_remove_object_terms_calls']=0;
+        $GLOBALS['bml_test_options']=$GLOBALS['bml_test_term_meta']=$GLOBALS['bml_test_post_terms']=$GLOBALS['bml_test_indexed']=[];$GLOBALS['bml_test_index_fail']=false;$GLOBALS['bml_test_wp_delete_term_calls']=$GLOBALS['bml_test_delete_term_meta_calls']=$GLOBALS['bml_test_wp_remove_object_terms_calls']=0;
         $GLOBALS['bml_test_terms']=['bml_city'=>[1=>(object)['term_id'=>1,'name'=>'Minsk','slug'=>'minsk','parent'=>0]],'bml_area'=>[2=>(object)['term_id'=>2,'name'=>'Minsk','slug'=>'minsk','parent'=>0]]];
         $post=new WP_Post(); $post->ID=7; $post->post_type='bml_location'; $GLOBALS['bml_test_posts']=[7=>$post]; $GLOBALS['bml_test_post_terms']=[7=>['bml_city'=>[1],'bml_area'=>[2]]]; $GLOBALS['bml_test_term_meta']=[1=>['_bml_area_term_id'=>2],2=>['_bml_migrated_from_city_term_id'=>1]];
     }
@@ -25,6 +25,19 @@ final class AreaMigrationRollbackExecutionTest extends TestCase
         $this->assertSame([],wp_get_post_terms(7,'bml_area',['fields'=>'ids']));
         $this->assertSame(0,(int)get_term_meta(1,'_bml_area_term_id',true));
         $this->assertFalse(isset($GLOBALS['bml_test_terms']['bml_area'][2]));
+        $this->assertSame([7],$GLOBALS['bml_test_indexed']);
+    }
+    public function testAlreadyAbsentRelationshipRefreshesIndexWithoutReplayingRemoval(): void
+    {
+        [$service,$journal,$id]=$this->fixture();$GLOBALS['bml_test_post_terms'][7]['bml_area']=[];
+        $this->forward($journal,$id,'ADD_LOCATION_AREA',['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2],['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2,'relationship_added_by_run'=>true]);
+        $this->assertSame('ROLLED_BACK',$service->executeRollback($id)['code']);$this->assertSame(0,$GLOBALS['bml_test_wp_remove_object_terms_calls']);$this->assertSame([7],$GLOBALS['bml_test_indexed']);
+    }
+    public function testIndexRefreshFailureLeavesSourceRemovedAndResumesWithoutReplay(): void
+    {
+        [$service,$journal,$id,$state]=$this->fixture();$this->forward($journal,$id,'ADD_LOCATION_AREA',['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2],['location_id'=>7,'city_term_id'=>1,'area_term_id'=>2,'relationship_added_by_run'=>true]);$GLOBALS['bml_test_index_fail']=true;
+        $this->assertSame('ROLLBACK_PARTIAL',$service->executeRollback($id)['code']);$this->assertSame([],$GLOBALS['bml_test_post_terms'][7]['bml_area']);$calls=$GLOBALS['bml_test_wp_remove_object_terms_calls'];$GLOBALS['bml_test_index_fail']=false;
+        $this->assertSame('ROLLED_BACK',$service->resumePartialRollback($id)['code']);$this->assertSame($calls,$GLOBALS['bml_test_wp_remove_object_terms_calls']);$this->assertSame([7,7],$GLOBALS['bml_test_indexed']);$this->assertSame(AreaMigrationStateStore::ROLLED_BACK,$state->get($id)['state']);
     }
     public function testUnknownOwnershipIsPreserved(): void
     {

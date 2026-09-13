@@ -95,7 +95,7 @@ final class Plugin
         $this->container->set(AreaMigrationRevalidator::class, static fn (): AreaMigrationRevalidator => new AreaMigrationRevalidator());
         $this->container->set(AreaMigrationService::class, static fn (Container $container): AreaMigrationService => new AreaMigrationService($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationPlanner::class), $container->get(AreaMigrationStateStore::class)));
         $this->container->set(AreaMigrationExecutor::class, static fn (Container $container): AreaMigrationExecutor => new AreaMigrationExecutor($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationStateStore::class), $container->get(AreaMigrationLock::class), $container->get(AreaMigrationJournal::class), $container->get(AreaMigrationRevalidator::class)));
-        $this->container->set(AreaRollbackService::class, static fn (Container $container): AreaRollbackService => new AreaRollbackService($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationStateStore::class), $container->get(AreaMigrationLock::class), $container->get(AreaMigrationJournal::class), $container->get(AreaMigrationRevalidator::class)));
+        $this->container->set(AreaRollbackService::class, static fn (Container $container): AreaRollbackService => new AreaRollbackService($container->get(MigrationSnapshotStore::class), $container->get(AreaMigrationStateStore::class), $container->get(AreaMigrationLock::class), $container->get(AreaMigrationJournal::class), $container->get(AreaMigrationRevalidator::class), null, $container->get(\BML_Location_Index::class)));
 
         $this->container->set(
             Activator::class,

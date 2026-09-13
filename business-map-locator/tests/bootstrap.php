@@ -294,7 +294,7 @@ if (!class_exists('BML_Location_Index')) {
         {
             $GLOBALS['bml_test_indexed'][] = $postId;
 
-            return true;
+            return !($GLOBALS['bml_test_index_fail'] ?? false);
         }
     }
 }
