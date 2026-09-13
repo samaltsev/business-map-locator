@@ -183,7 +183,7 @@ final class Plugin
             \BML_REST::class,
             static fn (Container $container): \BML_REST => new \BML_REST(
                 $container->get(LocationsController::class),
-                $container->get(AreaDescendantResolver::class)
+                $container->get(LocationRepository::class)
             )
         );
         $this->container->set(\BML_Cache_Invalidator::class, static fn (): \BML_Cache_Invalidator => new \BML_Cache_Invalidator());

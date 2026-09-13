@@ -19,7 +19,7 @@ final readonly class LocationRepository
     }
 
     /** @return array{items:list<array<string,mixed>>,truncated:bool} */
-    public function markers(float $north, float $south, float $east, float $west, string $category = '', string $city = '', string $area = '', string $search = '', int $limit = 1000, bool $fullWorld = false, ?Coordinates $origin = null, ?Distance $radius = null): array
+    public function markers(float $north, float $south, float $east, float $west, string $category = '', string $city = '', string $area = '', string $search = '', bool $withoutArea = false, int $limit = 1000, bool $fullWorld = false, ?Coordinates $origin = null, ?Distance $radius = null): array
     {
         global $wpdb;
         $limit = max(1, min(2000, $limit)); $table = \BML_Database::locations_index_table(); $where = ["visibility = 'public'", "operational_status <> 'hidden'", 'latitude BETWEEN %f AND %f']; $values = [$south, $north];
@@ -31,7 +31,7 @@ final readonly class LocationRepository
             }
             array_push($values, $west, $east);
         }
-        $this->appendPublicFilters($where, $values, $category, $city, $area, $search);
+        $this->appendPublicFilters($where, $values, $category, $city, $area, $withoutArea, $search);
 
         $distanceSql = '';
         $havingSql = '';
@@ -53,7 +53,7 @@ final readonly class LocationRepository
         return ['items' => array_map(static fn(array $row): array => ['id'=>(int)$row['post_id'],'title'=>(string)$row['title'],'lat'=>(float)$row['latitude'],'lng'=>(float)$row['longitude'],'operational_status'=>(string)$row['operational_status'],'category'=>$row['category'] !== '' ? ['name'=>(string)$row['category'],'slug'=>(string)$row['category_slug']] : null,'distance'=>isset($row['distance']) ? round((float)$row['distance'], 3) : null], $rows), 'truncated' => $truncated];
     }
     /** @return array{north:?float,south:?float,east:?float,west:?float,total:int} */
-    public function publicBounds(string $category = '', string $city = '', string $area = '', string $search = ''): array
+    public function publicBounds(string $category = '', string $city = '', string $area = '', string $search = '', bool $withoutArea = false): array
     {
         global $wpdb;
 
@@ -65,7 +65,7 @@ final readonly class LocationRepository
             'longitude IS NOT NULL',
         ];
         $values = [];
-        $this->appendPublicFilters($where, $values, $category, $city, $area, $search);
+        $this->appendPublicFilters($where, $values, $category, $city, $area, $withoutArea, $search);
         $sql = "SELECT MIN(latitude) AS south, MAX(latitude) AS north, MIN(longitude) AS west, MAX(longitude) AS east, COUNT(1) AS total FROM {$table} WHERE " . implode(' AND ', $where);
         $row = $wpdb->get_row($this->prepare($sql, $values), ARRAY_A);
 
@@ -98,7 +98,7 @@ final readonly class LocationRepository
         ];
         $values = [];
 
-        $this->appendPublicFilters($where, $values, $query->category, $query->city, $query->area, $query->search);
+        $this->appendPublicFilters($where, $values, $query->category, $query->city, $query->area, $query->withoutArea, $query->search);
 
         if ($query->boundingBox) {
             $this->appendBoundingBox($where, $values, $query->boundingBox);
@@ -188,38 +188,113 @@ final readonly class LocationRepository
         );
     }
 
-    /**
-     * @param list<string> $where
-     * @param list<mixed> $values
-     */
-    private function appendPublicFilters(array &$where, array &$values, string $category, string $city, string $area, string $search): void
+    /** @return array{categories:list<array<string,mixed>>,cities:list<array<string,mixed>>,areas:list<array<string,mixed>>,without_area:array{count:int,available:bool}} */
+    public function filterCounts(string $category = '', string $city = '', string $area = '', bool $withoutArea = false, string $search = ''): array
+    {
+        $categoryCounts = $this->groupedTermCounts('bml_category', $category, $city, $area, $withoutArea, $search, 'category');
+        $cityCounts = $this->groupedTermCounts('bml_city', $category, $city, $area, $withoutArea, $search, 'city');
+        $areaDirectCounts = $this->groupedTermCounts('bml_area', $category, $city, $area, $withoutArea, $search, 'area');
+
+        return [
+            'categories' => $this->termOptions('bml_category', $categoryCounts),
+            'cities' => $this->termOptions('bml_city', $cityCounts),
+            'areas' => $this->areaOptions($areaDirectCounts),
+            'without_area' => $this->withoutAreaOption($category, $city, $area, $search),
+        ];
+    }
+
+    /** @return array<int, int> */
+    private function groupedTermCounts(string $taxonomy, string $category, string $city, string $area, bool $withoutArea, string $search, string $selfDimension): array
+    {
+        global $wpdb;
+        $table = \BML_Database::locations_index_table();
+        $terms = \BML_Database::location_terms_table();
+        $where = ["l.visibility = 'public'", "l.operational_status <> 'hidden'", 'l.latitude IS NOT NULL', 'l.longitude IS NOT NULL'];
+        $values = [$taxonomy];
+        $this->appendPublicFilters($where, $values, $category, $city, $area, $withoutArea, $search, 'l.', $selfDimension);
+        $sql = "SELECT r.term_id, COUNT(DISTINCT l.post_id) AS count FROM {$table} l INNER JOIN {$terms} r ON r.location_id = l.post_id AND r.taxonomy = %s WHERE " . implode(' AND ', $where) . ' GROUP BY r.term_id';
+        $rows = $wpdb->get_results($wpdb->prepare($sql, $values), ARRAY_A);
+        $counts = [];
+        foreach (is_array($rows) ? $rows : [] as $row) {
+            $counts[(int) $row['term_id']] = (int) $row['count'];
+        }
+        return $counts;
+    }
+
+    /** @return list<array{term_id:int,slug:string,name:string,count:int,available:bool}> */
+    private function termOptions(string $taxonomy, array $counts): array
+    {
+        $options = [];
+        foreach (get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]) as $term) {
+            $count = $counts[(int) $term->term_id] ?? 0;
+            $options[] = ['term_id' => (int) $term->term_id, 'slug' => (string) $term->slug, 'name' => (string) $term->name, 'count' => $count, 'available' => $count > 0];
+        }
+        return $options;
+    }
+
+    /** @return list<array{term_id:int,slug:string,name:string,parent:int,depth:int,count:int,available:bool}> */
+    private function areaOptions(array $directCounts): array
+    {
+        $options = [];
+        foreach ($this->areas->publicOptions() as $option) {
+            $count = 0;
+            foreach ($this->areas->idsForTerm((int) $option['term_id']) as $termId) {
+                $count += $directCounts[$termId] ?? 0;
+            }
+            $option['count'] = $count;
+            $option['available'] = $count > 0;
+            $options[] = $option;
+        }
+        return $options;
+    }
+
+    /** @return array{count:int,available:bool} */
+    private function withoutAreaOption(string $category, string $city, string $area, string $search): array
+    {
+        global $wpdb;
+        $table = \BML_Database::locations_index_table();
+        $where = ["visibility = 'public'", "operational_status <> 'hidden'", 'latitude IS NOT NULL', 'longitude IS NOT NULL'];
+        $values = [];
+        $this->appendPublicFilters($where, $values, $category, $city, $area, false, $search, '', 'without_area');
+        $terms = \BML_Database::location_terms_table();
+        $where[] = "NOT EXISTS (SELECT 1 FROM {$terms} bml_area_terms WHERE bml_area_terms.location_id = post_id AND bml_area_terms.taxonomy = 'bml_area')";
+        $count = (int) $wpdb->get_var($this->prepare("SELECT COUNT(1) FROM {$table} WHERE " . implode(' AND ', $where), $values));
+        return ['count' => $count, 'available' => $count > 0];
+    }
+
+    private function appendPublicFilters(array &$where, array &$values, string $category, string $city, string $area, bool $withoutArea, string $search, string $prefix = '', ?string $exclude = null): void
     {
         global $wpdb;
 
-        if ($category !== '') {
-            $where[] = 'category_slug = %s';
+        if ($category !== '' && $exclude !== 'category') {
+            $where[] = $prefix . 'category_slug = %s';
             $values[] = $category;
         }
 
-        if ($city !== '') {
-            $where[] = 'city_slug = %s';
+        if ($city !== '' && $exclude !== 'city') {
+            $where[] = $prefix . 'city_slug = %s';
             $values[] = $city;
         }
 
-        if ($area !== '') {
+        if ($area !== '' && $exclude !== 'area') {
             $termIds = $this->areas->idsForSlug($area);
             if ($termIds === []) {
                 $where[] = '1 = 0';
             } else {
                 $placeholders = implode(', ', array_fill(0, count($termIds), '%d'));
-                $where[] = 'post_id IN (SELECT location_id FROM ' . \BML_Database::location_terms_table() . " WHERE taxonomy = 'bml_area' AND term_id IN ({$placeholders}))";
+                $where[] = $prefix . 'post_id IN (SELECT location_id FROM ' . \BML_Database::location_terms_table() . " WHERE taxonomy = 'bml_area' AND term_id IN ({$placeholders}))";
                 array_push($values, ...$termIds);
             }
         }
 
+        if ($withoutArea && $exclude !== 'without_area') {
+            $terms = \BML_Database::location_terms_table();
+            $where[] = "NOT EXISTS (SELECT 1 FROM {$terms} bml_area_terms WHERE bml_area_terms.location_id = {$prefix}post_id AND bml_area_terms.taxonomy = 'bml_area')";
+        }
+
         if ($search !== '') {
             $like = '%' . $wpdb->esc_like($search) . '%';
-            $where[] = '(search_text LIKE %s OR title LIKE %s OR address LIKE %s)';
+            $where[] = '(' . $prefix . 'search_text LIKE %s OR ' . $prefix . 'title LIKE %s OR ' . $prefix . 'address LIKE %s)';
             array_push($values, $like, $like, $like);
         }
     }

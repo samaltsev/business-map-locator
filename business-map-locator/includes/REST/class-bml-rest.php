@@ -5,11 +5,11 @@ if (!defined('ABSPATH')) {
 
 class BML_REST {
     private BusinessMapLocator\Rest\LocationsController $locations_controller;
-    private BusinessMapLocator\Domain\Area\AreaDescendantResolver $areas;
+    private BusinessMapLocator\Infrastructure\Database\LocationRepository $locations;
 
-    public function __construct(BusinessMapLocator\Rest\LocationsController $locations_controller, BusinessMapLocator\Domain\Area\AreaDescendantResolver $areas) {
+    public function __construct(BusinessMapLocator\Rest\LocationsController $locations_controller, BusinessMapLocator\Infrastructure\Database\LocationRepository $locations) {
         $this->locations_controller = $locations_controller;
-        $this->areas = $areas;
+        $this->locations = $locations;
     }
 
     public function hooks(): void {
@@ -36,6 +36,8 @@ class BML_REST {
                 'category' => ['sanitize_callback' => 'sanitize_title'],
                 'city' => ['sanitize_callback' => 'sanitize_title'],
                 'area' => ['sanitize_callback' => 'sanitize_title'],
+                'without_area' => ['type' => 'boolean', 'default' => false],
+                'search' => ['sanitize_callback' => 'sanitize_text_field'],
             ],
         ]);
     }
@@ -82,76 +84,30 @@ class BML_REST {
     /*
      * Filters
      */
-    public function filters(WP_REST_Request $request): WP_REST_Response {
+    public function filters(WP_REST_Request $request): WP_REST_Response|WP_Error {
         $category = sanitize_title((string) $request->get_param('category'));
         $city = sanitize_title((string) $request->get_param('city'));
+        $area = sanitize_title((string) $request->get_param('area'));
+        $without_area = in_array($request->get_param('without_area'), [true, 1, '1', 'true', 'yes', 'on'], true);
+        $search = sanitize_text_field((string) $request->get_param('search'));
+        if ($area !== '' && $without_area) {
+            return new WP_Error('bml_conflicting_area_filters', __('Area and without_area cannot be combined.', 'business-map-locator'), ['status' => 400]);
+        }
         $params = [
             'category' => $category,
             'city' => $city,
-            'hide_empty' => true,
+            'area' => $area,
+            'without_area' => $without_area,
+            'search' => $search,
         ];
         $cached = BML_Location_Cache::get('filters', $params);
         if ($cached !== false) {
             return rest_ensure_response($cached);
         }
 
-        $payload = [
-            'categories' => $this->filter_terms_from_index('category', $city),
-            'cities' => $this->filter_terms_from_index('city', $category),
-            'areas' => $this->areas->publicOptions(),
-        ];
+        $payload = $this->locations->filterCounts($category, $city, $area, $without_area, $search);
         BML_Location_Cache::set('filters', $params, $payload);
         return rest_ensure_response($payload);
-    }
-
-    private function filter_terms_from_index(string $type, string $related_slug): array {
-        global $wpdb;
-
-        $table = BML_Database::locations_index_table();
-        if (!BML_Database::table_exists($table)) {
-            return [];
-        }
-
-        $name_column = $type === 'city' ? 'city' : 'category';
-        $slug_column = $type === 'city' ? 'city_slug' : 'category_slug';
-        $related_column = $type === 'city' ? 'category_slug' : 'city_slug';
-        $where = [
-            "visibility = 'public'",
-            "operational_status <> 'hidden'",
-            'latitude IS NOT NULL',
-            'longitude IS NOT NULL',
-            "{$name_column} <> ''",
-            "{$slug_column} <> ''",
-        ];
-        $values = [];
-
-        if ($related_slug !== '') {
-            $where[] = "{$related_column} = %s";
-            $values[] = $related_slug;
-        }
-
-        $sql = "SELECT {$name_column} AS name, {$slug_column} AS slug, COUNT(1) AS count
-            FROM {$table}
-            WHERE " . implode(' AND ', $where) . "
-            GROUP BY {$slug_column}, {$name_column}
-            ORDER BY {$name_column} ASC";
-
-        if ($values !== []) {
-            $sql = $wpdb->prepare($sql, $values);
-        }
-
-        $rows = $wpdb->get_results($sql, ARRAY_A);
-        if (!is_array($rows)) {
-            return [];
-        }
-
-        return array_map(static function (array $row): array {
-            return [
-                'name' => (string) $row['name'],
-                'slug' => (string) $row['slug'],
-                'count' => (int) $row['count'],
-            ];
-        }, $rows);
     }
 
     /*

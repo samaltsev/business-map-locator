@@ -16,6 +16,7 @@ final readonly class SearchLocationsQuery
         public string $category,
         public string $city,
         public string $area,
+        public bool $withoutArea,
         public int $page,
         public int $perPage,
         public string $orderby,
@@ -46,6 +47,7 @@ final readonly class SearchLocationsQuery
             category: (string) ($params['category'] ?? ''),
             city: (string) ($params['city'] ?? ''),
             area: (string) ($params['area'] ?? ''),
+            withoutArea: self::boolean($params['without_area'] ?? false),
             page: max(1, (int) ($params['page'] ?? 1)),
             perPage: min(500, max(1, (int) ($params['per_page'] ?? 200))),
             orderby: self::orderby((string) ($params['orderby'] ?? 'title')),
@@ -67,6 +69,7 @@ final readonly class SearchLocationsQuery
             'category' => $this->category,
             'city' => $this->city,
             'area' => $this->area,
+            'without_area' => $this->withoutArea,
             'page' => $this->page,
             'per_page' => $this->perPage,
             'orderby' => $this->orderby,
@@ -131,5 +134,10 @@ final readonly class SearchLocationsQuery
         }
 
         return (float) $value;
+    }
+
+    private static function boolean(mixed $value): bool
+    {
+        return in_array($value, [true, 1, '1', 'true', 'yes', 'on'], true);
     }
 }

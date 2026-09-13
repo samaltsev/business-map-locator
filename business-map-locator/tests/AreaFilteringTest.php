@@ -71,7 +71,7 @@ final class AreaFilteringTest extends TestCase
         self::assertStringContainsString('idsForSlug($area)', $repository);
         self::assertStringContainsString("taxonomy = 'bml_area'", $repository);
         self::assertStringContainsString("'area' =>", $controller);
-        self::assertStringContainsString('$this->areas->publicOptions()', $filters);
+        self::assertStringContainsString('$this->locations->filterCounts(', $filters);
         self::assertStringNotContainsString('wp_set_object_terms', $repository);
         self::assertStringNotContainsString('rebuild(', $repository);
     }
