@@ -8,6 +8,7 @@ use BusinessMapLocator\Import\Dto\ImportJob;
 use BusinessMapLocator\Import\Mapping\ImportMapper;
 use BusinessMapLocator\Import\Duplicate\ExistingLocationLookup;
 use BusinessMapLocator\Domain\Area\AreaAssignment;
+use BusinessMapLocator\Domain\Location\LocationFieldSanitizer;
 use BusinessMapLocator\Support\OperationalStatusResolver;
 use BusinessMapLocator\Support\SlugGenerator;
 
@@ -128,14 +129,14 @@ final class LocationImporter
     {
         foreach (['address','region','country','postcode','phone','hours'] as $key) {
             if ($this->shouldWrite($data, $key, $isUpdate, $updatePolicy)) {
-                update_post_meta($postId, 'bml_' . $key, sanitize_text_field((string) ($data[$key] ?? '')));
+                update_post_meta($postId, 'bml_' . $key, LocationFieldSanitizer::sanitize($key, (string) ($data[$key] ?? '')));
             }
         }
         if ($this->shouldWrite($data, 'email', $isUpdate, $updatePolicy)) {
-            update_post_meta($postId, 'bml_email', sanitize_email((string) ($data['email'] ?? '')));
+            update_post_meta($postId, 'bml_email', LocationFieldSanitizer::sanitize('email', (string) ($data['email'] ?? '')));
         }
         if ($this->shouldWrite($data, 'website', $isUpdate, $updatePolicy)) {
-            update_post_meta($postId, 'bml_website', esc_url_raw((string) ($data['website'] ?? '')));
+            update_post_meta($postId, 'bml_website', LocationFieldSanitizer::sanitize('website', (string) ($data['website'] ?? '')));
         }
         update_post_meta($postId, 'bml_lat', $lat);
         update_post_meta($postId, 'bml_lng', $lng);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BusinessMapLocator\Admin\Location;
 
 use BusinessMapLocator\Domain\Area\AreaAssignment;
+use BusinessMapLocator\Domain\Location\LocationFieldSanitizer;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -154,11 +155,6 @@ final class LocationWriteService
 
     private function locationField(string $key, string $value): string
     {
-        return match ($key) {
-            'email' => sanitize_email($value),
-            'website' => esc_url_raw($value),
-            'hours' => sanitize_textarea_field($value),
-            default => sanitize_text_field($value),
-        };
+        return LocationFieldSanitizer::sanitize($key, $value);
     }
 }
