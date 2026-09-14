@@ -7,6 +7,7 @@
 
         var initialSnapshot = new FormData(form);
         var dirty = false;
+        var hoursValid = true;
         var autoSaveTimer = 0;
         var autoSaving = false;
         var saveState = document.getElementById('bml-save-state');
@@ -22,7 +23,7 @@
         function selectedText(name) { var el = field(name); return el && el.value && el.options[el.selectedIndex] ? el.options[el.selectedIndex].text.trim() : ''; }
         function appendSubmissionAliases(data) {
             ['address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours'].forEach(function (name) {
-                data.set(name, value(name));
+                if (field(name)) { data.set(name, value(name)); }
             });
         }
 
@@ -132,32 +133,68 @@
             var toolbar = editor.querySelector('[data-hours-copy-toolbar]');
             var summary = editor.querySelector('[data-hours-copy-summary]');
             var copySource = null;
+            var english = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-            function setRowState(row) {
-                var closed = row.querySelector('[data-hours-closed]');
-                var times = row.querySelectorAll('[data-hours-open], [data-hours-close]');
-                times.forEach(function (input) { input.disabled = closed.checked; });
-                row.classList.toggle('is-closed', closed.checked);
+            function read(row) {
+                return { closed: row.querySelector('[data-hours-closed]').checked,
+                    open: row.querySelector('[data-hours-open]').value,
+                    close: row.querySelector('[data-hours-close]').value };
             }
-
-            function synchronise() {
-                var incomplete = false;
-                var lines = rows.map(function (row) {
-                    var closed = row.querySelector('[data-hours-closed]');
-                    var open = row.querySelector('[data-hours-open]');
-                    var close = row.querySelector('[data-hours-close]');
-                    if (closed.checked) { return row.dataset.hoursLabel + ': Closed'; }
-                    if (!open.value || !close.value) { incomplete = true; return ''; }
-                    return row.dataset.hoursLabel + ': ' + open.value + '–' + close.value;
-                }).filter(Boolean);
-                if (incomplete) {
-                    message.textContent = 'Set both times for every open day.';
-                    return;
+            function write(row, day) {
+                row.querySelector('[data-hours-closed]').checked = day.closed;
+                row.querySelector('[data-hours-open]').value = day.open;
+                row.querySelector('[data-hours-close]').value = day.close;
+                row.querySelectorAll('[data-hours-open], [data-hours-close]').forEach(function (input) { input.disabled = day.closed; });
+                row.classList.toggle('is-closed', day.closed);
+            }
+            function valid(day) {
+                return day.closed || (/^([01]\d|2[0-3]):[0-5]\d$/.test(day.open) &&
+                    /^([01]\d|2[0-3]):[0-5]\d$/.test(day.close) && day.open !== day.close);
+            }
+            function hydrate() {
+                var saved = output.value.trim();
+                if (!saved) { return; }
+                var lines = saved.split(/\r?\n/).filter(function (line) { return line.trim() !== ''; });
+                var parsed = [];
+                var seen = {};
+                var ok = lines.length === rows.length;
+                lines.forEach(function (line) {
+                    var match = line.match(/^([^:]+):\s*(Closed|([0-2]\d:[0-5]\d)\s*[–-]\s*([0-2]\d:[0-5]\d))\s*$/i);
+                    if (!match) { ok = false; return; }
+                    var name = match[1].trim().toLowerCase();
+                    var index = rows.findIndex(function (row, i) {
+                        return [row.dataset.hoursLabel, row.dataset.hoursDay, english[i]].some(function (label) {
+                            return label && label.toLowerCase() === name;
+                        });
+                    });
+                    var day = { closed: match[2].toLowerCase() === 'closed', open: match[3] || '', close: match[4] || '' };
+                    if (index < 0 || seen[index] || !valid(day)) { ok = false; return; }
+                    seen[index] = true;
+                    parsed[index] = day;
+                });
+                if (ok) {
+                    rows.forEach(function (row, i) { write(row, parsed[i]); });
+                } else {
+                    // Never infer a weekly schedule from arbitrary legacy prose.
+                    rows.forEach(function (row) { write(row, { closed: false, open: '', close: '' }); });
+                    message.textContent = t('hoursLegacy', 'Saved text is preserved. To replace it, complete all seven days.');
                 }
-                output.value = lines.join('\n');
-                message.textContent = '';
             }
-
+            function synchronise() {
+                if (!rows.every(function (row) { return valid(read(row)); })) {
+                    hoursValid = false;
+                    message.textContent = t('hoursIncomplete', 'Set both times for every open day; use Closed for days off.');
+                    return false;
+                }
+                var lines = rows.map(function (row) {
+                    var day = read(row);
+                    return row.dataset.hoursLabel + ': ' + (day.closed ? 'Closed' : day.open + '–' + day.close);
+                });
+                output.value = lines.join('\n');
+                hoursValid = true;
+                message.textContent = '';
+                return true;
+            }
             function stopCopyMode() {
                 copySource = null;
                 toolbar.hidden = true;
@@ -168,47 +205,48 @@
                     target.closest('label').hidden = true;
                 });
             }
-
             function beginCopyMode(row) {
+                stopCopyMode();
                 copySource = row;
                 toolbar.hidden = false;
-                summary.textContent = 'Choose the days that should use ' + row.dataset.hoursLabel + ' hours.';
+                summary.textContent = row.dataset.hoursLabel + ': ' + t('hoursSelectDays', 'Select destination days.');
                 rows.forEach(function (candidate) {
-                    var isSource = candidate === row;
-                    candidate.classList.toggle('is-copy-source', isSource);
-                    candidate.querySelector('[data-hours-copy-target]').closest('label').hidden = isSource;
+                    candidate.classList.toggle('is-copy-source', candidate === row);
+                    candidate.querySelector('[data-hours-copy-target]').closest('label').hidden = candidate === row;
                 });
             }
-
             function applyCopy() {
                 if (!copySource) { return; }
-                var sourceClosed = copySource.querySelector('[data-hours-closed]');
-                var sourceOpen = copySource.querySelector('[data-hours-open]');
-                var sourceClose = copySource.querySelector('[data-hours-close]');
-                rows.forEach(function (row) {
-                    var target = row.querySelector('[data-hours-copy-target]');
-                    if (!target.checked) { return; }
-                    row.querySelector('[data-hours-closed]').checked = sourceClosed.checked;
-                    row.querySelector('[data-hours-open]').value = sourceOpen.value;
-                    row.querySelector('[data-hours-close]').value = sourceClose.value;
-                    setRowState(row);
-                });
-                synchronise();
+                var day = read(copySource);
+                var targets = rows.filter(function (row) { return row !== copySource && row.querySelector('[data-hours-copy-target]').checked; });
+                if (!valid(day) || !targets.length) {
+                    summary.textContent = t('hoursCopyInvalid', 'Complete the source day and select at least one destination.');
+                    return;
+                }
+                targets.forEach(function (row) { write(row, day); });
                 markDirty(copySource);
+                synchronise();
                 stopCopyMode();
             }
-
             rows.forEach(function (row) {
-                setRowState(row);
-                row.addEventListener('change', function () {
-                    setRowState(row);
-                    synchronise();
-                    markDirty(row);
-                });
+                write(row, read(row));
                 row.querySelector('[data-hours-copy-source]').addEventListener('click', function () { beginCopyMode(row); });
+            });
+            // Keep UI-only selection away from both the hours writer and form autosave.
+            ['input', 'change'].forEach(function (type) {
+                editor.addEventListener(type, function (event) {
+                    event.stopPropagation();
+                    if (!event.target.matches('[data-hours-closed], [data-hours-open], [data-hours-close]')) { return; }
+                    var row = event.target.closest('[data-hours-day]');
+                    write(row, read(row));
+                    markDirty(row);
+                    synchronise();
+                });
             });
             toolbar.querySelector('[data-hours-copy-apply]').addEventListener('click', applyCopy);
             toolbar.querySelector('[data-hours-copy-cancel]').addEventListener('click', stopCopyMode);
+            hydrate();
+            stopCopyMode();
         }
 
         function clearFieldError(target) {
@@ -232,7 +270,7 @@
         }
 
         function autoSaveDraft() {
-            if (!dirty || autoSaving || !value('title')) { return; }
+            if (!hoursValid || !dirty || autoSaving || !value('title')) { return; }
             autoSaving = true;
             setSaveState('saving', t('savingDraft', 'Saving draft…'));
             var data = new FormData(form);
@@ -301,6 +339,7 @@
         }
 
         function saveLocation(draft) {
+            if (!hoursValid) { createNotice(t('hoursIncomplete', 'Complete the working hours before saving.')); return; }
             if (!draft && !validatePublish()) { return; }
             if (autoSaving) { return; }
 
@@ -410,6 +449,7 @@
             });
         });
         form.addEventListener('bml:legacy-submit', function (event) {
+            if (!hoursValid) { createNotice(t('hoursIncomplete', 'Complete the working hours before saving.')); return; }
             var draft = Boolean(event.detail && event.detail.draft);
             if (!draft && !validatePublish()) { return; }
             if (autoSaving) { return; }

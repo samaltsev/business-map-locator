@@ -12,7 +12,7 @@ final class LocationEditorContactSaveContractTest extends TestCase
         self::assertIsString($source);
         self::assertStringContainsString("['address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours'].forEach", $source);
         self::assertStringContainsString("form.elements['bml_location_' + name]", $source);
-        self::assertStringContainsString('data.set(name, value(name));', $source);
+        self::assertStringContainsString('if (field(name)) { data.set(name, value(name)); }', $source);
     }
 
     public function testStructuredHoursEditorPreservesTheCanonicalHoursField(): void
