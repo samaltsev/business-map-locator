@@ -92,13 +92,14 @@ final class LocationAreaWriteTest extends TestCase
         self::assertStringNotContainsString('wp_set_object_terms($id, $input[\'area_id\']', $ajax);
     }
 
-    public function testEditorExposesNoAreaLeafOnlyAndInactivePreservationContract(): void
+    public function testFreeEditorDefersAreaAssignmentWithoutChangingWriterContract(): void
     {
         $view = (string) file_get_contents(dirname(__DIR__) . '/src/Admin/Location/View/location-editor.php');
-        self::assertStringContainsString('name="area_id"', $view); self::assertStringContainsString('No Area assigned', $view);
-        self::assertStringContainsString('disabled(!$leaf || ($inactive && !$current))', $view);
-        self::assertStringContainsString('get_term_meta($term->term_id,\'bml_area_active\'', $view);
-        self::assertStringContainsString("str_repeat('— '", $view);
+
+        self::assertStringNotContainsString('name="area_id"', $view);
+        self::assertStringNotContainsString('No Area assigned', $view);
+        self::assertSame(42, $this->save());
+        self::assertSame([], $this->areas());
     }
 
     /** @param array<string, mixed> $input */

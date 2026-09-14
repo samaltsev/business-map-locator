@@ -99,8 +99,6 @@ $card_settings = \BML_Plugin::settings();
                         <span><strong><?php esc_html_e('Hours and description', 'business-map-locator'); ?></strong><small><?php esc_html_e('Help visitors plan their visit.', 'business-map-locator'); ?></small></span>
                     </button>
                     <div id="bml-section-location-contract-body" class="bml-section-body"><div class="bml-form-grid">
-                        <label class="bml-field"><span><?php esc_html_e('Email', 'business-map-locator'); ?></span><input name="bml_location_email" type="email" value="<?php echo esc_attr((string) $meta['email']); ?>"></label>
-                        <label class="bml-field"><span><?php esc_html_e('Website', 'business-map-locator'); ?></span><input name="bml_location_website" type="url" value="<?php echo esc_attr((string) $meta['website']); ?>"></label>
                         <div class="bml-field bml-field--wide bml-hours-editor" data-bml-hours-editor>
                             <input type="hidden" name="bml_location_hours" data-bml-field="hours" data-hours-output value="<?php echo esc_attr((string) $meta['hours']); ?>">
                             <div class="bml-hours-editor__heading"><span><?php esc_html_e('Hours', 'business-map-locator'); ?></span><div><button type="button" class="button-link" data-hours-copy-weekdays><?php esc_html_e('Copy Monday to Friday', 'business-map-locator'); ?></button><button type="button" class="button-link" data-hours-copy-all><?php esc_html_e('Copy to all days', 'business-map-locator'); ?></button></div></div>
