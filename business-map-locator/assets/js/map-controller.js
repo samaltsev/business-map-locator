@@ -263,7 +263,7 @@
 
         if (title) { title.textContent = location.title || ''; }
         if (address) {
-            if (this.settings.showAddress === false || this.settings.show_address === 0 || this.settings.show_address === '0') {
+            if (this.settings.showAddress === false || this.settings.show_address === 0 || this.settings.show_address === '0' || !location.address) {
                 address.remove();
             } else {
                 address.textContent = location.address || '';
@@ -282,8 +282,8 @@
         }
 
         channels = [
-            ['phone', (this.settings.showPhone === false || this.settings.show_phone === 0 || this.settings.show_phone === '0') ? '' : location.phone, location.phone ? 'tel:' + location.phone : ''],
-            ['website', location.website, location.website || ''],
+            ['phone', (this.settings.showPhone === false || this.settings.show_phone === 0 || this.settings.show_phone === '0') ? '' : location.phone, safeTelephoneUrl(location.phone)],
+            ['website', location.website, safeWebsiteUrl(location.website)],
             ['whatsapp', location.whatsapp, popupContactUrl('whatsapp', location.whatsapp)],
             ['telegram', location.telegram, popupContactUrl('telegram', location.telegram)],
             ['viber', location.viber, popupContactUrl('viber', location.viber)],
