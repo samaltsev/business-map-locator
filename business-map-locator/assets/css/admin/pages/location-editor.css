@@ -201,9 +201,12 @@
 .bml-hours-editor { display: grid; gap: 12px; }
 .bml-hours-editor__heading { align-items: center; display: flex; gap: 12px; justify-content: space-between; }
 .bml-hours-editor__heading > span { color: #111827; font-weight: 700; }
-.bml-hours-editor__heading > div { display: flex; flex-wrap: wrap; gap: 12px; }
 .bml-hours-editor__days { border: 1px solid var(--bml-border); border-radius: 10px; overflow: hidden; }
-.bml-hours-day { align-items: center; border-bottom: 1px solid var(--bml-border); display: grid; gap: 12px; grid-template-columns: minmax(95px,1fr) 100px 118px 12px 118px; padding: 10px 12px; }
+.bml-hours-day { align-items: center; border-bottom: 1px solid var(--bml-border); display: grid; gap: 10px; grid-template-columns: minmax(82px,1fr) auto 100px 118px 12px 118px; padding: 10px 12px; }
+.bml-hours-day.is-copy-source { background: #eff6ff; }
+.bml-hours-copy-source { color: #1769e0; font-weight: 700; white-space: nowrap; }
+.bml-hours-copy-target { color: #1769e0; font-weight: 700; }
+.bml-hours-copy-toolbar { align-items: center; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; padding: 10px 12px; }
 .bml-hours-day:last-child { border-bottom: 0; }
 .bml-hours-day > label { align-items: center; color: #4b5563; display: inline-flex; gap: 6px; font-size: 12px; }
 .bml-hours-day input[type="time"] { width: 100%; }

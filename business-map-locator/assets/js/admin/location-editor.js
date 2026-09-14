@@ -129,6 +129,9 @@
             var output = editor.querySelector('[data-hours-output]');
             var message = editor.querySelector('[data-hours-message]');
             var rows = Array.prototype.slice.call(editor.querySelectorAll('[data-hours-day]'));
+            var toolbar = editor.querySelector('[data-hours-copy-toolbar]');
+            var summary = editor.querySelector('[data-hours-copy-summary]');
+            var copySource = null;
 
             function setRowState(row) {
                 var closed = row.querySelector('[data-hours-closed]');
@@ -147,7 +150,6 @@
                     if (!open.value || !close.value) { incomplete = true; return ''; }
                     return row.dataset.hoursLabel + ': ' + open.value + '–' + close.value;
                 }).filter(Boolean);
-
                 if (incomplete) {
                     message.textContent = 'Set both times for every open day.';
                     return;
@@ -156,19 +158,44 @@
                 message.textContent = '';
             }
 
-            function copyMonday(selector) {
-                var monday = rows[0];
-                var sourceClosed = monday.querySelector('[data-hours-closed]');
-                var sourceOpen = monday.querySelector('[data-hours-open]');
-                var sourceClose = monday.querySelector('[data-hours-close]');
-                rows.slice(1).forEach(function (row, index) {
-                    if (selector === 'weekdays' && index > 3) { return; }
+            function stopCopyMode() {
+                copySource = null;
+                toolbar.hidden = true;
+                rows.forEach(function (row) {
+                    row.classList.remove('is-copy-source');
+                    var target = row.querySelector('[data-hours-copy-target]');
+                    target.checked = false;
+                    target.closest('label').hidden = true;
+                });
+            }
+
+            function beginCopyMode(row) {
+                copySource = row;
+                toolbar.hidden = false;
+                summary.textContent = 'Choose the days that should use ' + row.dataset.hoursLabel + ' hours.';
+                rows.forEach(function (candidate) {
+                    var isSource = candidate === row;
+                    candidate.classList.toggle('is-copy-source', isSource);
+                    candidate.querySelector('[data-hours-copy-target]').closest('label').hidden = isSource;
+                });
+            }
+
+            function applyCopy() {
+                if (!copySource) { return; }
+                var sourceClosed = copySource.querySelector('[data-hours-closed]');
+                var sourceOpen = copySource.querySelector('[data-hours-open]');
+                var sourceClose = copySource.querySelector('[data-hours-close]');
+                rows.forEach(function (row) {
+                    var target = row.querySelector('[data-hours-copy-target]');
+                    if (!target.checked) { return; }
                     row.querySelector('[data-hours-closed]').checked = sourceClosed.checked;
                     row.querySelector('[data-hours-open]').value = sourceOpen.value;
                     row.querySelector('[data-hours-close]').value = sourceClose.value;
                     setRowState(row);
                 });
                 synchronise();
+                markDirty(copySource);
+                stopCopyMode();
             }
 
             rows.forEach(function (row) {
@@ -176,10 +203,12 @@
                 row.addEventListener('change', function () {
                     setRowState(row);
                     synchronise();
+                    markDirty(row);
                 });
+                row.querySelector('[data-hours-copy-source]').addEventListener('click', function () { beginCopyMode(row); });
             });
-            editor.querySelector('[data-hours-copy-weekdays]').addEventListener('click', function () { copyMonday('weekdays'); });
-            editor.querySelector('[data-hours-copy-all]').addEventListener('click', function () { copyMonday('all'); });
+            toolbar.querySelector('[data-hours-copy-apply]').addEventListener('click', applyCopy);
+            toolbar.querySelector('[data-hours-copy-cancel]').addEventListener('click', stopCopyMode);
         }
 
         function clearFieldError(target) {

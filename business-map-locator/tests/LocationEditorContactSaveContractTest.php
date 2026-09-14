@@ -24,9 +24,14 @@ final class LocationEditorContactSaveContractTest extends TestCase
         self::assertIsString($script);
         self::assertStringContainsString('data-bml-hours-editor', $view);
         self::assertStringContainsString('data-hours-output', $view);
-        self::assertStringContainsString('data-hours-copy-weekdays', $view);
+        self::assertStringContainsString('data-hours-copy-source', $view);
+        self::assertStringContainsString('data-hours-copy-target', $view);
+        self::assertStringContainsString('data-hours-copy-apply', $view);
         self::assertStringContainsString('function initHoursEditor()', $script);
         self::assertStringContainsString("output.value = lines.join('\\n');", $script);
+        self::assertStringContainsString('function beginCopyMode(row)', $script);
+        self::assertStringContainsString('function applyCopy()', $script);
+        self::assertStringContainsString('markDirty(copySource);', $script);
     }
 
     public function testAjaxSaveAcceptsLegacyContactFieldNames(): void
