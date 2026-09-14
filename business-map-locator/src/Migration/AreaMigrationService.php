@@ -62,7 +62,17 @@ final class AreaMigrationService
         $cityCounts = array_fill_keys([AreaMigrationPlanner::CREATE, AreaMigrationPlanner::ALREADY_MAPPED, AreaMigrationPlanner::COLLISION, AreaMigrationPlanner::AMBIGUOUS, AreaMigrationPlanner::REQUIRES_DECISION], 0);
         foreach ($cities as $city) { $decision = $this->planner->decide($city, $areas); $decisions[(int) $city['id']] = $decision; $cityCounts[$decision['status']]++; }
         $locationPlan = $this->planner->planLocations($this->locations(true), $decisions);
-        $plan = ['city_decisions' => array_values($decisions), 'location_decisions' => $locationPlan['records'], 'counts' => ['cities' => $cityCounts, 'locations' => $locationPlan['counts']], 'collision_list' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::COLLISION)), 'ambiguous_list' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::AMBIGUOUS)), 'decision_required_list' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === AreaMigrationPlanner::REQUIRES_DECISION)), 'planned_area_creations' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::CREATE)), 'planned_area_relationship_additions' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === 'ADD_AREA')), 'no_op_records' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === 'NOOP'))];
+        $requiredTaxonomies = [
+            'bml_city' => taxonomy_exists('bml_city'),
+            'bml_area' => taxonomy_exists('bml_area'),
+        ];
+        $planningBlockers = [];
+        foreach ($requiredTaxonomies as $taxonomy => $available) {
+            if (!$available) {
+                $planningBlockers[] = ['code' => 'TAXONOMY_UNAVAILABLE', 'taxonomy' => $taxonomy];
+            }
+        }
+        $plan = ['city_decisions' => array_values($decisions), 'location_decisions' => $locationPlan['records'], 'counts' => ['cities' => $cityCounts, 'locations' => $locationPlan['counts']], 'planning_blockers' => $planningBlockers, 'collision_list' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::COLLISION)), 'ambiguous_list' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::AMBIGUOUS)), 'decision_required_list' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === AreaMigrationPlanner::REQUIRES_DECISION)), 'planned_area_creations' => array_values(array_filter($decisions, static fn (array $d): bool => $d['status'] === AreaMigrationPlanner::CREATE)), 'planned_area_relationship_additions' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === 'ADD_AREA')), 'no_op_records' => array_values(array_filter($locationPlan['records'], static fn (array $r): bool => $r['status'] === 'NOOP'))];
 
         return [
             'locations' => count($locationPlan['records']), 'city_terms' => count($cities), 'would_create_areas' => $cityCounts[AreaMigrationPlanner::CREATE], 'would_migrate_relationships' => $locationPlan['counts']['ADD_AREA'], 'warnings' => [], 'errors' => [], 'plan' => $plan,
@@ -103,8 +113,9 @@ final class AreaMigrationService
         $counts = (array) ($snapshot['plan']['counts'] ?? []);
         $run = $this->state->transition($runId, AreaMigrationStateStore::SIMULATED, ['plan_counts' => $counts]);
         $cities = (array) ($counts['cities'] ?? []); $locations = (array) ($counts['locations'] ?? []);
-        $blocked = (int) ($cities[AreaMigrationPlanner::COLLISION] ?? 0) + (int) ($cities[AreaMigrationPlanner::AMBIGUOUS] ?? 0) + (int) ($cities[AreaMigrationPlanner::REQUIRES_DECISION] ?? 0) + (int) ($locations[AreaMigrationPlanner::REQUIRES_DECISION] ?? 0) > 0;
-        return $this->state->transition($run['run_id'], $blocked ? AreaMigrationStateStore::BLOCKED : AreaMigrationStateStore::READY);
+        $planningBlockers = array_values((array) ($snapshot['plan']['planning_blockers'] ?? []));
+        $blocked = $planningBlockers !== [] || (int) ($cities[AreaMigrationPlanner::COLLISION] ?? 0) + (int) ($cities[AreaMigrationPlanner::AMBIGUOUS] ?? 0) + (int) ($cities[AreaMigrationPlanner::REQUIRES_DECISION] ?? 0) + (int) ($locations[AreaMigrationPlanner::REQUIRES_DECISION] ?? 0) > 0;
+        return $this->state->transition($run['run_id'], $blocked ? AreaMigrationStateStore::BLOCKED : AreaMigrationStateStore::READY, ['planning_blockers' => $planningBlockers]);
     }
 
     /** @return array<string,mixed> */
