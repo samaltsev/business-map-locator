@@ -45,12 +45,11 @@ The planning smoke passed, but it is not a production migration approval and it 
 | 1 | Canonical Location contract | One save/import/index/REST/frontend definition for address, contacts, website, image, short/full description, hours and status. Prevents data loss and empty public fields. | P0 — not yet closed. |
 | 2 | Free cards and public detail contract | Complete compact card, accessible detail panel/popup, correct CTAs and truthful status labels (`Active`, never false `Open now`). | P0 — not yet closed. |
 | 3 | Server-driven frontend directory | Stop client-side full-result loading; preserve pagination, filters, bounds and detail loading on the server/API contract. | P0 — not yet closed. |
-| 4 | Areas and controlled City → Area migration | Free 1.0 requires hierarchical Areas. Planning is ready, but the data model, admin management, runtime UX and separately approved execution/rollback work remain. | P0 — planning only; execution intentionally deferred. |
-| 5 | Free locator configuration | Directory-only layout, consistent global settings, shortcode builder, Gutenberg controls, two Free presets and multiple manual shortcode instances. | P1 — partially present. |
-| 6 | Maps parity | Public settings contract for style/marker, Google clustering parity or safe feature gating, OSM default behaviour. | P1 — not fully closed. |
-| 7 | Localization and accessibility baseline | English source strings, EN/DE/UK/RU packs/POT workflow, keyboard/focus/error states and WCAG baseline checks. | P1 — not yet closed. |
-| 8 | Release hardening | Full regression/runtime matrix, PHP/WordPress compatibility matrix, security review, migration/recovery evidence and performance checks. | P1 — not yet closed. |
-| 9 | Release packaging | Version parity, changelog, readme/docs, clean install ZIP, fresh-install/upgrade/uninstall evidence and SHA-256. | Release — not started. |
+| 4 | Free locator configuration | Directory-only layout, consistent global settings, shortcode builder, Gutenberg controls, two Free presets and multiple manual shortcode instances. | P1 — partially present. |
+| 5 | Maps parity | Public settings contract for style/marker, Google clustering parity or safe feature gating, OSM default behaviour. | P1 — not fully closed. |
+| 6 | Localization and accessibility baseline | English source strings, EN/DE/UK/RU packs/POT workflow, keyboard/focus/error states and WCAG baseline checks. | P1 — not yet closed. |
+| 7 | Release hardening | Full regression/runtime matrix, PHP/WordPress compatibility matrix, security review, migration/recovery evidence and performance checks. | P1 — not yet closed. |
+| 8 | Release packaging | Version parity, changelog, readme/docs, clean install ZIP, fresh-install/upgrade/uninstall evidence and SHA-256. | Release — not started. |
 
 ## Delivery plan
 
@@ -66,16 +65,13 @@ Acceptance: no manual Location save can erase fields that import or REST rely on
 
 Close Gate 3 and the Free part of Gate 6. Acceptance: no browser-side “load every page” behaviour; bounds, search, category, area and Near me use the server contract; provider capability is truthful.
 
-### Cycle C — Areas decision
-
-Decide whether hierarchical Areas are in Free 1.0.
-
-- If **yes** (the current Master Spec target), implement the Area admin/data/REST/frontend path, then conduct a separately approved disposable-clone execution and rollback programme. The current `READY` run is only evidence that planning is possible.
-- If **no**, revise the Master Spec and Free/Pro matrix before release. A Free 1.0 release cannot silently omit a stated required hierarchy.
-
-### Cycle D — authoring and product finish
+### Cycle C — authoring and product finish
 
 Close Gate 5, Gate 7 and the remaining Gate 6 work. Acceptance: editors can configure each supported Free layout without undocumented global side effects; translations and accessible interaction are verified.
+
+### Cycle D — production hardening
+
+Close Gate 7. Run the full regression/runtime matrix, PHP/WordPress compatibility checks, security review and performance checks.
 
 ### Cycle E — Free Release Candidate and GA
 
@@ -83,14 +79,13 @@ Close Gates 8–9 in a release-only round. Freeze features, run the full test/ru
 
 ## Estimate of remaining work
 
-There are **five substantive development cycles plus one release cycle** remaining before a credible Free 1.0 production release:
+There are **four substantive development cycles plus one release cycle** remaining before a credible Free 1.0 production release:
 
 1. Location contract and cards;
 2. server-driven directory and map parity;
-3. Areas decision and implementation/migration path;
-4. locator authoring, localization and accessibility;
-5. production hardening;
-6. release packaging and release-candidate verification.
+3. locator authoring, localization and accessibility;
+4. production hardening;
+5. release packaging and release-candidate verification.
 
 This is deliberately expressed as gates rather than a percentage. The open items touch data safety, public UX and release confidence; they cannot responsibly be reduced to “a few screens”.
 
@@ -98,6 +93,7 @@ This is deliberately expressed as gates rather than a percentage. The open items
 
 - Do not add Execute, Resume or Rollback controls.
 - Do not run City → Area migration on the current runtime.
+- Do not add Areas to the Free 1.0 scope.
 - Do not rebuild the relation index as part of migration planning.
 - Do not start Pro-only Services, Schedules, Saved Locators, analytics or remote sync before Free gates are closed.
 
@@ -112,4 +108,16 @@ Scope:
 - define a canonical DTO/normalizer and compatibility rules;
 - add regression tests for manual save, import update, REST read and index update;
 - make no Area migration execution changes.
+
+## Post-launch enhancement — Areas
+
+**Product decision (2026-09-14):** Areas are not required for the first Free production release.
+
+After Free has been released, installed and validated by real users, Areas may be added as an optional filtering and navigation enhancement:
+
+- hierarchical territory filtering, such as Country → Region → City → District;
+- optional manual assignment of an Area to a Location;
+- no requirement to change existing City data for the initial Area feature;
+- real City → Area migration, if it is ever needed, remains a separately approved data-migration programme with its own backup, clone, execution and recovery evidence.
+
 
