@@ -1158,8 +1158,9 @@
                     '<h3>' + escapeHtml(detail.title || this.strings.location || 'Location') + '</h3>' +
                     (category ? '<p class="bml-inline-detail__category">' + escapeHtml(category) + '</p>' : '') +
                     (address ? '<p class="bml-inline-detail__address">' + escapeHtml(address) + '</p>' : '') + status +
-                    (detail.hours ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.hours || 'Hours') + '</strong><span>' + escapeHtml(detail.hours) + '</span></div>' : '') +
+                    (detail.hours ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.hours || 'Hours') + '</strong><span class="bml-inline-detail__hours">' + escapeHtml(detail.hours) + '</span></div>' : '') +
                     (phone ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.call || 'Phone') + '</strong><a href="' + escapeHtml(phone) + '">' + escapeHtml(detail.phone || this.strings.call || 'Call') + '</a></div>' : '') +
+                    (email ? '<div class="bml-inline-detail__row bml-inline-detail__email"><strong>' + escapeHtml(this.strings.email || 'Email') + '</strong><a href="' + escapeHtml(email) + '">' + escapeHtml(detail.email || this.strings.email || 'Email') + '</a></div>' : '') +
                     (website ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.visitWebsite || 'Website') + '</strong><a href="' + escapeHtml(website) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(this.strings.visitWebsite || 'Website') + '</a></div>' : '') +
                     (detail.excerpt ? '<p class="bml-inline-detail__text">' + escapeHtml(detail.excerpt) + '</p>' : '') +
                     (detail.content ? '<div class="bml-inline-detail__content">' + detail.content + '</div>' : '') +
