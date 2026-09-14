@@ -52,6 +52,17 @@ final class LocationWriteServiceTest extends TestCase
 
     public static function statuses(): array { return [['active', 'active'], ['temporarily_closed', 'temporarily_closed'], ['hidden', 'hidden'], ['open', 'active']]; }
 
+    public function testManualStatusWriteSynchronizesLegacyVisibility(): void
+    {
+        self::assertSame(42, $this->writer->save(42, ['title' => 'Test Location', 'status' => 'draft', 'operational_status' => 'hidden']));
+        self::assertSame('hidden', $GLOBALS['bml_test_meta'][42]['bml_operational_status']);
+        self::assertSame('0', $GLOBALS['bml_test_meta'][42]['bml_visible']);
+
+        self::assertSame(42, $this->writer->save(42, ['title' => 'Test Location', 'status' => 'draft', 'operational_status' => 'active']));
+        self::assertSame('active', $GLOBALS['bml_test_meta'][42]['bml_operational_status']);
+        self::assertSame('1', $GLOBALS['bml_test_meta'][42]['bml_visible']);
+    }
+
     public function testPublishCoordinateValidationDoesNotWriteOrIndexInvalidData(): void
     {
         $result = $this->writer->save(42, ['title' => 'Corrupt me', 'status' => 'publish', 'lat' => '91', 'lng' => '27.56']);

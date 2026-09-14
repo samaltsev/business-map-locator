@@ -5,6 +5,7 @@ namespace BusinessMapLocator\Admin\Location;
 
 use BusinessMapLocator\Domain\Area\AreaAssignment;
 use BusinessMapLocator\Domain\Location\LocationFieldSanitizer;
+use BusinessMapLocator\Support\OperationalStatusResolver;
 
 if (!defined('ABSPATH')) {
     exit;
@@ -72,7 +73,9 @@ final class LocationWriteService
         if ($this->has($input, 'operational_status')) {
             $operational = sanitize_key($this->string($input, 'operational_status'));
             $operational = $operational === 'open' ? 'active' : $operational;
-            update_post_meta($id, 'bml_operational_status', in_array($operational, ['active', 'temporarily_closed', 'hidden'], true) ? $operational : 'active');
+            $operational = in_array($operational, ['active', 'temporarily_closed', 'hidden'], true) ? $operational : 'active';
+            update_post_meta($id, 'bml_operational_status', $operational);
+            update_post_meta($id, 'bml_visible', OperationalStatusResolver::visibleValue($operational));
         }
         foreach (['bml_category' => 'category_id', 'bml_city' => 'city_id'] as $taxonomy => $field) {
             if ($this->has($input, $field)) {
