@@ -17,7 +17,7 @@
             return window.BMLAdmin && BMLAdmin.strings && BMLAdmin.strings[key] ? BMLAdmin.strings[key] : fallback;
         }
 
-        function field(name) { return form.querySelector('[data-bml-field="' + name + '"]') || form.elements[name]; }
+        function field(name) { return form.querySelector('[data-bml-field="' + name + '"]') || form.elements[name] || form.elements['bml_location_' + name]; }
         function value(name) { var el = field(name); return el && typeof el.value === 'string' ? el.value.trim() : ''; }
         function selectedText(name) { var el = field(name); return el && el.value && el.options[el.selectedIndex] ? el.options[el.selectedIndex].text.trim() : ''; }
         function appendSubmissionAliases(data) {
