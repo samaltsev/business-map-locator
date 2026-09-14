@@ -21,7 +21,7 @@
         function value(name) { var el = field(name); return el && typeof el.value === 'string' ? el.value.trim() : ''; }
         function selectedText(name) { var el = field(name); return el && el.value && el.options[el.selectedIndex] ? el.options[el.selectedIndex].text.trim() : ''; }
         function appendSubmissionAliases(data) {
-            ['address', 'region', 'country', 'postcode', 'phone'].forEach(function (name) {
+            ['address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours'].forEach(function (name) {
                 data.set(name, value(name));
             });
         }

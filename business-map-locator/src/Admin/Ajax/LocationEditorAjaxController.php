@@ -104,6 +104,12 @@ final class LocationEditorAjaxController
         foreach (['content', 'excerpt', 'address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours', 'lat', 'lng', 'operational_status', 'category_id', 'city_id', 'area_id', 'featured_image_id', 'remove_featured_image'] as $field) {
             if (isset($_POST[$field]) && !is_array($_POST[$field])) { $input[$field] = (string) wp_unslash($_POST[$field]); }
         }
+        foreach (['address', 'region', 'country', 'postcode', 'phone', 'email', 'website', 'hours'] as $field) {
+            $legacy = 'bml_location_' . $field;
+            if (!isset($input[$field]) && isset($_POST[$legacy]) && !is_array($_POST[$legacy])) {
+                $input[$field] = (string) wp_unslash($_POST[$legacy]);
+            }
+        }
         $result = $this->writer->save($id, $input);
         if (is_wp_error($result)) { wp_send_json_error(['message' => $result->get_error_message()], 422); }
         $id = (int) $result;
