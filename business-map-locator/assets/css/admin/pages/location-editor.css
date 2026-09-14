@@ -195,3 +195,23 @@
     .bml-sticky-savebar > div { display: grid; grid-template-columns: 1fr 1fr; }
     .bml-sticky-savebar [data-discard-changes] { display: none; }
 }
+
+
+/* Structured weekly hours editor. */
+.bml-hours-editor { display: grid; gap: 12px; }
+.bml-hours-editor__heading { align-items: center; display: flex; gap: 12px; justify-content: space-between; }
+.bml-hours-editor__heading > span { color: #111827; font-weight: 700; }
+.bml-hours-editor__heading > div { display: flex; flex-wrap: wrap; gap: 12px; }
+.bml-hours-editor__days { border: 1px solid var(--bml-border); border-radius: 10px; overflow: hidden; }
+.bml-hours-day { align-items: center; border-bottom: 1px solid var(--bml-border); display: grid; gap: 12px; grid-template-columns: minmax(95px,1fr) 100px 118px 12px 118px; padding: 10px 12px; }
+.bml-hours-day:last-child { border-bottom: 0; }
+.bml-hours-day > label { align-items: center; color: #4b5563; display: inline-flex; gap: 6px; font-size: 12px; }
+.bml-hours-day input[type="time"] { width: 100%; }
+.bml-hours-day.is-closed input[type="time"] { background: #f3f4f6; color: #9ca3af; }
+.bml-hours-current { background: #f8fafc; border-left: 3px solid #93c5fd; color: #4b5563; margin: 0; padding: 9px 11px; white-space: pre-line; }
+@media (max-width: 782px) {
+    .bml-hours-editor__heading { align-items: flex-start; flex-direction: column; }
+    .bml-hours-day { grid-template-columns: 1fr 1fr; }
+    .bml-hours-day > strong { grid-column: 1 / -1; }
+    .bml-hours-day > span { display: none; }
+}

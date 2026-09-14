@@ -15,6 +15,20 @@ final class LocationEditorContactSaveContractTest extends TestCase
         self::assertStringContainsString('data.set(name, value(name));', $source);
     }
 
+    public function testStructuredHoursEditorPreservesTheCanonicalHoursField(): void
+    {
+        $view = file_get_contents(dirname(__DIR__) . '/src/Admin/Location/View/location-editor.php');
+        $script = file_get_contents(dirname(__DIR__) . '/assets/js/admin/location-editor.js');
+
+        self::assertIsString($view);
+        self::assertIsString($script);
+        self::assertStringContainsString('data-bml-hours-editor', $view);
+        self::assertStringContainsString('data-hours-output', $view);
+        self::assertStringContainsString('data-hours-copy-weekdays', $view);
+        self::assertStringContainsString('function initHoursEditor()', $script);
+        self::assertStringContainsString("output.value = lines.join('\\n');", $script);
+    }
+
     public function testAjaxSaveAcceptsLegacyContactFieldNames(): void
     {
         $source = file_get_contents(dirname(__DIR__) . '/src/Admin/Ajax/LocationEditorAjaxController.php');

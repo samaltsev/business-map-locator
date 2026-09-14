@@ -123,6 +123,65 @@
 
         function updateAll() { updateCompletion(); updatePreview(); updateCityHint(); }
 
+        function initHoursEditor() {
+            var editor = form.querySelector('[data-bml-hours-editor]');
+            if (!editor) { return; }
+            var output = editor.querySelector('[data-hours-output]');
+            var message = editor.querySelector('[data-hours-message]');
+            var rows = Array.prototype.slice.call(editor.querySelectorAll('[data-hours-day]'));
+
+            function setRowState(row) {
+                var closed = row.querySelector('[data-hours-closed]');
+                var times = row.querySelectorAll('[data-hours-open], [data-hours-close]');
+                times.forEach(function (input) { input.disabled = closed.checked; });
+                row.classList.toggle('is-closed', closed.checked);
+            }
+
+            function synchronise() {
+                var incomplete = false;
+                var lines = rows.map(function (row) {
+                    var closed = row.querySelector('[data-hours-closed]');
+                    var open = row.querySelector('[data-hours-open]');
+                    var close = row.querySelector('[data-hours-close]');
+                    if (closed.checked) { return row.dataset.hoursLabel + ': Closed'; }
+                    if (!open.value || !close.value) { incomplete = true; return ''; }
+                    return row.dataset.hoursLabel + ': ' + open.value + '–' + close.value;
+                }).filter(Boolean);
+
+                if (incomplete) {
+                    message.textContent = 'Set both times for every open day.';
+                    return;
+                }
+                output.value = lines.join('\n');
+                message.textContent = '';
+            }
+
+            function copyMonday(selector) {
+                var monday = rows[0];
+                var sourceClosed = monday.querySelector('[data-hours-closed]');
+                var sourceOpen = monday.querySelector('[data-hours-open]');
+                var sourceClose = monday.querySelector('[data-hours-close]');
+                rows.slice(1).forEach(function (row, index) {
+                    if (selector === 'weekdays' && index > 3) { return; }
+                    row.querySelector('[data-hours-closed]').checked = sourceClosed.checked;
+                    row.querySelector('[data-hours-open]').value = sourceOpen.value;
+                    row.querySelector('[data-hours-close]').value = sourceClose.value;
+                    setRowState(row);
+                });
+                synchronise();
+            }
+
+            rows.forEach(function (row) {
+                setRowState(row);
+                row.addEventListener('change', function () {
+                    setRowState(row);
+                    synchronise();
+                });
+            });
+            editor.querySelector('[data-hours-copy-weekdays]').addEventListener('click', function () { copyMonday('weekdays'); });
+            editor.querySelector('[data-hours-copy-all]').addEventListener('click', function () { copyMonday('all'); });
+        }
+
         function clearFieldError(target) {
             var wrap = target && target.closest ? target.closest('.bml-field, .bml-coordinate-details') : null;
             if (!wrap) { return; }
@@ -425,6 +484,7 @@
         var copy = document.getElementById('bml-copy-coordinates');
         if (copy) { copy.addEventListener('click', function () { if (navigator.clipboard && value('lat') && value('lng')) { navigator.clipboard.writeText(value('lat') + ', ' + value('lng')); createNotice('Coordinates copied.'); } }); }
 
+        initHoursEditor();
         updateAll();
         window.setTimeout(function () { document.querySelectorAll('.bml-map-skeleton').forEach(function (el) { el.hidden = true; }); }, 700);
     });

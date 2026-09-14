@@ -112,7 +112,24 @@ $card_settings = \BML_Plugin::settings();
                     <div id="bml-section-location-contract-body" class="bml-section-body"><div class="bml-form-grid">
                         <label class="bml-field"><span><?php esc_html_e('Email', 'business-map-locator'); ?></span><input name="bml_location_email" type="email" value="<?php echo esc_attr((string) $meta['email']); ?>"></label>
                         <label class="bml-field"><span><?php esc_html_e('Website', 'business-map-locator'); ?></span><input name="bml_location_website" type="url" value="<?php echo esc_attr((string) $meta['website']); ?>"></label>
-                        <label class="bml-field bml-field--wide"><span><?php esc_html_e('Hours', 'business-map-locator'); ?></span><textarea name="bml_location_hours" rows="3"><?php echo esc_textarea((string) $meta['hours']); ?></textarea></label>
+                        <div class="bml-field bml-field--wide bml-hours-editor" data-bml-hours-editor>
+                            <input type="hidden" name="bml_location_hours" data-bml-field="hours" data-hours-output value="<?php echo esc_attr((string) $meta['hours']); ?>">
+                            <div class="bml-hours-editor__heading"><span><?php esc_html_e('Hours', 'business-map-locator'); ?></span><div><button type="button" class="button-link" data-hours-copy-weekdays><?php esc_html_e('Copy Monday to Friday', 'business-map-locator'); ?></button><button type="button" class="button-link" data-hours-copy-all><?php esc_html_e('Copy to all days', 'business-map-locator'); ?></button></div></div>
+                            <small><?php esc_html_e('Choose each day and its opening time. Closed days are shown clearly to visitors.', 'business-map-locator'); ?></small>
+                            <?php if ($meta['hours'] !== '') : ?><p class="bml-hours-current"><?php esc_html_e('Current saved hours:', 'business-map-locator'); ?> <strong><?php echo esc_html((string) $meta['hours']); ?></strong></p><?php endif; ?>
+                            <div class="bml-hours-editor__days">
+                                <?php foreach (['Mon' => __('Monday', 'business-map-locator'), 'Tue' => __('Tuesday', 'business-map-locator'), 'Wed' => __('Wednesday', 'business-map-locator'), 'Thu' => __('Thursday', 'business-map-locator'), 'Fri' => __('Friday', 'business-map-locator'), 'Sat' => __('Saturday', 'business-map-locator'), 'Sun' => __('Sunday', 'business-map-locator')] as $day_code => $day_label) : ?>
+                                    <div class="bml-hours-day" data-hours-day="<?php echo esc_attr($day_code); ?>" data-hours-label="<?php echo esc_attr($day_label); ?>">
+                                        <strong><?php echo esc_html($day_label); ?></strong>
+                                        <label><input type="checkbox" data-hours-closed checked> <?php esc_html_e('Closed', 'business-map-locator'); ?></label>
+                                        <input type="time" data-hours-open disabled aria-label="<?php echo esc_attr(sprintf(__('Opening time on %s', 'business-map-locator'), $day_label)); ?>">
+                                        <span>–</span>
+                                        <input type="time" data-hours-close disabled aria-label="<?php echo esc_attr(sprintf(__('Closing time on %s', 'business-map-locator'), $day_label)); ?>">
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <em class="bml-field-error" data-hours-message></em>
+                        </div>
                         <label class="bml-field bml-field--wide"><span><?php esc_html_e('Excerpt', 'business-map-locator'); ?></span><textarea name="excerpt" rows="2"><?php echo esc_textarea((string) ($post?->post_excerpt ?? '')); ?></textarea></label>
                         <label class="bml-field bml-field--wide"><span><?php esc_html_e('Description', 'business-map-locator'); ?></span><textarea name="content" rows="5"><?php echo esc_textarea((string) ($post?->post_content ?? '')); ?></textarea></label>
                     </div></div>
