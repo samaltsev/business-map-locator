@@ -38,4 +38,17 @@ final class LocationEditorContactSaveContractTest extends TestCase
         self::assertStringContainsString("\$legacy = 'bml_location_' . \$field;", $source);
         self::assertStringContainsString('!isset($input[$field]) && isset($_POST[$legacy])', $source);
     }
+
+    public function testFreeLocationEditorFocusesOnCoreFieldsAndExplainsSiteTimezone(): void
+    {
+        $view = file_get_contents(dirname(__DIR__) . '/src/Admin/Location/View/location-editor.php');
+
+        self::assertIsString($view);
+        self::assertStringContainsString("Hours and description", $view);
+        self::assertStringContainsString("WordPress site timezone", $view);
+        self::assertStringNotContainsString('name="area_id"', $view);
+        self::assertStringNotContainsString('name="bml_location_phone"', $view);
+        self::assertStringNotContainsString('name="bml_location_email"', $view);
+        self::assertStringNotContainsString('name="bml_location_website"', $view);
+    }
 }
