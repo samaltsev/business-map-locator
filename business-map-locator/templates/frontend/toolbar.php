@@ -15,11 +15,11 @@
             </label>
         <?php endif; ?>
 
-        <?php if ($city_mode === 'visible') : ?>
+        <?php if ($area_mode === 'visible') : ?>
             <label class="bml-filter-control">
-                <span class="screen-reader-text"><?php esc_html_e('Filter by city', 'business-map-locator'); ?></span>
-                <select class="bml-city-filter">
-                    <option value=""><?php esc_html_e('All cities', 'business-map-locator'); ?></option>
+                <span class="screen-reader-text"><?php esc_html_e('Filter by area', 'business-map-locator'); ?></span>
+                <select class="bml-area-filter bml-city-filter" data-bml-city-alias="area">
+                    <option value=""><?php esc_html_e('All areas', 'business-map-locator'); ?></option>
                 </select>
             </label>
         <?php endif; ?>

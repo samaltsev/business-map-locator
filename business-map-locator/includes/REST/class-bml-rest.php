@@ -86,8 +86,12 @@ class BML_REST {
      */
     public function filters(WP_REST_Request $request): WP_REST_Response|WP_Error {
         $category = sanitize_title((string) $request->get_param('category'));
-        $city = sanitize_title((string) $request->get_param('city'));
-        $area = sanitize_title((string) $request->get_param('area'));
+        $territory = \BusinessMapLocator\Support\AreaCompatibilityResolver::normalize(
+            $request->get_param('area'),
+            $request->get_param('city')
+        );
+        $city = $territory['city'];
+        $area = $territory['area'];
         $without_area = in_array($request->get_param('without_area'), [true, 1, '1', 'true', 'yes', 'on'], true);
         $search = sanitize_text_field((string) $request->get_param('search'));
         if ($area !== '' && $without_area) {
@@ -106,6 +110,9 @@ class BML_REST {
         }
 
         $payload = $this->locations->filterCounts($category, $city, $area, $without_area, $search);
+        if (!empty($payload['areas']) && is_array($payload['areas'])) {
+            $payload['cities'] = $payload['areas'];
+        }
         BML_Location_Cache::set('filters', $params, $payload);
         return rest_ensure_response($payload);
     }

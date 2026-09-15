@@ -8,54 +8,23 @@
   "description": "Interactive business locator with map, search and filters.",
   "textdomain": "business-map-locator",
   "attributes": {
-    "layout": {
-      "type": "string",
-      "default": "split"
-    },
-    "category": {
-      "type": "string",
-      "default": ""
-    },
-    "city": {
-      "type": "string",
-      "default": ""
-    },
-    "categoryMode": {
-      "type": "string",
-      "default": "visible"
-    },
-    "cityMode": {
-      "type": "string",
-      "default": "visible"
-    },
-    "perPage": {
-      "type": "number",
-      "default": 24
-    },
-    "height": {
-      "type": "number",
-      "default": 620
-    },
-    "search": {
-      "type": "boolean",
-      "default": true
-    },
-    "filters": {
-      "type": "boolean",
-      "default": true
-    },
-    "geolocation": {
-      "type": "boolean",
-      "default": true
-    }
+    "layout": { "type": "string", "default": "split" },
+    "category": { "type": "string", "default": "" },
+    "area": { "type": "string", "default": "" },
+    "city": { "type": "string", "default": "" },
+    "categoryMode": { "type": "string", "default": "visible" },
+    "areaMode": { "type": "string", "default": "" },
+    "cityMode": { "type": "string", "default": "visible" },
+    "perPage": { "type": "number", "default": 24 },
+    "height": { "type": "number", "default": 620 },
+    "search": { "type": "boolean", "default": true },
+    "filters": { "type": "boolean", "default": true },
+    "geolocation": { "type": "boolean", "default": true }
   },
   "editorScript": "file:./index.js",
   "editorStyle": "file:./editor.css",
   "supports": {
     "html": false,
-    "align": [
-      "wide",
-      "full"
-    ]
+    "align": ["wide", "full"]
   }
 }

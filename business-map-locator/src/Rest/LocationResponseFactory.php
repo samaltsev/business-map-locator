@@ -9,9 +9,7 @@ use WP_REST_Response;
 
 final readonly class LocationResponseFactory
 {
-    /**
-     * @param array{items: list<array<string, mixed>>, total: int} $result
-     */
+    /** @param array{items: list<array<string, mixed>>, total: int} $result */
     public function create(array $result, SearchLocationsQuery $query): WP_REST_Response
     {
         $items = $this->items($result['items']);
@@ -32,19 +30,13 @@ final readonly class LocationResponseFactory
         return $response;
     }
 
-    /**
-     * @param list<array<string, mixed>> $items
-     * @return list<array<string, mixed>>
-     */
+    /** @param list<array<string, mixed>> $items @return list<array<string, mixed>> */
     private function items(array $items): array
     {
         return array_map(fn (array $item): array => $this->item($item), $items);
     }
 
-    /**
-     * @param array<string, mixed> $item
-     * @return array<string, mixed>
-     */
+    /** @param array<string, mixed> $item @return array<string, mixed> */
     private function item(array $item): array
     {
         $postId = (int) ($item['id'] ?? 0);
@@ -77,6 +69,7 @@ final readonly class LocationResponseFactory
             'linkedin' => '',
             'tiktok' => '',
             'category' => $this->term($item['category'] ?? null, $postId, 'bml_category'),
+            'area' => $this->term($item['area'] ?? null, $postId, 'bml_area'),
             'city' => $this->term($item['city'] ?? null, $postId, 'bml_city'),
             'distance' => array_key_exists('distance', $item) && $item['distance'] !== null ? round((float) $item['distance'], 3) : null,
         ];
@@ -84,10 +77,7 @@ final readonly class LocationResponseFactory
 
     private function meta(int $postId, string $key): string
     {
-        if ($postId <= 0) {
-            return '';
-        }
-
+        if ($postId <= 0) return '';
         return $this->string(get_post_meta($postId, $key, true));
     }
 
@@ -99,81 +89,44 @@ final readonly class LocationResponseFactory
 
     private function image(int $postId): string
     {
-        if ($postId <= 0) {
-            return '';
-        }
-
+        if ($postId <= 0) return '';
         return (string) (get_the_post_thumbnail_url($postId, 'medium') ?: '');
     }
 
-    /**
-     * @return array<string, string|int>|null
-     */
+    /** @return array<string, string|int>|null */
     private function term(mixed $value, int $postId, string $taxonomy): ?array
     {
         if (is_array($value) && !empty($value['name'])) {
-            $term = [
-                'name' => $this->string($value['name']),
-                'slug' => $this->string($value['slug'] ?? ''),
-            ];
+            $term = ['name' => $this->string($value['name']), 'slug' => $this->string($value['slug'] ?? '')];
             return $this->withCategoryIcon($term, $taxonomy);
         }
-
-        if ($postId <= 0) {
-            return null;
-        }
-
+        if ($postId <= 0) return null;
         $terms = wp_get_post_terms($postId, $taxonomy);
-        if (is_wp_error($terms) || empty($terms)) {
-            return null;
-        }
-
+        if (is_wp_error($terms) || empty($terms)) return null;
         $term = $terms[0];
-        return $this->withCategoryIcon([
-            'name' => $term->name,
-            'slug' => $term->slug,
-        ], $taxonomy, (int) $term->term_id);
+        return $this->withCategoryIcon(['name' => $term->name, 'slug' => $term->slug], $taxonomy, (int) $term->term_id);
     }
 
-    /**
-     * @param array<string, string|int> $term
-     * @return array<string, string|int>
-     */
+    /** @param array<string, string|int> $term @return array<string, string|int> */
     private function withCategoryIcon(array $term, string $taxonomy, int $termId = 0): array
     {
-        if ($taxonomy !== 'bml_category') {
-            return $term;
-        }
-
+        if ($taxonomy !== 'bml_category') return $term;
         $icon = $this->categoryIcon($termId, (string) ($term['slug'] ?? ''));
-        if ($icon !== '') {
-            $term['icon'] = $icon;
-        }
-
+        if ($icon !== '') $term['icon'] = $icon;
         return $term;
     }
 
     private function categoryIcon(int $termId, string $slug): string
     {
         static $cache = [];
-
         $key = $termId > 0 ? 'id:' . $termId : 'slug:' . $slug;
-        if (array_key_exists($key, $cache)) {
-            return $cache[$key];
-        }
-
+        if (array_key_exists($key, $cache)) return $cache[$key];
         if ($termId <= 0 && $slug !== '') {
             $term = get_term_by('slug', $slug, 'bml_category');
-            if ($term && !is_wp_error($term)) {
-                $termId = (int) $term->term_id;
-            }
+            if ($term && !is_wp_error($term)) $termId = (int) $term->term_id;
         }
-
         $iconId = $termId > 0 ? (int) get_term_meta($termId, 'bml_icon_id', true) : 0;
-        if ($iconId <= 0) {
-            return $cache[$key] = '';
-        }
-
+        if ($iconId <= 0) return $cache[$key] = '';
         return $cache[$key] = (string) (
             wp_get_attachment_image_url($iconId, 'bml_category_icon')
             ?: wp_get_attachment_image_url($iconId, 'thumbnail')

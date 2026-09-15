@@ -7,6 +7,7 @@ use BusinessMapLocator\Domain\Geo\BoundingBox;
 use BusinessMapLocator\Domain\Geo\Coordinates;
 use BusinessMapLocator\Domain\Geo\Distance;
 use BusinessMapLocator\Domain\Geo\DistanceUnit;
+use BusinessMapLocator\Support\AreaCompatibilityResolver;
 use InvalidArgumentException;
 
 final readonly class SearchLocationsQuery
@@ -37,6 +38,7 @@ final readonly class SearchLocationsQuery
         $lng = self::nullableFloat($params['lng'] ?? null);
         $radius = self::nullableFloat($params['radius'] ?? null);
         $unit = DistanceUnit::tryFrom((string) ($params['unit'] ?? 'km')) ?? DistanceUnit::Kilometres;
+        $territory = AreaCompatibilityResolver::normalize($params['area'] ?? '', $params['city'] ?? '');
 
         if (($lat === null || $lng === null) && $radius !== null) {
             throw new InvalidArgumentException('Radius search requires latitude and longitude.');
@@ -45,8 +47,8 @@ final readonly class SearchLocationsQuery
         return new self(
             search: trim((string) ($params['search'] ?? '')),
             category: (string) ($params['category'] ?? ''),
-            city: (string) ($params['city'] ?? ''),
-            area: (string) ($params['area'] ?? ''),
+            city: $territory['city'],
+            area: $territory['area'],
             withoutArea: self::boolean($params['without_area'] ?? false),
             page: max(1, (int) ($params['page'] ?? 1)),
             perPage: min(500, max(1, (int) ($params['per_page'] ?? 200))),
