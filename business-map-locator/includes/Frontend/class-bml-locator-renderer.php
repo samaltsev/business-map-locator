@@ -1,6 +1,8 @@
 <?php
 if (!defined('ABSPATH')) { exit; }
 
+use BusinessMapLocator\Support\AreaCompatibilityResolver;
+
 final class BML_Locator_Renderer {
     public static function render(array $attributes = []): string {
         BML_Frontend::enqueue();
@@ -13,8 +15,10 @@ final class BML_Locator_Renderer {
         $attributes = wp_parse_args($attributes, [
             'layout' => 'split',
             'category' => '',
+            'area' => '',
             'city' => '',
             'category_mode' => 'visible',
+            'area_mode' => '',
             'city_mode' => 'visible',
             'height' => $settings['map_height'] ?? 620,
             'list_width' => $settings['list_width'] ?? 38,
@@ -29,20 +33,24 @@ final class BML_Locator_Renderer {
         ]);
 
         $layout = in_array($attributes['layout'], ['split', 'map', 'cards'], true) ? $attributes['layout'] : 'split';
-
         $category = sanitize_title((string) $attributes['category']);
-        $city = sanitize_title((string) $attributes['city']);
+        $territory = AreaCompatibilityResolver::normalize($attributes['area'], $attributes['city']);
+        $area = $territory['area'];
+        $legacyCity = $territory['city'];
+        $compatibilityTerritory = $area !== '' ? $area : $legacyCity;
         $categoryMode = self::filterMode($attributes['category_mode'] ?? 'visible');
-        $cityMode = self::filterMode($attributes['city_mode'] ?? 'visible');
+        $areaMode = self::filterMode(($attributes['area_mode'] ?? '') !== '' ? $attributes['area_mode'] : ($attributes['city_mode'] ?? 'visible'));
         $perPage = max(12, min(36, (int) $attributes['per_page']));
 
         return [
             'id' => 'bml-locator-' . wp_generate_uuid4(),
             'layout' => $layout,
             'category' => $category,
-            'city' => $city,
+            'area' => $area,
+            'city' => $compatibilityTerritory,
             'category_mode' => $categoryMode,
-            'city_mode' => $cityMode,
+            'area_mode' => $areaMode,
+            'city_mode' => $areaMode,
             'height' => max(300, min(1200, (int) $attributes['height'])),
             'list_width' => max(25, min(60, (int) $attributes['list_width'])),
             'search' => (bool) $attributes['search'],
@@ -52,9 +60,11 @@ final class BML_Locator_Renderer {
             'settings' => [
                 'layout' => $layout,
                 'category' => $category,
-                'city' => $city,
+                'area' => $area,
+                'city' => $compatibilityTerritory,
                 'categoryMode' => $categoryMode,
-                'cityMode' => $cityMode,
+                'areaMode' => $areaMode,
+                'cityMode' => $areaMode,
                 'height' => max(300, min(1200, (int) $attributes['height'])),
                 'listWidth' => max(25, min(60, (int) $attributes['list_width'])),
                 'per_page' => $perPage,

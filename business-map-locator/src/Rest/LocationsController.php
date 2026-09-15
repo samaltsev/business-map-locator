@@ -5,14 +5,15 @@ namespace BusinessMapLocator\Rest;
 
 use BusinessMapLocator\Application\Location\SearchLocationsHandler;
 use BusinessMapLocator\Application\Location\SearchLocationsQuery;
+use BusinessMapLocator\Infrastructure\Database\LocationRepository;
+use BusinessMapLocator\Support\AreaCompatibilityResolver;
+use BusinessMapLocator\Support\OperationalStatusResolver;
 use InvalidArgumentException;
 use WP_Error;
+use WP_Post;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
-use WP_Post;
-use BusinessMapLocator\Infrastructure\Database\LocationRepository;
-use BusinessMapLocator\Support\OperationalStatusResolver;
 
 final readonly class LocationsController
 {
@@ -44,6 +45,8 @@ final readonly class LocationsController
                 'search' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
                 'category' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
                 'city' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+                'area' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+                'without_area' => ['type' => 'boolean', 'default' => false],
                 'lat' => ['type' => 'number', 'minimum' => -90, 'maximum' => 90],
                 'lng' => ['type' => 'number', 'minimum' => -180, 'maximum' => 180],
                 'radius' => ['type' => 'number', 'minimum' => 1, 'maximum' => 500],
@@ -60,6 +63,7 @@ final readonly class LocationsController
                 'search' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
                 'category' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
                 'city' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+                'area' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
             ],
         ]);
         register_rest_route('business-map/v1', '/locations/(?P<id>[1-9][0-9]*)', [
@@ -93,8 +97,17 @@ final readonly class LocationsController
 
         try {
             $category = sanitize_title(self::optionalString($request->get_param('category'), 'category'));
-            $city = sanitize_title(self::optionalString($request->get_param('city'), 'city'));
+            $territory = AreaCompatibilityResolver::normalize(
+                self::optionalString($request->get_param('area'), 'area'),
+                self::optionalString($request->get_param('city'), 'city')
+            );
+            $city = $territory['city'];
+            $area = $territory['area'];
+            $withoutArea = self::boolean($request->get_param('without_area'));
             $search = sanitize_text_field(self::optionalString($request->get_param('search'), 'search'));
+            if ($area !== '' && $withoutArea) {
+                return self::conflictingAreaFilters();
+            }
             $nearQuery = SearchLocationsQuery::fromArray([
                 'lat' => $request->get_param('lat'),
                 'lng' => $request->get_param('lng'),
@@ -111,20 +124,29 @@ final readonly class LocationsController
 
         $limit = max(1, min(1000, absint($request->get_param('limit') ?: 1000)));
 
-        return rest_ensure_response($this->repository->markers($values['north'], $values['south'], $values['east'], $values['west'], $category, $city, $search, $limit, $fullWorld, $nearQuery->origin, $nearQuery->radius));
+        return rest_ensure_response($this->repository->markers($values['north'], $values['south'], $values['east'], $values['west'], $category, $city, $area, $search, $withoutArea, $limit, $fullWorld, $nearQuery->origin, $nearQuery->radius));
     }
 
     public function bounds(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
             $category = sanitize_title(self::optionalString($request->get_param('category'), 'category'));
-            $city = sanitize_title(self::optionalString($request->get_param('city'), 'city'));
+            $territory = AreaCompatibilityResolver::normalize(
+                self::optionalString($request->get_param('area'), 'area'),
+                self::optionalString($request->get_param('city'), 'city')
+            );
+            $city = $territory['city'];
+            $area = $territory['area'];
+            $withoutArea = self::boolean($request->get_param('without_area'));
             $search = sanitize_text_field(self::optionalString($request->get_param('search'), 'search'));
+            if ($area !== '' && $withoutArea) {
+                return self::conflictingAreaFilters();
+            }
         } catch (InvalidArgumentException $exception) {
             return new WP_Error('bml_invalid_location_query', $exception->getMessage(), ['status' => 400]);
         }
 
-        return rest_ensure_response($this->repository->publicBounds($category, $city, $search));
+        return rest_ensure_response($this->repository->publicBounds($category, $city, $area, $search, $withoutArea));
     }
 
     private static function optionalString(mixed $value, string $parameter): string
@@ -168,6 +190,9 @@ final readonly class LocationsController
         } catch (InvalidArgumentException $exception) {
             return new WP_Error('bml_invalid_location_query', $exception->getMessage(), ['status' => 400]);
         }
+        if ($query->area !== '' && $query->withoutArea) {
+            return self::conflictingAreaFilters();
+        }
 
         try {
             $result = $this->searchHandler->handle($query);
@@ -203,92 +228,39 @@ final readonly class LocationsController
         return $lat !== false && $lng !== false && $lat >= -90 && $lat <= 90 && $lng >= -180 && $lng <= 180;
     }
 
-    /**
-     * @return array<string, array<string, mixed>>
-     */
+    /** @return array<string, array<string, mixed>> */
     private function args(): array
     {
         return [
-            'search' => [
-                'type' => 'string',
-                'default' => '',
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value),
-            ],
-            'category' => [
-                'type' => 'string',
-                'default' => '',
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value),
-            ],
-            'city' => [
-                'type' => 'string',
-                'default' => '',
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value),
-            ],
-            'page' => [
-                'type' => 'integer',
-                'default' => 1,
-                'minimum' => 1,
-                'sanitize_callback' => static fn (mixed $value): int => absint($value),
-                'validate_callback' => static fn (mixed $value): bool => is_numeric($value) && (int) $value >= 1,
-            ],
-            'per_page' => [
-                'type' => 'integer',
-                'default' => 200,
-                'minimum' => 1,
-                'maximum' => 500,
-                'sanitize_callback' => static fn (mixed $value): int => absint($value),
-                'validate_callback' => static fn (mixed $value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 500,
-            ],
-            'orderby' => [
-                'type' => 'string',
-                'default' => 'title',
-                'enum' => ['title', 'date', 'modified', 'menu_order', 'distance'],
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_key((string) $value),
-            ],
-            'order' => [
-                'type' => 'string',
-                'default' => 'ASC',
-                'enum' => ['ASC', 'DESC', 'asc', 'desc'],
-                'sanitize_callback' => static fn (mixed $value): string => strtoupper(sanitize_text_field((string) $value)),
-            ],
+            'search' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
+            'category' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+            'city' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+            'area' => ['type' => 'string', 'default' => '', 'sanitize_callback' => static fn (mixed $value): string => sanitize_title((string) $value)],
+            'without_area' => ['type' => 'boolean', 'default' => false],
+            'page' => ['type' => 'integer', 'default' => 1, 'minimum' => 1, 'sanitize_callback' => static fn (mixed $value): int => absint($value), 'validate_callback' => static fn (mixed $value): bool => is_numeric($value) && (int) $value >= 1],
+            'per_page' => ['type' => 'integer', 'default' => 200, 'minimum' => 1, 'maximum' => 500, 'sanitize_callback' => static fn (mixed $value): int => absint($value), 'validate_callback' => static fn (mixed $value): bool => is_numeric($value) && (int) $value >= 1 && (int) $value <= 500],
+            'orderby' => ['type' => 'string', 'default' => 'title', 'enum' => ['title', 'date', 'modified', 'menu_order', 'distance'], 'sanitize_callback' => static fn (mixed $value): string => sanitize_key((string) $value)],
+            'order' => ['type' => 'string', 'default' => 'ASC', 'enum' => ['ASC', 'DESC', 'asc', 'desc'], 'sanitize_callback' => static fn (mixed $value): string => strtoupper(sanitize_text_field((string) $value))],
             'north' => ['type' => 'number'],
             'south' => ['type' => 'number'],
             'east' => ['type' => 'number'],
             'west' => ['type' => 'number'],
-            'bbox' => [
-                'type' => 'string',
-                'description' => 'Bounding box as west,south,east,north.',
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value),
-            ],
-            'bounds' => [
-                'type' => 'string',
-                'description' => 'Bounding box alias as west,south,east,north.',
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value),
-            ],
-            'lat' => [
-                'type' => 'number',
-                'minimum' => -90,
-                'maximum' => 90,
-                'sanitize_callback' => static fn (mixed $value): float => (float) $value,
-            ],
-            'lng' => [
-                'type' => 'number',
-                'minimum' => -180,
-                'maximum' => 180,
-                'sanitize_callback' => static fn (mixed $value): float => (float) $value,
-            ],
-            'radius' => [
-                'type' => 'number',
-                'minimum' => 1,
-                'maximum' => 500,
-                'sanitize_callback' => static fn (mixed $value): float => (float) $value,
-            ],
-            'unit' => [
-                'type' => 'string',
-                'default' => 'km',
-                'enum' => ['km', 'mi'],
-                'sanitize_callback' => static fn (mixed $value): string => sanitize_key((string) $value),
-            ],
+            'bbox' => ['type' => 'string', 'description' => 'Bounding box as west,south,east,north.', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
+            'bounds' => ['type' => 'string', 'description' => 'Bounding box alias as west,south,east,north.', 'sanitize_callback' => static fn (mixed $value): string => sanitize_text_field((string) $value)],
+            'lat' => ['type' => 'number', 'minimum' => -90, 'maximum' => 90, 'sanitize_callback' => static fn (mixed $value): float => (float) $value],
+            'lng' => ['type' => 'number', 'minimum' => -180, 'maximum' => 180, 'sanitize_callback' => static fn (mixed $value): float => (float) $value],
+            'radius' => ['type' => 'number', 'minimum' => 1, 'maximum' => 500, 'sanitize_callback' => static fn (mixed $value): float => (float) $value],
+            'unit' => ['type' => 'string', 'default' => 'km', 'enum' => ['km', 'mi'], 'sanitize_callback' => static fn (mixed $value): string => sanitize_key((string) $value)],
         ];
+    }
+
+    private static function boolean(mixed $value): bool
+    {
+        return in_array($value, [true, 1, '1', 'true', 'yes', 'on'], true);
+    }
+
+    private static function conflictingAreaFilters(): WP_Error
+    {
+        return new WP_Error('bml_conflicting_area_filters', __('Area and without_area cannot be combined.', 'business-map-locator'), ['status' => 400]);
     }
 }

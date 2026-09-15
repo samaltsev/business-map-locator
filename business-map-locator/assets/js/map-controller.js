@@ -49,6 +49,24 @@
         });
     }
 
+    function buildRestUrl(restBase, endpoint, params) {
+        var url = new URL(String(restBase || ''), window.location.href);
+        var route = url.searchParams.get('rest_route');
+        var path = String(endpoint || '').replace(/^\/+/, '');
+
+        if (route !== null) {
+            url.searchParams.set('rest_route', route.replace(/\/?$/, '/') + path);
+        } else {
+            url.pathname = url.pathname.replace(/\/?$/, '/') + path;
+        }
+
+        new URLSearchParams(params || '').forEach(function (value, key) {
+            url.searchParams.set(key, value);
+        });
+
+        return url.toString();
+    }
+
     function filterMode(root, dimension) {
         var mode = (root.dataset[dimension + 'Mode'] || 'visible').toLowerCase();
         return ['visible', 'locked', 'hidden'].indexOf(mode) !== -1 ? mode : 'visible';
@@ -245,7 +263,7 @@
 
         if (title) { title.textContent = location.title || ''; }
         if (address) {
-            if (this.settings.showAddress === false || this.settings.show_address === 0 || this.settings.show_address === '0') {
+            if (this.settings.showAddress === false || this.settings.show_address === 0 || this.settings.show_address === '0' || !location.address) {
                 address.remove();
             } else {
                 address.textContent = location.address || '';
@@ -264,8 +282,8 @@
         }
 
         channels = [
-            ['phone', (this.settings.showPhone === false || this.settings.show_phone === 0 || this.settings.show_phone === '0') ? '' : location.phone, location.phone ? 'tel:' + location.phone : ''],
-            ['website', location.website, location.website || ''],
+            ['phone', (this.settings.showPhone === false || this.settings.show_phone === 0 || this.settings.show_phone === '0') ? '' : location.phone, safeTelephoneUrl(location.phone)],
+            ['website', location.website, safeWebsiteUrl(location.website)],
             ['whatsapp', location.whatsapp, popupContactUrl('whatsapp', location.whatsapp)],
             ['telegram', location.telegram, popupContactUrl('telegram', location.telegram)],
             ['viber', location.viber, popupContactUrl('viber', location.viber)],
@@ -514,12 +532,12 @@
         var params = createFilterParams(this.root);
         var query = params.toString();
 
-        return fetchJson(this.restUrl + 'filters' + (query ? '?' + query : ''));
+        return fetchJson(buildRestUrl(this.restUrl, 'filters', query));
     };
 
     LocatorDataSource.prototype.loadLocations = function (page, origin, perPage, bounds) {
         var self = this; this.abort('card'); if (window.AbortController) { this.cardAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations?' + createParams(this.root, this.settings, page || 1, origin, perPage, bounds).toString(), this.cardAbortController && this.cardAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations', createParams(this.root, this.settings, page || 1, origin, perPage, bounds)), this.cardAbortController && this.cardAbortController.signal);
     };
     LocatorDataSource.prototype.loadMarkers = function (bounds, origin) {
         var params = new URLSearchParams(bounds); var filters = createFilterParams(this.root);
@@ -528,17 +546,17 @@
         if (search && search.value.trim()) { params.set('search', search.value.trim()); }
         appendNearParams(params, this.settings, origin);
         this.abort('marker'); if (window.AbortController) { this.markerAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations/markers?' + params.toString(), this.markerAbortController && this.markerAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations/markers', params), this.markerAbortController && this.markerAbortController.signal);
     };
     LocatorDataSource.prototype.loadCityBounds = function (city) {
         var params = new URLSearchParams();
         if (city) { params.set('city', city); }
         this.abort('bounds'); if (window.AbortController) { this.boundsAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations/bounds?' + params.toString(), this.boundsAbortController && this.boundsAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations/bounds', params), this.boundsAbortController && this.boundsAbortController.signal);
     };
     LocatorDataSource.prototype.loadDetail = function (id) {
         this.abort('detail'); if (window.AbortController) { this.detailAbortController = new AbortController(); }
-        return fetchJson(this.restUrl + 'locations/' + encodeURIComponent(id), this.detailAbortController && this.detailAbortController.signal);
+        return fetchJson(buildRestUrl(this.restUrl, 'locations/' + encodeURIComponent(id)), this.detailAbortController && this.detailAbortController.signal);
     };
 
     LocatorDataSource.prototype.destroy = function () {
@@ -1140,8 +1158,9 @@
                     '<h3>' + escapeHtml(detail.title || this.strings.location || 'Location') + '</h3>' +
                     (category ? '<p class="bml-inline-detail__category">' + escapeHtml(category) + '</p>' : '') +
                     (address ? '<p class="bml-inline-detail__address">' + escapeHtml(address) + '</p>' : '') + status +
-                    (detail.hours ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.hours || 'Hours') + '</strong><span>' + escapeHtml(detail.hours) + '</span></div>' : '') +
+                    (detail.hours ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.hours || 'Hours') + '</strong><span class="bml-inline-detail__hours">' + escapeHtml(detail.hours) + '</span></div>' : '') +
                     (phone ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.call || 'Phone') + '</strong><a href="' + escapeHtml(phone) + '">' + escapeHtml(detail.phone || this.strings.call || 'Call') + '</a></div>' : '') +
+                    (email ? '<div class="bml-inline-detail__row bml-inline-detail__email"><strong>' + escapeHtml(this.strings.email || 'Email') + '</strong><a href="' + escapeHtml(email) + '">' + escapeHtml(detail.email || this.strings.email || 'Email') + '</a></div>' : '') +
                     (website ? '<div class="bml-inline-detail__row"><strong>' + escapeHtml(this.strings.visitWebsite || 'Website') + '</strong><a href="' + escapeHtml(website) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(this.strings.visitWebsite || 'Website') + '</a></div>' : '') +
                     (detail.excerpt ? '<p class="bml-inline-detail__text">' + escapeHtml(detail.excerpt) + '</p>' : '') +
                     (detail.content ? '<div class="bml-inline-detail__content">' + detail.content + '</div>' : '') +

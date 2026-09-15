@@ -7,6 +7,7 @@ use BusinessMapLocator\Domain\Geo\BoundingBox;
 use BusinessMapLocator\Domain\Geo\Coordinates;
 use BusinessMapLocator\Domain\Geo\Distance;
 use BusinessMapLocator\Domain\Geo\DistanceUnit;
+use BusinessMapLocator\Support\AreaCompatibilityResolver;
 use InvalidArgumentException;
 
 final readonly class SearchLocationsQuery
@@ -15,6 +16,8 @@ final readonly class SearchLocationsQuery
         public string $search,
         public string $category,
         public string $city,
+        public string $area,
+        public bool $withoutArea,
         public int $page,
         public int $perPage,
         public string $orderby,
@@ -35,6 +38,7 @@ final readonly class SearchLocationsQuery
         $lng = self::nullableFloat($params['lng'] ?? null);
         $radius = self::nullableFloat($params['radius'] ?? null);
         $unit = DistanceUnit::tryFrom((string) ($params['unit'] ?? 'km')) ?? DistanceUnit::Kilometres;
+        $territory = AreaCompatibilityResolver::normalize($params['area'] ?? '', $params['city'] ?? '');
 
         if (($lat === null || $lng === null) && $radius !== null) {
             throw new InvalidArgumentException('Radius search requires latitude and longitude.');
@@ -43,7 +47,9 @@ final readonly class SearchLocationsQuery
         return new self(
             search: trim((string) ($params['search'] ?? '')),
             category: (string) ($params['category'] ?? ''),
-            city: (string) ($params['city'] ?? ''),
+            city: $territory['city'],
+            area: $territory['area'],
+            withoutArea: self::boolean($params['without_area'] ?? false),
             page: max(1, (int) ($params['page'] ?? 1)),
             perPage: min(500, max(1, (int) ($params['per_page'] ?? 200))),
             orderby: self::orderby((string) ($params['orderby'] ?? 'title')),
@@ -64,6 +70,8 @@ final readonly class SearchLocationsQuery
             'search' => $this->search,
             'category' => $this->category,
             'city' => $this->city,
+            'area' => $this->area,
+            'without_area' => $this->withoutArea,
             'page' => $this->page,
             'per_page' => $this->perPage,
             'orderby' => $this->orderby,
@@ -128,5 +136,10 @@ final readonly class SearchLocationsQuery
         }
 
         return (float) $value;
+    }
+
+    private static function boolean(mixed $value): bool
+    {
+        return in_array($value, [true, 1, '1', 'true', 'yes', 'on'], true);
     }
 }

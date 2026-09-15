@@ -1,6 +1,8 @@
 <?php
 if (!defined('ABSPATH')) { exit; }
 
+use BusinessMapLocator\Support\AreaCompatibilityResolver;
+
 class BML_Shortcode {
     public function hooks(): void {
         add_shortcode('business_map_locator', [__CLASS__, 'render_locator']);
@@ -12,8 +14,10 @@ class BML_Shortcode {
         $attributes = shortcode_atts([
             'layout' => 'split',
             'category' => '',
+            'area' => '',
             'city' => '',
             'category_mode' => 'visible',
+            'area_mode' => '',
             'city_mode' => 'visible',
             'height' => $settings['map_height'] ?? 620,
             'list_width' => $settings['list_width'] ?? 38,
@@ -25,8 +29,14 @@ class BML_Shortcode {
             'show_phone' => $settings['show_phone'] ?? 1,
             'show_navigation' => $settings['show_navigation'] ?? 1,
         ], is_array($attributes) ? $attributes : [], 'business_map_locator');
+
+        $territory = AreaCompatibilityResolver::normalize($attributes['area'], $attributes['city']);
+        $attributes['area'] = $territory['area'];
+        $attributes['city'] = $territory['city'];
         $attributes['category_mode'] = self::filter_mode($attributes['category_mode']);
-        $attributes['city_mode'] = self::filter_mode($attributes['city_mode']);
+        $attributes['area_mode'] = self::filter_mode($attributes['area_mode'] !== '' ? $attributes['area_mode'] : $attributes['city_mode']);
+        $attributes['city_mode'] = $attributes['area_mode'];
+
         BML_Frontend::enqueue();
         return BML_Locator_Renderer::render($attributes);
     }

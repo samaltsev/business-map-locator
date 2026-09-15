@@ -695,6 +695,11 @@
 .bml-locator .bml-detail-panel__hours {
     color: var(--bml-color-success);
     font-weight: 700;
+    white-space: pre-line;
+}
+
+.bml-locator .bml-inline-detail__hours {
+    white-space: pre-line;
 }
 
 .bml-locator .bml-detail-panel__content > :first-child {

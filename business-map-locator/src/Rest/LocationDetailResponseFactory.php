@@ -12,6 +12,9 @@ final readonly class LocationDetailResponseFactory
     public function create(WP_Post $post): array
     {
         $id = (int) $post->ID;
+        $area = $this->term($id, 'bml_area');
+        $legacyCity = $this->term($id, 'bml_city');
+
         return [
             'id' => $id,
             'title' => (string) $post->post_title,
@@ -31,7 +34,8 @@ final readonly class LocationDetailResponseFactory
             'image' => (string) (get_the_post_thumbnail_url($id, 'medium') ?: ''),
             'operational_status' => OperationalStatusResolver::resolve($this->meta($id, 'bml_operational_status'), $this->meta($id, 'bml_visible')),
             'category' => $this->term($id, 'bml_category'),
-            'city' => $this->term($id, 'bml_city'),
+            'area' => $area,
+            'city' => $area ?? $legacyCity,
         ];
     }
 

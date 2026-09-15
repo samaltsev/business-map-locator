@@ -10,6 +10,24 @@
         document.addEventListener('DOMContentLoaded', callback);
     }
 
+    function buildRestUrl(restBase, endpoint, params) {
+        var url = new URL(String(restBase || ''), window.location.href);
+        var route = url.searchParams.get('rest_route');
+        var path = String(endpoint || '').replace(/^\/+/, '');
+
+        if (route !== null) {
+            url.searchParams.set('rest_route', route.replace(/\/?$/, '/') + path);
+        } else {
+            url.pathname = url.pathname.replace(/\/?$/, '/') + path;
+        }
+
+        new URLSearchParams(params || '').forEach(function (value, key) {
+            url.searchParams.set(key, value);
+        });
+
+        return url.toString();
+    }
+
     function initSettingsRuntime(studio, form) {
         var listeners = {};
         var initialSnapshot = snapshot();
@@ -201,7 +219,7 @@
 
         function fetchMarkers(bounds) {
             var params = Object.assign({}, bounds, { limit: PREVIEW_MARKER_LIMIT });
-            var url = restBase.replace(/\/?$/, '/') + 'locations/markers?' + new URLSearchParams(params).toString();
+            var url = buildRestUrl(restBase, 'locations/markers', params);
             if (markerAbortController) { markerAbortController.abort(); }
             markerAbortController = window.AbortController ? new AbortController() : null;
             return fetch(url, { headers: restNonce ? { 'X-WP-Nonce': restNonce } : {}, signal: markerAbortController && markerAbortController.signal }).then(function (response) {
@@ -213,7 +231,7 @@
         }
 
         function fetchPreviewBounds() {
-            var url = restBase.replace(/\/?$/, '/') + 'locations/bounds';
+            var url = buildRestUrl(restBase, 'locations/bounds');
             if (boundsAbortController) { boundsAbortController.abort(); }
             boundsAbortController = window.AbortController ? new AbortController() : null;
             return fetch(url, {
@@ -611,7 +629,7 @@
                 return;
             }
             setCenterStatus('is-testing', 'Searching for the place…');
-            fetch(restBase.replace(/\/?$/, '/') + 'geocode/search?q=' + encodeURIComponent(query), {
+            fetch(buildRestUrl(restBase, 'geocode/search', { q: query }), {
                 headers: restNonce ? { 'X-WP-Nonce': restNonce } : {}
             }).then(function (response) {
                 if (!response.ok) { throw new Error('REST ' + response.status); }
@@ -675,7 +693,7 @@
         function loadFrontendPreview() {
             if (frontendLoaded || !frontendPreview) { return; }
             frontendLoaded = true;
-            fetch(restBase.replace(/\/?$/, '/') + 'locations?page=1&per_page=6&orderby=title&order=ASC', {
+            fetch(buildRestUrl(restBase, 'locations', { page: 1, per_page: 6, orderby: 'title', order: 'ASC' }), {
                 headers: restNonce ? { 'X-WP-Nonce': restNonce } : {}
             }).then(function (response) {
                 if (!response.ok) { throw new Error('REST ' + response.status); }

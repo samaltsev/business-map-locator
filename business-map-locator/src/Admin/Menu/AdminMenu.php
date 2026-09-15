@@ -7,6 +7,7 @@ use BusinessMapLocator\Admin\Location\LocationEditorPage;
 use BusinessMapLocator\Admin\Taxonomy\TaxonomyPage;
 use BusinessMapLocator\Admin\Import\ImportPage;
 use BusinessMapLocator\Admin\Settings\SettingsPage;
+use BusinessMapLocator\Admin\Migration\MigrationControlPage;
 use BusinessMapLocator\WordPress\Capabilities;
 if (!defined('ABSPATH')) { exit; }
 final class AdminMenu
@@ -18,7 +19,8 @@ final class AdminMenu
         private LocationEditorPage $locationEditor,
         private TaxonomyPage $taxonomies,
         private ImportPage $importPage,
-        private SettingsPage $settings
+        private SettingsPage $settings,
+        private MigrationControlPage $migration
     ) {}
     public function register(): void
     {
@@ -29,7 +31,9 @@ final class AdminMenu
             ['bml-locations', __('Locations','business-map-locator'), Capabilities::EDIT_LOCATIONS, [$this->locations,'render']],
             ['bml-categories', __('Categories','business-map-locator'), Capabilities::MANAGE_TERMS, [$this->taxonomies,'categories']],
             ['bml-cities', __('Cities','business-map-locator'), Capabilities::MANAGE_TERMS, [$this->taxonomies,'cities']],
+            ['edit-tags.php?taxonomy=bml_area&post_type=bml_location', __('Areas','business-map-locator'), Capabilities::MANAGE_AREAS, static function (): void {}],
             ['bml-import', __('Import / Export','business-map-locator'), Capabilities::MANAGE_IMPORTS, [$this->importPage,'render']],
+            ['bml-migration-control', __('Migration control','business-map-locator'), Capabilities::MANAGE_SETTINGS, [$this->migration,'render']],
             ['bml-settings', __('Settings','business-map-locator'), Capabilities::MANAGE_SETTINGS, [$this->settings,'render']],
         ];
         foreach ($items as [$slug,$label,$cap,$callback]) {

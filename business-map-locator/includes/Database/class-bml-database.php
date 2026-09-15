@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 final class BML_Database {
-    public const VERSION = '1.3.3';
+    public const VERSION = '1.3.4';
     public const VERSION_OPTION = 'bml_database_version';
     public const REBUILD_OFFSET_OPTION = 'bml_index_rebuild_offset';
     public const REBUILD_REQUIRED_OPTION = 'bml_index_rebuild_required';
@@ -13,6 +13,12 @@ final class BML_Database {
         global $wpdb;
 
         return $wpdb->prefix . 'bml_locations_index';
+    }
+
+    public static function location_terms_table(): string {
+        global $wpdb;
+
+        return $wpdb->prefix . 'bml_location_terms';
     }
 
     public static function import_job_rows_table(): string {
@@ -36,12 +42,13 @@ final class BML_Database {
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
         dbDelta(BML_Schema::locations_index_sql());
+        dbDelta(BML_Schema::location_terms_sql());
         dbDelta(BML_Schema::import_jobs_sql());
         dbDelta(BML_Schema::import_job_rows_sql());
         dbDelta(BML_Schema::import_job_events_sql());
         (new \BusinessMapLocator\Infrastructure\Database\Migration\SchemaMigrator())->migrate();
 
-        if (!self::table_exists(self::locations_index_table()) || !self::table_exists(self::import_jobs_table()) || !self::table_exists(self::import_job_rows_table()) || !self::table_exists(self::import_job_events_table())) {
+        if (!self::table_exists(self::locations_index_table()) || !self::table_exists(self::location_terms_table()) || !self::table_exists(self::import_jobs_table()) || !self::table_exists(self::import_job_rows_table()) || !self::table_exists(self::import_job_events_table())) {
             return false;
         }
 
@@ -61,6 +68,7 @@ final class BML_Database {
         return $stored === ''
             || version_compare($stored, self::VERSION, '<')
             || !self::table_exists(self::locations_index_table())
+            || !self::table_exists(self::location_terms_table())
             || !self::table_exists(self::import_jobs_table())
             || !self::table_exists(self::import_job_rows_table())
             || !self::table_exists(self::import_job_events_table())

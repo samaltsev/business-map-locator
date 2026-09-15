@@ -1,0 +1,15 @@
+<?php
+declare(strict_types=1);
+use PHPUnit\Framework\TestCase;
+use BusinessMapLocator\Migration\AreaMigrationJournal;
+final class AreaMigrationJournalTest extends TestCase
+{
+    private string $dir;
+    protected function setUp(): void { $this->dir=dirname(__DIR__).'/.journal-fixture-'.bin2hex(random_bytes(4)); mkdir($this->dir, 0777, true); }
+    protected function tearDown(): void { if(!is_dir($this->dir))return; $items=new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->dir,FilesystemIterator::SKIP_DOTS),RecursiveIteratorIterator::CHILD_FIRST);foreach($items as $item){$path=$item->getPathname();if($item->isDir())rmdir($path);else unlink($path);}rmdir($this->dir); }
+    public function testStableIdentityAndRunIsolation(): void { $j=new AreaMigrationJournal($this->dir);$a=$j->planOperation('run-a',2,'CREATE_AREA',['city_term_id'=>1],['slug'=>'minsk']);$again=$j->planOperation('run-a',2,'CREATE_AREA',['city_term_id'=>1],['slug'=>'minsk']);$b=$j->planOperation('run-b',2,'CREATE_AREA',['city_term_id'=>1]);$this->assertSame($a['operation_key'],$again['operation_key']);$this->assertNotSame($a['operation_key'],$b['operation_key']);$this->assertCount(1,$j->listRunOperations('run-a')); }
+    public function testTransitionsCrashWindowAndConcreteEvidence(): void { $j=new AreaMigrationJournal($this->dir);$r=$j->planOperation('run',2,'CREATE_AREA',['city_term_id'=>1]);$r=$j->beginOperation('run',$r['operation_key']);$this->assertSame('STARTED',$r['state']);$this->assertCount(1,$j->listIncompleteOperations('run'));$r=$j->markApplied('run',$r['operation_key'],['area_term_id'=>50]);$r=$j->markVerified('run',$r['operation_key'],['city_meta'=>50]);$r=$j->completeOperation('run',$r['operation_key']);$this->assertSame(50,$r['result']['area_term_id']);$this->assertSame(1,$r['attempt']);$this->assertSame(1,$j->progress('run')['completed']); }
+    public function testFailuresAndRollbackTransitionsAreValidated(): void { $j=new AreaMigrationJournal($this->dir);$r=$j->planOperation('run',2,'ADD_LOCATION_AREA',['location_id'=>9,'area_term_id'=>5]);$this->expectException(LogicException::class);$j->completeOperation('run',$r['operation_key']); }
+    public function testV1CannotPlanEvidence(): void { $this->expectException(LogicException::class);(new AreaMigrationJournal($this->dir))->planOperation('run',1,'CREATE_AREA',['city_term_id'=>1]); }
+    public function testFailureCheckpointsNeverLoseCommittedEvidence(): void { foreach(['AFTER_TEMP_VALIDATED','AFTER_CURRENT_MOVED_TO_PREVIOUS','AFTER_TEMP_PROMOTED_TO_CURRENT','BEFORE_PREVIOUS_CLEANUP'] as $point){$root=$this->dir.'/'.$point;mkdir($root,0777,true);$j=new AreaMigrationJournal($root,static function(string $actual)use($point):void{if($actual===$point)throw new RuntimeException($point);});$r=$j->planOperation('run',2,'CREATE_AREA',['city_term_id'=>1]);try{$j->beginOperation('run',$r['operation_key']);}catch(RuntimeException){}$reloaded=$j->getOperation('run','CREATE_AREA',['city_term_id'=>1]);$this->assertNotNull($reloaded);$this->assertContains($reloaded['state'],['PLANNED','STARTED']);} }
+}

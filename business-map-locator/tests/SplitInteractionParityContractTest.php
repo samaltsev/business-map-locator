@@ -9,7 +9,7 @@ final class SplitInteractionParityContractTest extends TestCase
     {
         $controller = (string) file_get_contents(dirname(__DIR__) . '/assets/js/map-controller.js');
 
-        self::assertStringContainsString("'locations/bounds?'", $controller);
+        self::assertStringContainsString("buildRestUrl(this.restUrl, 'locations/bounds', params)", $controller);
         self::assertStringContainsString("params.set('city', city);", $controller);
         self::assertStringContainsString('LocatorController.prototype.centerOnSelectedCity', $controller);
         self::assertStringContainsString('LocatorController.prototype.fitAggregateBounds', $controller);

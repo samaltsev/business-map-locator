@@ -139,6 +139,8 @@ class BML_Frontend {
             'call' => __('Call', 'business-map-locator'),
             'visitWebsite' => __('Visit website', 'business-map-locator'),
             'temporarilyClosed' => __('Temporarily closed', 'business-map-locator'),
+            'active' => __('Active', 'business-map-locator'),
+            'hours' => __('Hours', 'business-map-locator'),
             'imageUnavailable' => __('Image unavailable', 'business-map-locator'),
             'close' => __('Close', 'business-map-locator'),
             'back' => __('Back', 'business-map-locator'),

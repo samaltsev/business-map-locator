@@ -195,3 +195,28 @@
     .bml-sticky-savebar > div { display: grid; grid-template-columns: 1fr 1fr; }
     .bml-sticky-savebar [data-discard-changes] { display: none; }
 }
+
+
+/* Structured weekly hours editor: explicit slots keep copy controls out of the time row. */
+.bml-hours-editor { display: grid; gap: 12px; min-width: 0; }
+.bml-hours-editor__heading { display: flex; flex-wrap: wrap; gap: 12px; }
+.bml-hours-editor__heading > span { font-weight: 700; }
+.bml-hours-editor__days { border: 1px solid var(--bml-border); border-radius: 10px; overflow: hidden; min-width: 0; }
+.bml-hours-day { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid var(--bml-border); }
+.bml-hours-day:last-child { border-bottom: 0; }
+.bml-hours-day > strong { grid-column: 1 / 3; grid-row: 1; }
+.bml-hours-copy-source { grid-column: 3; grid-row: 1; justify-self: end; }
+.bml-hours-day > label:not(.bml-hours-copy-target) { grid-column: 1 / -1; grid-row: 2; }
+.bml-hours-day > [data-hours-open] { grid-column: 1; grid-row: 3; }
+.bml-hours-day > span { grid-column: 2; grid-row: 3; display: block; }
+.bml-hours-day > [data-hours-close] { grid-column: 3; grid-row: 3; }
+.bml-hours-day > .bml-hours-copy-target { grid-column: 1 / -1; grid-row: 4; }
+.bml-hours-day > label { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.bml-hours-editor input[type="checkbox"] { width: 18px; height: 18px; min-height: 18px; flex: 0 0 18px; margin: 0; }
+.bml-hours-editor input[type="time"] { width: 100%; min-width: 0; box-sizing: border-box; }
+.bml-hours-copy-target[hidden], .bml-hours-copy-toolbar[hidden] { display: none !important; }
+.bml-hours-day.is-copy-source { background: #eff6ff; }
+.bml-hours-day.is-closed input[type="time"] { background: #f3f4f6; color: #6b7280; }
+.bml-hours-copy-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #eff6ff; padding: 12px; border-radius: 8px; }
+.bml-hours-copy-toolbar > span { flex-basis: 100%; }
+.bml-hours-current { background: #f8fafc; border-left: 3px solid #93c5fd; margin: 0; padding: 10px; white-space: pre-line; overflow-wrap: anywhere; }

@@ -4,8 +4,10 @@
     class="bml-locator bml-layout-<?php echo esc_attr($layout); ?><?php echo !empty($preview_mode) ? ' bml-locator--preview' : ''; ?>"
     tabindex="-1"
     data-category="<?php echo esc_attr($category); ?>"
+    data-area="<?php echo esc_attr($area); ?>"
     data-city="<?php echo esc_attr($city); ?>"
     data-category-mode="<?php echo esc_attr($category_mode); ?>"
+    data-area-mode="<?php echo esc_attr($area_mode); ?>"
     data-city-mode="<?php echo esc_attr($city_mode); ?>"
     data-preview="<?php echo !empty($preview_mode) ? '1' : '0'; ?>"
     data-settings="<?php echo esc_attr(wp_json_encode($settings)); ?>"
@@ -13,7 +15,7 @@
 >
     <?php if ($layout !== 'split') : ?>
         <header class="bml-locator__header">
-            <?php echo BML_Locator_Renderer::template('toolbar.php', compact('search', 'filters', 'geolocation', 'category_mode', 'city_mode')); ?>
+            <?php echo BML_Locator_Renderer::template('toolbar.php', compact('search', 'filters', 'geolocation', 'category_mode', 'area_mode')); ?>
         </header>
     <?php endif; ?>
 
@@ -26,7 +28,7 @@
         <section class="bml-directory" aria-label="<?php esc_attr_e('Business locations', 'business-map-locator'); ?>">
             <?php if ($layout === 'split') : ?>
                 <div class="bml-directory__toolbar">
-                    <?php echo BML_Locator_Renderer::template('toolbar.php', compact('search', 'filters', 'geolocation', 'category_mode', 'city_mode')); ?>
+                    <?php echo BML_Locator_Renderer::template('toolbar.php', compact('search', 'filters', 'geolocation', 'category_mode', 'area_mode')); ?>
                 </div>
             <?php endif; ?>
             <?php echo BML_Locator_Renderer::template('list.php', compact('id')); ?>

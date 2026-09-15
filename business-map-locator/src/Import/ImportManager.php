@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace BusinessMapLocator\Import;
 
 use BusinessMapLocator\Import\Config\ImportLimits;
+use BusinessMapLocator\Import\Config\ImportUpdatePolicy;
 use BusinessMapLocator\Import\Csv\CsvReader;
 use BusinessMapLocator\Import\Csv\CsvException;
 use BusinessMapLocator\Import\Duplicate\DuplicateDetector;
@@ -73,8 +74,12 @@ final class ImportManager
         return $this->duplicates->delete();
     }
 
-    public function prepare(array $file, bool $dryRun = false): array
+    public function prepare(array $file, bool $dryRun = false, string $updatePolicy = ImportUpdatePolicy::NON_EMPTY_ONLY): array
     {
+        $updatePolicy = ImportUpdatePolicy::normalize($updatePolicy);
+        if ($updatePolicy === null) {
+            throw new ImportJobException('invalid_update_policy', 'The selected import update policy is invalid.', 422);
+        }
         $this->uploadValidator->validate($file);
         $directory = $this->importDirectory->path();
         $token = wp_generate_uuid4();
@@ -123,6 +128,7 @@ final class ImportManager
                 'log' => [],
                 'duplicateExternalIds' => (array) ($inspection['duplicateExternalIds'] ?? []),
                 'dryRun' => $dryRun,
+                'updatePolicy' => $updatePolicy,
                 'wouldCreate' => 0,
                 'wouldUpdate' => 0,
                 'wouldSkip' => 0,
@@ -599,6 +605,7 @@ final class ImportManager
             'wouldSkip' => (int) ($job['wouldSkip'] ?? 0),
             'wouldFail' => (int) ($job['wouldFail'] ?? 0),
             'dryRun' => !empty($job['dryRun']),
+            'updatePolicy' => (string) ($job['updatePolicy'] ?? ImportUpdatePolicy::NON_EMPTY_ONLY),
             'retryable' => !empty($job['retryable']),
             'failureCode' => (string) ($job['failureCode'] ?? ''),
             'completedAt' => (string) ($job['completedAt'] ?? ''),

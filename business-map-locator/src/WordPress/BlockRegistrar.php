@@ -17,6 +17,7 @@ final class BlockRegistrar
             'render_callback' => static fn (array $attributes): string =>
                 \BML_Shortcode::render_locator(array_merge($attributes, [
                     'category_mode' => $attributes['categoryMode'] ?? 'visible',
+                    'area_mode' => $attributes['areaMode'] ?? ($attributes['cityMode'] ?? 'visible'),
                     'city_mode' => $attributes['cityMode'] ?? 'visible',
                     'per_page' => $attributes['perPage'] ?? 24,
                 ])),

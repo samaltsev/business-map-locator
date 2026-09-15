@@ -12,6 +12,9 @@ final class BML_Cache_Invalidator {
         add_action('created_bml_city', [$this, 'invalidate']);
         add_action('edited_bml_city', [$this, 'invalidate']);
         add_action('delete_bml_city', [$this, 'invalidate']);
+        add_action('created_bml_area', [$this, 'invalidate']);
+        add_action('edited_bml_area', [$this, 'invalidate']);
+        add_action('delete_bml_area', [$this, 'invalidate']);
         add_action('update_option_bml_settings', [$this, 'invalidate']);
     }
 
@@ -26,7 +29,7 @@ final class BML_Cache_Invalidator {
     }
 
     public function terms_changed(int $object_id, $terms, $tt_ids, string $taxonomy): void {
-        if ($taxonomy === 'bml_category' || $taxonomy === 'bml_city') {
+        if ($taxonomy === 'bml_category' || $taxonomy === 'bml_city' || $taxonomy === 'bml_area') {
             $this->invalidate();
         }
     }

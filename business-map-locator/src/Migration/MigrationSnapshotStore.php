@@ -7,7 +7,7 @@ use RuntimeException;
 
 final class MigrationSnapshotStore
 {
-    private const SCHEMA_VERSION = 1;
+    private const SCHEMA_VERSION = 2;
 
     public function __construct(private readonly ?string $baseDirectory = null)
     {
@@ -25,7 +25,7 @@ final class MigrationSnapshotStore
             throw new RuntimeException('Refusing to write an invalid migration snapshot.');
         }
 
-        $path = trailingslashit($directory) . 'snapshot-' . gmdate('Ymd-His') . '.json';
+        $path = trailingslashit($directory) . 'snapshot-' . gmdate('Ymd-His') . '-' . $this->uniqueSuffix() . '.json';
         $handle = @fopen($path, 'x');
         if ($handle === false) {
             throw new RuntimeException('A migration snapshot already exists for this second.');
@@ -51,10 +51,13 @@ final class MigrationSnapshotStore
             return [];
         }
 
-        $paths = glob(trailingslashit($directory) . 'snapshot-????????-??????.json') ?: [];
+        $paths = array_merge(
+            glob(trailingslashit($directory) . 'snapshot-????????-??????-*.json') ?: [],
+            glob(trailingslashit($directory) . 'snapshot-????????-??????.json') ?: []
+        );
         rsort($paths, SORT_STRING);
 
-        return array_values($paths);
+        return array_values(array_unique($paths));
     }
 
     /** @return array<string, mixed>|null */
@@ -83,7 +86,7 @@ final class MigrationSnapshotStore
             }
         }
 
-        if (($snapshot['schema_version'] ?? null) !== self::SCHEMA_VERSION) {
+        if (!in_array(($snapshot['schema_version'] ?? null), [1, self::SCHEMA_VERSION], true)) {
             $errors[] = 'Unsupported snapshot schema version.';
         }
         if (($snapshot['migration'] ?? null) !== 'bml_city_to_area_v1') {
@@ -101,8 +104,18 @@ final class MigrationSnapshotStore
         if (!is_array($snapshot['taxonomies'] ?? null) || !is_array($snapshot['terms'] ?? null)) {
             $errors[] = 'Snapshot taxonomies and terms must be arrays.';
         }
+        if (($snapshot['schema_version'] ?? null) === self::SCHEMA_VERSION && (!is_array($snapshot['locations'] ?? null) || !is_array($snapshot['plan'] ?? null))) {
+            $errors[] = 'Version 2 snapshots require locations and plan evidence.';
+        }
 
         return ['valid' => $errors === [], 'errors' => $errors];
+    }
+
+    private function uniqueSuffix(): string
+    {
+        return function_exists('wp_generate_uuid4')
+            ? str_replace('-', '', wp_generate_uuid4())
+            : bin2hex(random_bytes(16));
     }
 
     private function directory(): string

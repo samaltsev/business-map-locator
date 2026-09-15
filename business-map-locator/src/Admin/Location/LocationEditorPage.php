@@ -42,15 +42,18 @@ final class LocationEditorPage {
             'service_options' => $this->services->all(),
             'category_ids' => $post ? wp_get_post_terms($post->ID, 'bml_category', ['fields' => 'ids']) : [],
             'city_ids' => $post ? wp_get_post_terms($post->ID, 'bml_city', ['fields' => 'ids']) : [],
+            'area_ids' => $post ? wp_get_post_terms($post->ID, 'bml_area', ['fields' => 'ids']) : [],
             'image_id' => $post ? get_post_thumbnail_id($post->ID) : 0,
             'categories' => get_terms(['taxonomy' => 'bml_category', 'hide_empty' => false]),
             'cities' => get_terms(['taxonomy' => 'bml_city', 'hide_empty' => false]),
+            'areas' => get_terms(['taxonomy' => 'bml_area', 'hide_empty' => false]),
             'can_manage_terms' => current_user_can(\BusinessMapLocator\WordPress\Capabilities::MANAGE_TERMS),
             'can_publish' => current_user_can(\BusinessMapLocator\WordPress\Capabilities::PUBLISH_LOCATIONS),
         ];
 
         if (is_wp_error($data['categories'])) { $data['categories'] = []; }
         if (is_wp_error($data['cities'])) { $data['cities'] = []; }
+        if (is_wp_error($data['areas'])) { $data['areas'] = []; }
         $data['completeness'] = $this->completeness->calculate($data);
 
         $view = \BML_DIR . 'src/Admin/Location/View/location-editor.php';
