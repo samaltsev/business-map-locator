@@ -45,6 +45,9 @@ final readonly class LocationResponseFactory
             $this->value($item, 'operational_status', $postId, 'bml_operational_status'),
             $this->meta($postId, 'bml_visible')
         );
+        $area = $this->term($item['area'] ?? null, $postId, 'bml_area');
+        $legacyCity = $this->term($item['city'] ?? null, $postId, 'bml_city');
+
         return [
             'id' => $postId,
             'title' => $this->string($item['title'] ?? ''),
@@ -69,8 +72,8 @@ final readonly class LocationResponseFactory
             'linkedin' => '',
             'tiktok' => '',
             'category' => $this->term($item['category'] ?? null, $postId, 'bml_category'),
-            'area' => $this->term($item['area'] ?? null, $postId, 'bml_area'),
-            'city' => $this->term($item['city'] ?? null, $postId, 'bml_city'),
+            'area' => $area,
+            'city' => $area ?? $legacyCity,
             'distance' => array_key_exists('distance', $item) && $item['distance'] !== null ? round((float) $item['distance'], 3) : null,
         ];
     }
